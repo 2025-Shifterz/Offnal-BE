@@ -1,6 +1,12 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,macos,windows,intellij,intellij+all,gradle
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,macos,windows,intellij,intellij+all,gradle
 
+### security ###
+.env.*
+.env
+.key
+.pem
+
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
@@ -55,7 +61,7 @@ cmake-build-*/
 
 # IntelliJ
 out/
-application-secret.yml
+
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/

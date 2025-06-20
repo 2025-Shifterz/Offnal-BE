@@ -13,16 +13,20 @@ import java.util.Map;
 @RequestMapping("/login")
 public class KakaoLoginPageController {
 
+    private final KakaoService kakaoService;
     @Value("${kakao.client_id}")
     private String client_id;
 
     @Value("${kakao.redirect_uri}")
     private String redirect_uri;
 
+    public KakaoLoginPageController(KakaoService kakaoService) {
+        this.kakaoService = kakaoService;
+    }
+
     @GetMapping("/page")
     public ResponseEntity<Map<String, String>> loginPage() {
-        String location =
-                "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + client_id + "&redirect_uri=" + redirect_uri;
+        String location = kakaoService.getKakaoAuthorizationUrl();
 
         // JSON 형태로 반환
         Map<String, String> response = new HashMap<>();

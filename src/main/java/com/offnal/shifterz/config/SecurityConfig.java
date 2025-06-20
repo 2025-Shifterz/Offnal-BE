@@ -1,4 +1,4 @@
-package com.offnal.shifterz.config.security;
+package com.offnal.shifterz.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
