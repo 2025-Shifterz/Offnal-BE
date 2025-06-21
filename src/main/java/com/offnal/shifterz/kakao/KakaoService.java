@@ -33,11 +33,13 @@ public class KakaoService {
     }
 
     public String getKakaoAccessToken(String code) {
+
         KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
                 .uri(uriBuilder -> uriBuilder
                         .path("/oauth/token")
                         .queryParam("grant_type", "authorization_code")
                         .queryParam("client_id", clientId)
+                        .queryParam("redirect_uri", redirectUri)
                         .queryParam("code", code)
                         .build(true))
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
@@ -48,10 +50,6 @@ public class KakaoService {
                 .bodyToMono(KakaoTokenResponseDto.class)
                 .block();
 
-        log.info(" [Kakao] Access Token: {}", kakaoTokenResponseDto.getAccessToken());
-        log.info(" [Kakao] Refresh Token: {}", kakaoTokenResponseDto.getRefreshToken());
-        //제공 조건: OpenID Connect가 활성화 된 앱의 토큰 발급 요청인 경우 또는 scope에 openid를 포함한 추가 항목 동의 받기 요청을 거친 토큰 발급 요청인 경우
-        log.info(" [Kakao] Scope: {}", kakaoTokenResponseDto.getScope());
 
         return kakaoTokenResponseDto.getAccessToken();
     }
@@ -70,10 +68,6 @@ public class KakaoService {
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
                 .bodyToMono(KakaoUserInfoResponseDto.class)
                 .block();
-
-        log.info("[Kakao] Auth ID: {} ", userInfo.getId());
-        log.info("[Kakao] NickName: {} ", userInfo.getKakaoAccount().getProfile().getNickName());
-        log.info("[Kakao] ProfileImageUrl: {} ", userInfo.getKakaoAccount().getProfile().getProfileImageUrl());
 
         return userInfo;
     }

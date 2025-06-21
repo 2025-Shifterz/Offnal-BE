@@ -17,6 +17,12 @@ public class SecurityConfig {
                         "/login",
                         "/login/page",
                         "/callback",
+                        "/swagger",
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/api-docs",
+                        "/api-docs/**",
+                        "/v3/api-docs/**",
                         "/error").permitAll() // 허용 URL 지정
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
                 )
