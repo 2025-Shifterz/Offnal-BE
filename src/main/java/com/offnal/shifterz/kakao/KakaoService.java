@@ -1,5 +1,7 @@
 package com.offnal.shifterz.kakao;
 
+import com.offnal.shifterz.member.dto.AuthResponseDto;
+import com.offnal.shifterz.member.service.MemberService;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,9 +74,10 @@ public class KakaoService {
         return userInfo;
     }
 
-    public String getKakaoAuthorizationUrl (){
+    public String getKakaoAuthorizationUrl() {
         return String.format(
                 "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=%s&redirect_uri=%s",
                 clientId, redirectUri);
     }
+
 }

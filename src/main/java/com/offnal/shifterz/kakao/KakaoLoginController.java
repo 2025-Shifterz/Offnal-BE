@@ -25,9 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("")
 public class KakaoLoginController {
 
-    private final KakaoService kakaoService;
-    private final MemberService memberService;
-    private final JwtTokenProvider jwtTokenProvider;
+
+    private final KakaoLoginService kakaoLoginService;
 
     @ApiResponse(responseCode = "200", description = "성공적으로 사용자 정보를 반환함",
             content = @Content(
@@ -52,38 +51,18 @@ public class KakaoLoginController {
     @GetMapping("/callback")
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
         try {
-            // 1. 카카오 사용자 정보 조회
-            String accessToken = kakaoService.getKakaoAccessToken(code);
-            KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken);
+            // 서비스 호출
+            KakaoLoginService.KakaoLoginResult result = kakaoLoginService.loginWithKakao(code);
 
-            // 2. 회원 등록 또는 업데이트
-            MemberService.MemberResult result = memberService.registerOrUpdateKakaoMember(
-                    userInfo.getId(),
-                    userInfo.getKakaoAccount().getEmail(),
-                    userInfo.getKakaoAccount().getProfile().getNickName(),
-                    userInfo.getKakaoAccount().getProfile().getProfileImageUrl()
-            );
-
-            // 3. JWT 토큰 발급
-            String jwtAccessToken = jwtTokenProvider.createToken(result.getMember().getEmail());
-            String jwtRefreshToken = jwtTokenProvider.createRefreshToken(result.getMember().getEmail());
-
-            // 4. 헤더에 토큰 넣기
+            // 헤더 설정
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + jwtAccessToken);
-            headers.set("Refresh-Token", jwtRefreshToken);
+            headers.set("Authorization", "Bearer " + result.getAccessToken());
+            headers.set("Refresh-Token", result.getRefreshToken());
 
-            // 5. 응답 DTO 생성
-            AuthResponseDto response = AuthResponseDto.builder()
-                    .nickname(result.getMember().getKakaoNickname())
-                    .isNewMember(result.isNewMember())
-                    .message("로그인을 성공했습니다")
-                    .build();
-
-            // 6. 응답 반환 (헤더 + 바디)
+            // 헤더 + 바디 응답
             return ResponseEntity.ok()
                     .headers(headers)
-                    .body(response);
+                    .body(result.getAuthResponseDto());
 
         } catch (Exception e) {
             log.error("카카오 로그인 처리 중 오류 발생", e);
