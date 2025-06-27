@@ -1,0 +1,38 @@
+package com.offnal.shifterz.global.response;
+
+import com.offnal.shifterz.member.dto.AuthResponseDto;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+public @interface SuccessApiResponses {
+
+    // 공통 성공 응답
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "요청 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "code": "SUCCESS",
+                                      "message": "요청이 정상적으로 처리되었습니다.",
+                                      "data": null
+                                    }
+                                    """)
+                    ))
+    })
+    public @interface Common {
+    }
+
+
+}

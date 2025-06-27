@@ -8,31 +8,19 @@ import lombok.Getter;
 @Getter
 @Builder
 public class AuthResponseDto {
-    @Schema(description = "회원 ID")
-    private Long memberId;
-    @Schema(description = "이메일")
-    private String email;
-    @Schema(description = "닉네임")
+
+    @Schema(description = "카카오 닉네임", example = "구혜승")
     private String nickname;
-    @Schema(description = "프로필 이미지 URL")
-    private String profileImageUrl;
-    @Schema(description = "JWT 액세스 토큰")
-    private String accessToken;
-    @Schema(description = "JWT 리프레시 토큰")
-    private String refreshToken;
 
-    @Schema(description = "신규 가입 여부")
-    private boolean isNewMember;
+    @Schema(description = "신규 가입 여부, 기존 - false / 신규 - true", example = "true")
+    private boolean newMember;
 
-    public static AuthResponseDto from(Member member, String accessToken, String refreshToken, boolean isNewMember) {
+
+
+    public static AuthResponseDto from(Member member, boolean isNewMember) {
         return AuthResponseDto.builder()
-                .memberId(member.getId())
-                .email(member.getEmail())
                 .nickname(member.getKakaoNickname())
-                .profileImageUrl(member.getProfileImageUrl())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .isNewMember(isNewMember)
+                .newMember(isNewMember)
                 .build();
     }
 }
