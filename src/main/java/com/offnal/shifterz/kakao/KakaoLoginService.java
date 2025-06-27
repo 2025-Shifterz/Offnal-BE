@@ -32,21 +32,10 @@ public class KakaoLoginService {
         String jwtAccessToken = jwtTokenProvider.createToken(result.getMember().getEmail());
         String jwtRefreshToken = jwtTokenProvider.createRefreshToken(result.getMember().getEmail());
 
-        // 응답 DTO
-        AuthResponseDto responseDto = AuthResponseDto.builder()
-                .nickname(result.getMember().getKakaoNickname())
-                .isNewMember(result.isNewMember())
-                .message("로그인을 성공했습니다")
-                .build();
+        AuthResponseDto responseDto = AuthResponseDto.from(result.getMember(), result.isNewMember());
 
         return new KakaoLoginResult(responseDto, jwtAccessToken, jwtRefreshToken);
     }
 
-    @Getter
-    @RequiredArgsConstructor
-    public static class KakaoLoginResult {
-        private final AuthResponseDto authResponseDto;
-        private final String accessToken;
-        private final String refreshToken;
-    }
+
 }

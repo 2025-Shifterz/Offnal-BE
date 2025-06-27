@@ -49,7 +49,7 @@ public class KakaoLoginController {
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
         try {
             // 서비스 호출
-            KakaoLoginService.KakaoLoginResult result = kakaoLoginService.loginWithKakao(code);
+             KakaoLoginResult result = kakaoLoginService.loginWithKakao(code);
 
             // 헤더 설정
             HttpHeaders headers = new HttpHeaders();
