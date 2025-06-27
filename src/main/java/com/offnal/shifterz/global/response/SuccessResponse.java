@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class CustomApiResponse<T> {
+public class SuccessResponse<T> {
 
     @Schema(description = "응답 코드", example = "LOGIN_SUCCESS")
     private final String code;
@@ -17,16 +17,16 @@ public class CustomApiResponse<T> {
     @Schema(description = "응답 데이터")
     private final T data;
 
-    public static <T> CustomApiResponse<T> success(SuccessCode code, T data) {
-        return CustomApiResponse.<T>builder()
+    public static <T> SuccessResponse<T> success(SuccessCode code, T data) {
+        return SuccessResponse.<T>builder()
                 .code(code.name())
                 .message(code.getMessage())
                 .data(data)
                 .build();
     }
 
-    public static CustomApiResponse<Void> success(SuccessCode code) {
-        return CustomApiResponse.<Void>builder()
+    public static SuccessResponse<Void> success(SuccessCode code) {
+        return SuccessResponse.<Void>builder()
                 .code(code.name())
                 .message(code.getMessage())
                 .data(null)

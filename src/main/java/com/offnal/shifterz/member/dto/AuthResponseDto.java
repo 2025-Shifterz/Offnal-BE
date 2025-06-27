@@ -9,18 +9,18 @@ import lombok.Getter;
 @Builder
 public class AuthResponseDto {
 
-    @Schema(description = "닉네임")
+    @Schema(description = "카카오 닉네임", example = "구혜승")
     private String nickname;
 
-    @Schema(description = "신규 가입 여부")
-    private boolean isNewMember;
+    @Schema(description = "신규 가입 여부, 기존 - false / 신규 - true", example = "true")
+    private boolean newMember;
 
 
 
     public static AuthResponseDto from(Member member, boolean isNewMember) {
         return AuthResponseDto.builder()
                 .nickname(member.getKakaoNickname())
-                .isNewMember(isNewMember)
+                .newMember(isNewMember)
                 .build();
     }
 }

@@ -72,9 +72,10 @@ public class KakaoService {
         return userInfo;
     }
 
-    public String getKakaoAuthorizationUrl (){
-        return String.format(
+    public KakaoLoginPageResponse getKakaoAuthorizationUrl() {
+        String url = String.format(
                 "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=%s&redirect_uri=%s",
                 clientId, redirectUri);
+        return new KakaoLoginPageResponse(url);
     }
 }
