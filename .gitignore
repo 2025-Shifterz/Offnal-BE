@@ -291,4 +291,12 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
+# Certbot 인증서 및 관련 파일 제외
+certbot/
+certbot/**
+
+# Nginx 관련 설정 제외
+nginx/
+nginx/**
+
 # End of https://www.toptal.com/developers/gitignore/api/java,macos,windows,intellij,intellij+all,gradle
