@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  spring:
+    container_name: spring
+    build:
+      context: src
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: always
+    env_file:
+      - .env
+    environment:
+      URL: "${URL}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
+      KAKAO_CLIENT_ID: "${KAKAO_CLIENT_ID}"
+  nginx:
+    container_name: nginx
+    image: nginx:1.15-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - spring
+    environment:
+      URL: "${URL}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
+      KAKAO_CLIENT_ID: "${KAKAO_CLIENT_ID}"
+      SERVER_PORT: 80
