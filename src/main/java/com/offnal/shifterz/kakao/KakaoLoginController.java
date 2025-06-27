@@ -1,6 +1,9 @@
 package com.offnal.shifterz.kakao;
 
+import com.offnal.shifterz.global.response.CustomApiResponse;
+import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.member.dto.AuthResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,29 +28,31 @@ public class KakaoLoginController {
 
     private final KakaoLoginService kakaoLoginService;
 
-    @ApiResponse(responseCode = "200", description = "성공적으로 사용자 정보를 반환함",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = AuthResponseDto.class),
-                examples = {
-                        @ExampleObject(
-                                name = "성공 예시",
-                                value = "{\n" +
-                                        "    \"memberId\": 1,\n" +
-                                        "    \"email\": \"shifterz@naver.com\",\n" +
-                                        "    \"nickname\": \"시프터즈\",\n" +
-                                        "    \"profileImageUrl\": \"https://example.com/profile/example.jpg\",\n" +
-                                        "    \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\",\n" +
-                                        "    \"refreshToken\": \"dGhpcyBpcyBhIHJlZnJlc2ggdG9rZW4uLi5tYXNrZWQ\",\n" +
-                                        "    \"newMember\": true\n" +
-                                        "}"
-                        )
-                }
-    ))
-    @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생")
+
+    @Operation(summary = "카카오 로그인 콜백 처리", description = "카카오 인가 코드(code)를 기반으로 JWT 토큰과 사용자 정보를 반환합니다.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 사용자 정보를 반환함",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = AuthResponseDto.class),
+                            examples = @ExampleObject(
+                                    name = "성공 예시",
+                                    value = "{\n" +
+                                            "  \"code\": \"LOGIN_SUCCESS\",\n" +
+                                            "  \"message\": \"로그인을 성공했습니다.\",\n" +
+                                            "  \"data\": {\n" +
+                                            "    \"nickname\": \"시프터즈\",\n" +
+                                            "    \"newMember\": true,\n" +
+                                            "    \"message\": \"로그인을 성공했습니다\"\n" +
+                                            "  }\n" +
+                                            "}"
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생")
+    })
     @GetMapping("/callback")
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
-        try {
             // 서비스 호출
              KakaoLoginResult result = kakaoLoginService.loginWithKakao(code);
 
@@ -59,11 +64,8 @@ public class KakaoLoginController {
             // 헤더 + 바디 응답
             return ResponseEntity.ok()
                     .headers(headers)
-                    .body(result.getAuthResponseDto());
+                    .body(CustomApiResponse.success(SuccessCode.LOGIN_SUCCESS, result.getAuthResponseDto()));
 
-        } catch (Exception e) {
-            log.error("카카오 로그인 처리 중 오류 발생", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+
     }
 }
