@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -15,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "work_schedules")
-public class WorkSch {
+public class WorkCalendar {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
