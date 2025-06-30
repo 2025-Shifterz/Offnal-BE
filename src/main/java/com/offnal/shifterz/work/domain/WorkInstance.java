@@ -21,7 +21,7 @@ public class WorkInstance {
     private Long id;
 
     //근무 날짜
-    private LocalDateTime workDay;
+    private String workDay;
 
     //근무 유형
     @Enumerated(EnumType.STRING)

@@ -22,6 +22,10 @@ public class WorkCalendar {
 
     private String name; // 근무표 이름
 
+    private String year;
+
+    private String month;
+
     @ElementCollection
     @CollectionTable(name = "work_times", joinColumns = @JoinColumn(name = "work_sch_id"))
     private List<WorkTime> workTimes;
