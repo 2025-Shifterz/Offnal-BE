@@ -1,6 +1,7 @@
 package com.offnal.shifterz.kakao;
 
 import com.offnal.shifterz.global.exception.ErrorApiResponses;
+import com.offnal.shifterz.global.exception.ErrorResponse;
 import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.global.response.SuccessCode;
@@ -16,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -72,7 +72,18 @@ public class KakaoLoginController {
                                     description = "Refresh Token",
                                     schema = @Schema(type = "string", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
                             )
-                    })
+                    }),
+            @ApiResponse(responseCode = "500", description = "회원 등록 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(name = "MEMBER_SAVE_FAILED", value = """
+                                    {
+                                      "code": "MEMBER_SAVE_FAILED",
+                                      "message": "회원 등록에 실패했습니다."
+                                    }
+                                    """)
+                    ))
     })
     @GetMapping("/callback")
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
