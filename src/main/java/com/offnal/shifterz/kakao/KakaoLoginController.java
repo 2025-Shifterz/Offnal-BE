@@ -2,9 +2,8 @@ package com.offnal.shifterz.kakao;
 
 import com.offnal.shifterz.global.exception.ErrorApiResponses;
 import com.offnal.shifterz.global.exception.ErrorResponse;
-import com.offnal.shifterz.global.response.SuccessApiResponses;
-import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.global.response.SuccessCode;
+import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.member.dto.AuthResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

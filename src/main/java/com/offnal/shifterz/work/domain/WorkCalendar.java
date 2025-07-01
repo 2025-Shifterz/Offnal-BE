@@ -6,7 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @AllArgsConstructor
@@ -20,7 +21,9 @@ public class WorkCalendar {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name; // 근무표 이름
+    private Long memberId;
+
+    private String calendarName; // 근무표 이름
 
     private String year;
 
@@ -28,8 +31,7 @@ public class WorkCalendar {
 
     @ElementCollection
     @CollectionTable(name = "work_times", joinColumns = @JoinColumn(name = "work_sch_id"))
-    private List<WorkTime> workTimes;
+    private Map<String, WorkTime> workTimes = new HashMap<>();
 
-    private String workGroup; // 근무 조 (예: A조, B조)
+    private String workGroup; // 유저의 근무 조 (예: A조, B조)
 }
-

@@ -40,8 +40,8 @@ public class JwtTokenProvider {
     }
 
     // Access Token 생성
-    public String createToken(String email) {
-        Claims claims = Jwts.claims().setSubject(email); // JWT payload 에 저장되는 정보단위
+    public String createToken(Long memberId) {
+        Claims claims = Jwts.claims().setSubject(memberId.toString()); // JWT payload 에 저장되는 정보단위
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
@@ -101,6 +101,11 @@ public class JwtTokenProvider {
 
     // Request의 Header에서 token 값 가져오기
     public String resolveToken(HttpServletRequest request) {
+
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
         return request.getHeader("X-AUTH-TOKEN");
     }
 }

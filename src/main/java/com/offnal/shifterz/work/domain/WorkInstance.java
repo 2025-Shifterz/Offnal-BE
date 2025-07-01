@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,6 +27,6 @@ public class WorkInstance {
 
     //근무표와 매핑
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "work_calendar")
+    @JoinColumn(name = "work_calendar_id")
     private WorkCalendar workCalendar;
 }

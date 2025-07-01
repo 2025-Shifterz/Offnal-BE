@@ -1,6 +1,5 @@
 package com.offnal.shifterz.global.exception;
 
-import com.offnal.shifterz.global.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
