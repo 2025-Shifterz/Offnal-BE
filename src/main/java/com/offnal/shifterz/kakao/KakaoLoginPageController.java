@@ -48,17 +48,6 @@ public class KakaoLoginPageController {
                             )
                     )
             ),
-            @ApiResponse(responseCode = "500", description = "회원 등록 실패",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(name = "MEMBER_SAVE_FAILED", value = """
-                                    {
-                                      "code": "MEMBER_SAVE_FAILED",
-                                      "message": "회원 등록에 실패했습니다."
-                                    }
-                                    """)
-                    ))
     })
     public ResponseEntity<KakaoLoginPageResponse> loginPage() {
         return ResponseEntity.ok(kakaoService.getKakaoAuthorizationUrl());
