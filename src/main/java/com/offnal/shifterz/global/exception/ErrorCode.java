@@ -18,8 +18,10 @@ public enum ErrorCode {
 
     // 회원 관련
     MEMBER_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "회원 등록에 실패했습니다."),
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다.");
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
 
+    //근무 관련
+    WORK_INSTANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 일자에 저장된 근무 정보가 없습니다.");
     private final HttpStatus httpStatus;
     private final String message;
 

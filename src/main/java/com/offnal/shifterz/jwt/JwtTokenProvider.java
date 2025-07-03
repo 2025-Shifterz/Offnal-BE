@@ -1,5 +1,7 @@
 package com.offnal.shifterz.jwt;
 
+import com.offnal.shifterz.global.exception.CustomException;
+import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.repository.MemberRepository;
 import com.offnal.shifterz.member.service.MemberService;
@@ -77,18 +79,17 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         Long memberId = getUserPk(token);
 
-        // 사용자 정보 조회. 사용자 없으면 예외 발생
-        Optional<Member> optionalMember = memberRepository.findById(memberId);
-        Member member = optionalMember.orElseThrow(() -> new RuntimeException("Member not found"));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        UserDetails userDetails = User.builder()
-                .username(String.valueOf(member.getId()))
-                .password("") // 카카오 로그인이므로 패스워드 불필요
-                .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")))
-                .build();
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        CustomUserDetails customUserDetails = new CustomUserDetails(member);
+
+        return new UsernamePasswordAuthenticationToken(
+                customUserDetails,
+                "",
+                customUserDetails.getAuthorities()
+        );
     }
-
     // 토큰 유효성, 만료일자 확인
     public boolean validateToken(String jwtToken) {
         try {
@@ -108,4 +109,7 @@ public class JwtTokenProvider {
         }
         return request.getHeader("X-AUTH-TOKEN");
     }
+
+
+
 }
