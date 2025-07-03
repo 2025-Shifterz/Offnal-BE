@@ -88,4 +88,80 @@ public @interface ErrorApiResponses {
                     ))
     })
     @interface Member {}
+
+    // 캘린더 저장 관련 에러
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "근무표 등록 요청 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "CALENDAR_NAME_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_NAME_REQUIRED",
+                                          "message": "근무표 이름은 필수입니다."
+                                        }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_YEAR_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_YEAR_REQUIRED",
+                                          "message": "연도는 필수입니다."
+                                        }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_MONTH_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_MONTH_REQUIRED",
+                                          "message": "월은 필수입니다."
+                                        }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_WORK_GROUP_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_WORK_GROUP_REQUIRED",
+                                          "message": "근무조는 필수입니다."
+                                        }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_WORK_TIME_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_WORK_TIME_REQUIRED",
+                                          "message": "근무 시간 정보는 필수입니다."
+                                        }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_SHIFT_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_SHIFT_REQUIRED",
+                                          "message": "근무일 정보는 필수입니다."
+                                        }
+                                        """)
+                            }
+                    ))
+    })
+    @interface WorkCalendar {}
+
+    // 근무 시간 관련
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "근무 시간 관련 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "WORK_TIME_START_REQUIRED", value = """
+                                        {
+                                          "code": "WORK_TIME_START_REQUIRED",
+                                          "message": "근무 시작 시간은 필수입니다."
+                                        }
+                                        """),
+                                    @ExampleObject(name = "WORK_TIME_END_REQUIRED", value = """
+                                        {
+                                          "code": "WORK_TIME_END_REQUIRED",
+                                          "message": "근무 종료 시간은 필수입니다."
+                                        }
+                                        """),
+                            }
+                    ))
+    })
+    public @interface WorkTime {}
 }

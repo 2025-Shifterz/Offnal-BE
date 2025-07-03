@@ -22,9 +22,6 @@ public class WorkCalendarRequestDto {
     @Schema(description = "월")
     private String month;
 
-    @Schema(description = "회원 ID")
-    private Long memberId;
-
     @Schema(description = "근무조")
     private String workGroup;
 

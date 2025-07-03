@@ -15,7 +15,7 @@ import java.util.Map;
 public class WorkCalendarConverter {
 
     // WorkCalendarRequestDto -> WorkCalendar
-    public static WorkCalendar toEntity(WorkCalendarRequestDto workCalendarRequestDto) {
+    public static WorkCalendar toEntity(Long memberId, WorkCalendarRequestDto workCalendarRequestDto) {
 
         Map<String, WorkTime> workTimeMap = new HashMap<>();
         for (Map.Entry<String, WorkTimeDto> entry : workCalendarRequestDto.getWorkTimes().entrySet()) {
@@ -26,7 +26,7 @@ public class WorkCalendarConverter {
             LocalTime startTime = LocalTime.parse(workTimeDto.getStartTime());
             LocalTime endTime = LocalTime.parse(workTimeDto.getEndTime());
 
-            WorkTime workTime = new WorkTime(timeType, startTime, endTime);
+            WorkTime workTime = WorkTime.of(timeType, startTime, endTime);
             workTimeMap.put(symbol, workTime);
         }
 
@@ -34,7 +34,7 @@ public class WorkCalendarConverter {
                 .calendarName(workCalendarRequestDto.getCalendarName())
                 .year(workCalendarRequestDto.getYear())
                 .month(workCalendarRequestDto.getMonth())
-                .memberId(workCalendarRequestDto.getMemberId())
+                .memberId(memberId)
                 .workGroup(workCalendarRequestDto.getWorkGroup())
                 .workTimes(workTimeMap)
                 .build();

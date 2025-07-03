@@ -33,5 +33,21 @@ public @interface SuccessApiResponses {
     public @interface Common {
     }
 
-
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "근무표 등록 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "근무표 등록 성공 예시", value = """
+                                    {
+                                      "code": "CALENDAR_CREATED",
+                                      "message": "근무표 등록에 성공했습니다.",
+                                      "data": null
+                                    }
+                                """)
+                    ))
+    })
+    public @interface Calendar {}
 }
