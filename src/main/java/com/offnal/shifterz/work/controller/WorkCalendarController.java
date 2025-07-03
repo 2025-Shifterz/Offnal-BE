@@ -1,12 +1,12 @@
 package com.offnal.shifterz.work.controller;
 
+import com.offnal.shifterz.global.exception.ErrorApiResponses;
 import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
 import com.offnal.shifterz.work.service.WorkCalendarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +24,10 @@ public class WorkCalendarController {
     private final WorkCalendarService workCalendarService;
 
     @Operation(summary = "근무표 등록")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "근무표 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
+    @ErrorApiResponses.Common
+    @ApiResponse(responseCode = "200", description = "근무표 등록 성공")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+
     @PostMapping
     public ResponseEntity<Long> createWorkCalendar(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(

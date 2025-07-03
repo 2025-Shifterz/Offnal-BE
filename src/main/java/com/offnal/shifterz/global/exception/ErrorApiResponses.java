@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 
 public @interface ErrorApiResponses {
 
-    //공토 에러
+    //공통 에러
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
