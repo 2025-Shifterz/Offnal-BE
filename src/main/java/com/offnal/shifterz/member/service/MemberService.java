@@ -1,13 +1,19 @@
 package com.offnal.shifterz.member.service;
 
+import com.offnal.shifterz.jwt.CustomUserDetails;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @Slf4j
@@ -45,6 +51,13 @@ public class MemberService {
             newMember.setProfileImageUrl(profileImageUrl);
 
             Member savedMember = memberRepository.save(newMember);
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    new CustomUserDetails(savedMember),
+                    null,
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
             return new MemberResult(savedMember, true);
         }
