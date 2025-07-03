@@ -35,7 +35,6 @@ public class WorkCalendarController {
     @ErrorApiResponses.WorkTime
     @PostMapping
     public ResponseEntity<SuccessResponse<Void>> createWorkCalendar(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(
                     mediaType = "application/json",
                     examples = @ExampleObject(
@@ -62,9 +61,7 @@ public class WorkCalendarController {
                     )
             )
     )@RequestBody WorkCalendarRequestDto workCalendarRequestDto) {
-
-        Long memberId = userDetails.getId();
-        workCalendarService.saveWorkCalendar(memberId, workCalendarRequestDto);
+        workCalendarService.saveWorkCalendar(workCalendarRequestDto);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.CALENDAR_CREATED));
     }
 }

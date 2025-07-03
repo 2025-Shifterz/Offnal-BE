@@ -1,5 +1,6 @@
 package com.offnal.shifterz.work.service;
 
+import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.work.converter.WorkCalendarConverter;
@@ -54,8 +55,9 @@ public class WorkCalendarService {
     }
 
     @Transactional
-    public void saveWorkCalendar(Long memberId, WorkCalendarRequestDto workCalendarRequestDto) {
+    public void saveWorkCalendar(WorkCalendarRequestDto workCalendarRequestDto) {
         validate(workCalendarRequestDto);
+        Long memberId = AuthService.getCurrentUserId();
 
         WorkCalendar calendar = WorkCalendarConverter.toEntity(memberId, workCalendarRequestDto);
         WorkCalendar savedCalendar = workCalendarRepository.save(calendar);
