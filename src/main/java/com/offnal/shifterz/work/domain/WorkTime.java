@@ -33,10 +33,10 @@ public class WorkTime {
     // 유효성 검증
     public static WorkTime of(WorkTimeType type, LocalTime start, LocalTime end) {
         if (start == null) {
-            throw new CustomException(ErrorCode.WORK_TIME_START_REQUIRED);
+            throw new CustomException(ErrorCode.CALENDAR_WORK_TIME_REQUIRED);
         }
         if (end == null) {
-            throw new CustomException(ErrorCode.WORK_TIME_END_REQUIRED);
+            throw new CustomException(ErrorCode.CALENDAR_WORK_TIME_REQUIRED);
         }
         return new WorkTime(type, start, end);
     }

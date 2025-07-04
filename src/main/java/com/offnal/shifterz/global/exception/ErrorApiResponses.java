@@ -138,30 +138,4 @@ public @interface ErrorApiResponses {
                     ))
     })
     @interface WorkCalendar {}
-
-    // 근무 시간 관련
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.RUNTIME)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "근무 시간 관련 오류",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(name = "WORK_TIME_START_REQUIRED", value = """
-                                        {
-                                          "code": "WORK_TIME_START_REQUIRED",
-                                          "message": "근무 시작 시간은 필수입니다."
-                                        }
-                                        """),
-                                    @ExampleObject(name = "WORK_TIME_END_REQUIRED", value = """
-                                        {
-                                          "code": "WORK_TIME_END_REQUIRED",
-                                          "message": "근무 종료 시간은 필수입니다."
-                                        }
-                                        """),
-                            }
-                    ))
-    })
-    public @interface WorkTime {}
 }

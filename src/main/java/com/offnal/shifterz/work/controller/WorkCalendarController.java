@@ -30,7 +30,6 @@ public class WorkCalendarController {
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @ErrorApiResponses.WorkCalendar
-    @ErrorApiResponses.WorkTime
     @PostMapping
     public ResponseEntity<SuccessResponse<Void>> createWorkCalendar(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(

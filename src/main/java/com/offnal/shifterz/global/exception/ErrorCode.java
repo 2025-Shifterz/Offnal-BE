@@ -26,12 +26,7 @@ public enum ErrorCode {
     CALENDAR_MONTH_REQUIRED(HttpStatus.BAD_REQUEST, "월은 필수입니다."),
     CALENDAR_WORK_GROUP_REQUIRED(HttpStatus.BAD_REQUEST, "근무조는 필수입니다."),
     CALENDAR_WORK_TIME_REQUIRED(HttpStatus.BAD_REQUEST, "근무 시간 정보는 필수입니다."),
-    CALENDAR_SHIFT_REQUIRED(HttpStatus.BAD_REQUEST, "근무일 정보는 필수입니다."),
-
-    // 근무 시간 관련
-    WORK_TIME_START_REQUIRED(HttpStatus.BAD_REQUEST, "근무 시작 시간은 필수입니다."),
-    WORK_TIME_END_REQUIRED(HttpStatus.BAD_REQUEST, "근무 종료 시간은 필수입니다.");
-
+    CALENDAR_SHIFT_REQUIRED(HttpStatus.BAD_REQUEST, "근무일 정보는 필수입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
