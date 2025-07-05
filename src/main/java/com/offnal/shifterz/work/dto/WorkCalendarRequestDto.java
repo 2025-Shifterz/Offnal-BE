@@ -16,34 +16,34 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WorkCalendarRequestDto {
-    @NotEmpty
+    @NotEmpty(message = "근무표 이름은 필수입니다.")
     @NotNull
     @Schema(description = "근무표 이름")
     private String calendarName;
 
-    @NotEmpty
+    @NotEmpty(message = "연도는 필수입니다.")
     @NotNull
     @Schema(description = "연도")
     private String year;
 
-    @NotEmpty
+    @NotEmpty(message = "월은 필수입니다.")
     @NotNull
     @Schema(description = "월")
     private String month;
 
-    @NotEmpty
+    @NotEmpty(message = "근무조는 필수입니다.")
     @NotNull
     @Schema(description = "근무조")
     private String workGroup;
 
     @Valid
-    @NotEmpty
+    @NotEmpty(message = "근무 시간 정보는 필수입니다.")
     @NotNull
     @Schema(description = "근무타입별 시간 정보(D/E/N)")
     private Map<String, WorkTimeDto> workTimes;
 
     @Valid
-    @NotEmpty
+    @NotEmpty(message = "근무일 정보는 필수입니다.")
     @NotNull
     @Schema(description = "근무표(날짜별 근무타입)")
     private Map<String, String> shifts;

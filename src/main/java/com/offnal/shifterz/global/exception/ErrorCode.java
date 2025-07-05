@@ -35,4 +35,14 @@ public enum ErrorCode {
         this.httpStatus = httpStatus;
         this.message = message;
     }
+
+    // ErrorMessage -> ErrorCode
+    public static ErrorCode fromMessage(String message) {
+        for (ErrorCode errorCode : ErrorCode.values()) {
+            if (errorCode.getMessage().equals(message)) {
+                return errorCode;
+            }
+        }
+        return INTERNAL_SERVER_ERROR;
+    }
 }

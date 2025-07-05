@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Map;
+
 @Getter
 @Builder
 public class ErrorResponse {
@@ -13,6 +15,9 @@ public class ErrorResponse {
 
     @Schema(description = "에러 메시지", example = "서버 내부 오류가 발생했습니다.")
     private final String message;
+
+    @Schema(description = "필드별 에러 정보", example = "{\"calendarName\": \"근무표 이름은 필수입니다.\"}")
+    private final Map<String, String> errors;
 
     public static ErrorResponse from(ErrorCode errorCode) {
         return ErrorResponse.builder()
