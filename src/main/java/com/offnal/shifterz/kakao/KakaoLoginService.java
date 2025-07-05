@@ -5,7 +5,6 @@ import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.jwt.JwtTokenProvider;
 import com.offnal.shifterz.member.dto.AuthResponseDto;
 import com.offnal.shifterz.member.service.MemberService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +41,7 @@ public class KakaoLoginService {
         }
 
         // 4. 토큰 발급
-        String jwtAccessToken = jwtTokenProvider.createToken(result.getMember().getEmail());
+        String jwtAccessToken = jwtTokenProvider.createToken(result.getMember().getId());
         String jwtRefreshToken = jwtTokenProvider.createRefreshToken(result.getMember().getEmail());
 
         AuthResponseDto responseDto = AuthResponseDto.from(result.getMember(), result.isNewMember());

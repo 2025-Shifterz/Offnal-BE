@@ -1,6 +1,5 @@
 package com.offnal.shifterz.global.exception;
 
-import com.offnal.shifterz.global.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,7 +13,7 @@ import java.lang.annotation.Target;
 
 public @interface ErrorApiResponses {
 
-    //공토 에러
+    //공통 에러
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
@@ -89,4 +88,54 @@ public @interface ErrorApiResponses {
                     ))
     })
     @interface Member {}
+
+    // 캘린더 저장 관련 에러
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "근무표 등록 요청 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "CALENDAR_NAME_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_NAME_REQUIRED",
+                                          "message": "근무표 이름은 필수입니다."
+                                        }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_YEAR_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_YEAR_REQUIRED",
+                                          "message": "연도는 필수입니다."
+                                        }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_MONTH_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_MONTH_REQUIRED",
+                                          "message": "월은 필수입니다."
+                                        }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_WORK_GROUP_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_WORK_GROUP_REQUIRED",
+                                          "message": "근무조는 필수입니다."
+                                        }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_WORK_TIME_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_WORK_TIME_REQUIRED",
+                                          "message": "근무 시간 정보는 필수입니다."
+                                        }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_SHIFT_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_SHIFT_REQUIRED",
+                                          "message": "근무일 정보는 필수입니다."
+                                        }
+                                        """)
+                            }
+                    ))
+    })
+    @interface WorkCalendar {}
 }
