@@ -2,10 +2,11 @@ package com.offnal.shifterz.member.domain;
 
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Entity

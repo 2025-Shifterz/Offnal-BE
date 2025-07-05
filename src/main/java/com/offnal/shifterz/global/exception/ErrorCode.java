@@ -18,7 +18,15 @@ public enum ErrorCode {
 
     // 회원 관련
     MEMBER_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "회원 등록에 실패했습니다."),
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다.");
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
+
+    // 캘린더 저장 관련
+    CALENDAR_NAME_REQUIRED(HttpStatus.BAD_REQUEST, "근무표 이름은 필수입니다."),
+    CALENDAR_YEAR_REQUIRED(HttpStatus.BAD_REQUEST, "연도는 필수입니다."),
+    CALENDAR_MONTH_REQUIRED(HttpStatus.BAD_REQUEST, "월은 필수입니다."),
+    CALENDAR_WORK_GROUP_REQUIRED(HttpStatus.BAD_REQUEST, "근무조는 필수입니다."),
+    CALENDAR_WORK_TIME_REQUIRED(HttpStatus.BAD_REQUEST, "근무 시간 정보는 필수입니다."),
+    CALENDAR_SHIFT_REQUIRED(HttpStatus.BAD_REQUEST, "근무일 정보는 필수입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

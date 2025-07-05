@@ -1,5 +1,7 @@
 package com.offnal.shifterz.jwt;
 
+import com.offnal.shifterz.global.exception.CustomException;
+import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.repository.MemberRepository;
 import com.offnal.shifterz.member.service.MemberService;
@@ -13,16 +15,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
@@ -40,8 +37,8 @@ public class JwtTokenProvider {
     }
 
     // Access Token 생성
-    public String createToken(String email) {
-        Claims claims = Jwts.claims().setSubject(email); // JWT payload 에 저장되는 정보단위
+    public String createToken(Long memberId) {
+        Claims claims = Jwts.claims().setSubject(memberId.toString()); // JWT payload 에 저장되는 정보단위
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
@@ -77,16 +74,16 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         Long memberId = getUserPk(token);
 
-        // 사용자 정보 조회. 사용자 없으면 예외 발생
-        Optional<Member> optionalMember = memberRepository.findById(memberId);
-        Member member = optionalMember.orElseThrow(() -> new RuntimeException("Member not found"));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        UserDetails userDetails = User.builder()
-                .username(String.valueOf(member.getId()))
-                .password("") // 카카오 로그인이므로 패스워드 불필요
-                .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")))
-                .build();
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        CustomUserDetails customUserDetails = new CustomUserDetails(member);
+
+        return new UsernamePasswordAuthenticationToken(
+                customUserDetails,
+                "",
+                customUserDetails.getAuthorities()
+        );
     }
 
     // 토큰 유효성, 만료일자 확인
@@ -101,6 +98,11 @@ public class JwtTokenProvider {
 
     // Request의 Header에서 token 값 가져오기
     public String resolveToken(HttpServletRequest request) {
+
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
         return request.getHeader("X-AUTH-TOKEN");
     }
 }

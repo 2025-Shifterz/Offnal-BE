@@ -15,4 +15,14 @@ public enum WorkTimeType {
     public String getKoreanName() {
         return koreanName;
     }
+
+    public static WorkTimeType fromSymbol(String symbol) {
+        return switch (symbol) {
+            case "D" -> DAY;
+            case "E" -> EVENING;
+            case "N" -> NIGHT;
+            case "-" -> OFF;
+            default -> throw new IllegalArgumentException("Unknown shift type: " + symbol);
+        };
+    }
 }
