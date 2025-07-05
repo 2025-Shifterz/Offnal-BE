@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,7 +58,7 @@ public class WorkCalendarController {
                                         """
                     )
             )
-    )@RequestBody WorkCalendarRequestDto workCalendarRequestDto) {
+    )@RequestBody @Valid WorkCalendarRequestDto workCalendarRequestDto) {
         workCalendarService.saveWorkCalendar(workCalendarRequestDto);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.CALENDAR_CREATED));
     }
