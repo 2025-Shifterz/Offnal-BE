@@ -2,17 +2,15 @@ package com.offnal.shifterz.work.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
+@Builder
 @Table(name = "work_instance")
 public class WorkInstance {
 
@@ -29,6 +27,6 @@ public class WorkInstance {
 
     //근무표와 매핑
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "work_calendar")
+    @JoinColumn(name = "work_calendar_id")
     private WorkCalendar workCalendar;
 }
