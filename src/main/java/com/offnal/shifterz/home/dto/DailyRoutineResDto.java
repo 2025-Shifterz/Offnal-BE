@@ -1,21 +1,25 @@
 package com.offnal.shifterz.home.dto;
 
-import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 import java.util.List;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
 @Builder
 public class DailyRoutineResDto {
 
-    // 하루 식단 카드 리스트
+    @Schema(description = "하루 동안의 식사 정보 리스트 (아침, 점심, 저녁 또는 간식 포함)")
     private List<MealCardDto> meals;
 
-    // 공복 시간, 수면 시간 등 건강 가이드
+    @Schema(description = "수면 일정 및 공복 시간 등 건강 가이드 정보")
     private HealthGuideDto health;
+
+    public static DailyRoutineResDto from(List<MealCardDto> meals, HealthGuideDto health) {
+        return DailyRoutineResDto.builder()
+                .meals(meals)
+                .health(health)
+                .build();
+    }
 }

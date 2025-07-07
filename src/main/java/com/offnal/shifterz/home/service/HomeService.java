@@ -1,9 +1,6 @@
 package com.offnal.shifterz.home.service;
 
-import com.offnal.shifterz.home.dto.DailyRoutineResDto;
-import com.offnal.shifterz.home.dto.HealthGuideDto;
-import com.offnal.shifterz.home.dto.HomeResDto;
-import com.offnal.shifterz.home.dto.MealCardDto;
+import com.offnal.shifterz.home.dto.*;
 import com.offnal.shifterz.work.domain.WorkInstance;
 import com.offnal.shifterz.work.domain.WorkTime;
 import com.offnal.shifterz.work.domain.WorkTimeType;
@@ -22,7 +19,8 @@ public class HomeService {
 
     private final WorkInstanceRepository workInstanceRepository;
 
-    public HomeResDto homeView(Long memberId) {
+    // 어제/오늘/내일 근무 형태 + 오늘의 루틴 정보를 모두 포함한 통합 API
+    public HomeDetailResDto getHomeDetail(Long memberId) {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
         LocalDate tomorrow = today.plusDays(1);
@@ -31,11 +29,7 @@ public class HomeService {
         WorkTimeType todayType = findWorkTypeOrNull(today, memberId);
         WorkTimeType tomorrowType = findWorkTypeOrNull(tomorrow, memberId);
 
-        return HomeResDto.from(yesterdayType, todayType, tomorrowType);
-    }
-
-    public DailyRoutineResDto getTodayRoutine(Long memberId) {
-        LocalDate today = LocalDate.now();
+        // 오늘 근무 정보 조회
         String day = String.valueOf(today.getDayOfMonth());
         String year = String.valueOf(today.getYear());
         String month = String.valueOf(today.getMonthValue());
@@ -46,30 +40,46 @@ public class HomeService {
                 )
                 .orElseThrow(() -> new RuntimeException("오늘의 근무 정보가 없습니다."));
 
-        WorkTimeType todayType = todayWork.getWorkTimeType();
-        String typeKey = convertTypeToKey(todayType);
-        WorkTime workTime = todayWork.getWorkCalendar().getWorkTimes().get(typeKey);
-
-        // Add null check for workTime
-        if (workTime == null) {
-            throw new RuntimeException("오늘의 근무 시간 정보가 없습니다. 날짜: " + day);
+        WorkTime workTime = null;
+        if (todayType != WorkTimeType.OFF) {
+            String typeKey = convertTypeToKey(todayType);
+            workTime = todayWork.getWorkCalendar().getWorkTimes().get(typeKey);
+            if (workTime == null) {
+                throw new RuntimeException("오늘의 근무 시간 정보가 없습니다.");
+            }
         }
 
-        WorkTimeType yesterdayType = findWorkTypeOrNull(today.minusDays(1), memberId);
-        WorkTimeType tomorrowType = findWorkTypeOrNull(today.plusDays(1), memberId);
+        DailyRoutineResDto routine = getRoutineByWorkType(todayType, workTime, yesterdayType, tomorrowType);
 
-        return getRoutineByWorkType(todayType, workTime, yesterdayType, tomorrowType);
+        return HomeDetailResDto.from(yesterdayType, todayType, tomorrowType, routine);
     }
 
+    // 근무 형태에 따른 루틴 구성
+    private DailyRoutineResDto getRoutineByWorkType(
+            WorkTimeType type,
+            WorkTime workTime,
+            WorkTimeType yesterdayType,
+            WorkTimeType tomorrowType
+    ) {
+        return switch (type) {
+            case OFF -> buildOffRoutine(yesterdayType, tomorrowType);
+            case DAY -> buildDayRoutine(workTime);
+            case EVENING -> buildEveningRoutine(workTime);
+            case NIGHT -> buildNightRoutine(workTime);
+        };
+    }
+
+    // 근무 타입을 키값으로 변환 (ex: DAY -> D)
     private String convertTypeToKey(WorkTimeType type) {
         return switch (type) {
             case DAY -> "D";
             case EVENING -> "E";
             case NIGHT -> "N";
-            case OFF -> "O"; // OFF도 정의돼 있다면
+            case OFF -> "-";
         };
     }
 
+    // 특정 날짜의 근무 형태 조회
     private WorkTimeType findWorkTypeOrNull(LocalDate date, Long memberId) {
         String day = String.valueOf(date.getDayOfMonth());
         String year = String.valueOf(date.getYear());
@@ -83,63 +93,37 @@ public class HomeService {
                 .orElse(null);
     }
 
-    public DailyRoutineResDto getRoutineByWorkType(
-            WorkTimeType type,
-            WorkTime workTime,
-            WorkTimeType yesterdayType,
-            WorkTimeType tomorrowType
-    ) {
-        return switch (type) {
-            case OFF -> buildOffRoutine(yesterdayType, tomorrowType);
-            case DAY -> {
-                if (workTime == null) {
-                    throw new RuntimeException("주간 근무에 대한 시간 정보가 없습니다.");
-                }
-                yield buildDayRoutine(workTime);
-            }
-            case EVENING -> {
-                if (workTime == null) {
-                    throw new RuntimeException("저녁 근무에 대한 시간 정보가 없습니다.");
-                }
-                yield buildEveningRoutine(workTime);
-            }
-            case NIGHT -> {
-                if (workTime == null) {
-                    throw new RuntimeException("야간 근무에 대한 시간 정보가 없습니다.");
-                }
-                yield buildNightRoutine(workTime);
-            }
-        };
-    }
-
+    // OFF 근무 루틴 구성
     private DailyRoutineResDto buildOffRoutine(WorkTimeType yesterdayType, WorkTimeType tomorrowType) {
         List<String> sleepSchedules = new ArrayList<>();
+        List<Map.Entry<LocalTime, LocalTime>> sleepRanges = new ArrayList<>();
+
         if (yesterdayType == WorkTimeType.NIGHT) {
             sleepSchedules.add("(1) 08:00 ~ 13:00 수면");
+            sleepRanges.add(new AbstractMap.SimpleEntry<>(LocalTime.of(8, 0), LocalTime.of(13, 0)));
         }
         if (tomorrowType == WorkTimeType.DAY) {
             sleepSchedules.add("(2) 22:00 ~ 05:00 수면");
+            sleepRanges.add(new AbstractMap.SimpleEntry<>(LocalTime.of(22, 0), LocalTime.of(5, 0)));
         }
 
-        String sleepComment = getClosestSleepScheduleComment(List.of(
-                new AbstractMap.SimpleEntry<>(LocalTime.of(8, 0), LocalTime.of(13, 0)),
-                new AbstractMap.SimpleEntry<>(LocalTime.of(22, 0), LocalTime.of(5, 0))
-        ));
+        String sleepComment = getClosestSleepScheduleComment(sleepRanges);
 
-        return DailyRoutineResDto.builder()
-                .meals(List.of(
+        return DailyRoutineResDto.from(
+                List.of(
                         meal("점심", LocalTime.of(13, 30), "기상 후 체력 회복", List.of("김밥", "칼국수")),
                         meal("저녁", LocalTime.of(17, 30), "밤잠 대비 소화 부담 최소화", List.of("죽", "나물", "연두부"))
-                ))
-                .health(HealthGuideDto.builder()
-                        .sleepGuide(sleepSchedules)
-                        .sleepSchedule(sleepComment)
-                        .fastingComment("생체 리듬 유지에 집중 야식, 피하고 수면 시간 지키기")
-                        .fastingSchedule("저녁 식사 후 공복 유지")
-                        .build())
-                .build();
+                ),
+                HealthGuideDto.from(
+                        sleepSchedules,
+                        sleepComment,
+                        "생체 리듬 유지에 집중 야식, 피하고 수면 시간 지키기",
+                        "저녁 식사 후 공복 유지"
+                )
+        );
     }
 
+    // DAY 근무 루틴 구성
     private DailyRoutineResDto buildDayRoutine(WorkTime workTime) {
         LocalTime start = workTime.getStartTime();
         LocalTime end = workTime.getEndTime();
@@ -147,21 +131,22 @@ public class HomeService {
         LocalTime sleepStart = end.plusHours(6);
         LocalTime sleepEnd = end.plusHours(13);
 
-        return DailyRoutineResDto.builder()
-                .meals(List.of(
+        return DailyRoutineResDto.from(
+                List.of(
                         meal("아침", start.minusHours(1), "기상 직후 에너지 공급", List.of("오트밀", "계란")),
                         meal("점심", start.plusHours(5), " 근무 집중력 유지", List.of("현미밥", "생선", "나물")),
                         meal("저녁", end.plusHours(3), "소화 부담 없는 식사로 수면 대비", List.of("밥", "두부", "나물"))
-                ))
-                .health(HealthGuideDto.builder()
-                        .sleepGuide(List.of("주간 근무 후, 오후 근무 대비해 늦게 수면"))
-                        .sleepSchedule(format(sleepStart) + " ~ " + format(sleepEnd) + " 수면")
-                        .fastingComment("수명 질 향상 및 조기 기상 위해 저녁 일찍 → 공복 유지 후 수면")
-                        .fastingSchedule(format(end.plusHours(4)) + " 이후 공복 유지")
-                        .build())
-                .build();
+                ),
+                HealthGuideDto.from(
+                        List.of("주간 근무 후, 오후 근무 대비해 늦게 수면"),
+                        format(sleepStart) + " ~ " + format(sleepEnd) + " 수면",
+                        "수면 질 향상 및 조기 기상 위해 저녁 일찍 → 공복 유지 후 수면",
+                        format(end.plusHours(4)) + " 이후 공복 유지"
+                )
+        );
     }
 
+    // EVENING 근무 루틴 구성
     private DailyRoutineResDto buildEveningRoutine(WorkTime workTime) {
         LocalTime start = workTime.getStartTime();
         LocalTime end = workTime.getEndTime();
@@ -169,21 +154,22 @@ public class HomeService {
         LocalTime sleepStart = end.plusHours(15);
         LocalTime fastingTime = end.plusHours(1);
 
-        return DailyRoutineResDto.builder()
-                .meals(List.of(
+        return DailyRoutineResDto.from(
+                List.of(
                         meal("아침", start.minusHours(7), "리듬 전환 대비", List.of("계란", "토스트")),
                         meal("점심", start.minusHours(2), "근무 전 에너지 확보", List.of("현미밥", "닭가슴살", "채소")),
                         meal("저녁", end.minusHours(3), "과식 피하기", List.of("고구마", "두부 샐러드"))
-                ))
-                .health(HealthGuideDto.builder()
-                        .sleepGuide(List.of("퇴근 후 바로 잠들면 내일 야간 근무에 지장이 갈 수 있어요"))
-                        .sleepSchedule("밤샘 후 " + format(sleepStart) + " 수면")
-                        .fastingComment("늦은 기상이므로 퇴근 후 과식 금지")
-                        .fastingSchedule(format(fastingTime) + " 이후 공복 유지")
-                        .build())
-                .build();
+                ),
+                HealthGuideDto.from(
+                        List.of("퇴근 후 바로 잠들면 내일 야간 근무에 지장이 갈 수 있어요"),
+                        "밤샘 후 " + format(sleepStart) + " 수면",
+                        "늦은 기상이므로 퇴근 후 과식 금지",
+                        format(fastingTime) + " 이후 공복 유지"
+                )
+        );
     }
 
+    // NIGHT 근무 루틴 구성
     private DailyRoutineResDto buildNightRoutine(WorkTime workTime) {
         LocalTime start = workTime.getStartTime();
         LocalTime end = workTime.getEndTime();
@@ -198,39 +184,37 @@ public class HomeService {
                 new AbstractMap.SimpleEntry<>(postSleepStart, postSleepEnd)
         ));
 
-        return DailyRoutineResDto.builder()
-                .meals(List.of(
+        return DailyRoutineResDto.from(
+                List.of(
                         meal("점심", LocalTime.of(12, 0), "야근 전 주요 에너지 확보", List.of("현미밥", "생선구이", "채소")),
                         meal("출근 전 간식", start.minusHours(5), "포만감 및 졸림 방지", List.of("고구마", "삶은 달걀", "두유")),
                         meal("근무 중 간식 1", start.plusHours(3), "혈당 안정 및 집중력 유지", List.of("바나나", "견과류")),
                         meal("근무 중 간식 2", start.plusHours(6), "혈당 안정 및 집중력 유지", List.of("삶은 계란", "따뜻한 물")),
                         meal("퇴근 직후 소식", end.plusMinutes(30), "위 부담 줄이며 안정된 수면 유도", List.of("연두부", "물"))
-                ))
-                .health(HealthGuideDto.builder()
-                        .sleepGuide(List.of(
+                ),
+                HealthGuideDto.from(
+                        List.of(
                                 "(1) 출근 전 " + format(preSleepStart) + " ~ " + format(preSleepEnd) + " 수면",
                                 "(2) 퇴근 후 " + format(postSleepStart) + " ~ " + format(postSleepEnd) + " 수면"
-                        ))
-                        .sleepSchedule(sleepComment)
-                        .fastingComment("퇴근 후 원활한 수면을 위해 " + end.minusHours(3) +"시 이후엔 카페인도 섭취 금지")
-                        .fastingSchedule(end.minusHours(3) + " 이후 공복 유지")
-                        .build())
-                .build();
+                        ),
+                        sleepComment,
+                        "퇴근 후 원활한 수면을 위해 " + format(end.minusHours(3)) + " 이후엔 카페인 섭취 금지",
+                        format(end.minusHours(3)) + " 이후 공복 유지"
+                )
+        );
     }
 
+    // 식단 카드 생성 유틸
     private MealCardDto meal(String label, LocalTime time, String desc, List<String> items) {
-        return MealCardDto.builder()
-                .label(label)
-                .time(format(time))
-                .description(desc)
-                .items(items)
-                .build();
+        return MealCardDto.from(label, format(time), desc, items);
     }
 
+    // 시간 포맷 변환 유틸
     private String format(LocalTime time) {
         return time.format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 
+    // 현재 시간과 가장 가까운 수면 시간 반환
     private String getClosestSleepScheduleComment(List<Map.Entry<LocalTime, LocalTime>> sleepRanges) {
         LocalTime now = LocalTime.now();
         Map.Entry<LocalTime, LocalTime> closest = null;
@@ -251,6 +235,7 @@ public class HomeService {
         }
     }
 
+    // 분 단위 차이 계산
     private long minutesBetween(LocalTime t1, LocalTime t2) {
         return Math.abs(t1.toSecondOfDay() - t2.toSecondOfDay()) / 60;
     }

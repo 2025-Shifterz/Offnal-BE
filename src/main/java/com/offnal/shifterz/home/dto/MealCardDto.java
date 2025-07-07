@@ -1,23 +1,32 @@
 package com.offnal.shifterz.home.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.List;
 
-@Data
+@Getter
 @Builder
 public class MealCardDto {
-    private String label;        // 예: 점심, 출근 전 간식
-    private String time;         // 예: 12:00
-    private String description;  // 예: 야근 전 에너지 확보
-    private List<String> items; // 예: [현미밥, 생선구이, 채소]
 
-    private MealCardDto meal(String label, String time, String desc, List<String> items) {
+    @Schema(description = "식사의 구분 (예: 아침, 점심, 저녁, 간식 등)")
+    private String label;
+
+    @Schema(description = "식사 시간 (HH:mm 형식)")
+    private String time;
+
+    @Schema(description = "식사 목적 또는 설명")
+    private String description;
+
+    @Schema(description = "권장 식사 메뉴 리스트")
+    private List<String> items;
+
+    public static MealCardDto from(String label, String time, String description, List<String> items) {
         return MealCardDto.builder()
                 .label(label)
                 .time(time)
-                .description(desc)
+                .description(description)
                 .items(items)
                 .build();
     }
