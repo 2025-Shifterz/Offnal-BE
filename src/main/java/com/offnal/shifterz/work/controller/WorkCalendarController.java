@@ -83,10 +83,10 @@ public class WorkCalendarController {
                                     name = "근무일 조회 예시",
                                     value = """
                                         [
-                                          { "day": "2025-07-01", "workTypeName": "오후" },
-                                          { "day": "2025-07-02", "workTypeName": "오후" },
-                                          { "day": "2025-07-03", "workTypeName": "야간" },
-                                          { "day": "2025-07-04", "workTypeName": "휴무" }
+                                          { "day": "1", "workTypeName": "오후" },
+                                          { "day": "2", "workTypeName": "오후" },
+                                          { "day": "3", "workTypeName": "야간" },
+                                          { "day": "4", "workTypeName": "휴무" }
                                         ]
                                         """
                             )
@@ -98,12 +98,13 @@ public class WorkCalendarController {
     })
 
     @GetMapping
-    public ResponseEntity<List<WorkDayResponseDto>> getWorkDaysByMonth(
+    public ResponseEntity<SuccessResponse<List<WorkDayResponseDto>>> getWorkDaysByMonth(
             @RequestParam String year,
             @RequestParam String month
     ) {
         List<WorkDayResponseDto> response = workCalendarService.getWorkDaysByYearAndMonth(year, month);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.DATA_FETCHED, response));
+
     }
 
 }
