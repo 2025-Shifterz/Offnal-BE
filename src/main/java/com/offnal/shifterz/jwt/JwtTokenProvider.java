@@ -90,6 +90,7 @@ public class JwtTokenProvider {
                 customUserDetails.getAuthorities()
         );
     }
+
     // 토큰 유효성, 만료일자 확인
     public boolean validateToken(String jwtToken) {
         try {
