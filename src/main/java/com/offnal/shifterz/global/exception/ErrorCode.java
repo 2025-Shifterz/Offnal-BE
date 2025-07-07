@@ -26,7 +26,11 @@ public enum ErrorCode {
     CALENDAR_MONTH_REQUIRED(HttpStatus.BAD_REQUEST, "월은 필수입니다."),
     CALENDAR_WORK_GROUP_REQUIRED(HttpStatus.BAD_REQUEST, "근무조는 필수입니다."),
     CALENDAR_WORK_TIME_REQUIRED(HttpStatus.BAD_REQUEST, "근무 시간 정보는 필수입니다."),
-    CALENDAR_SHIFT_REQUIRED(HttpStatus.BAD_REQUEST, "근무일 정보는 필수입니다.");
+    CALENDAR_SHIFT_REQUIRED(HttpStatus.BAD_REQUEST, "근무일 정보는 필수입니다."),
+
+    // 근무일 조회 관련
+    INVALID_YEAR_FORMAT(HttpStatus.BAD_REQUEST, "연도 형식이 올바르지 않습니다."),
+    INVALID_MONTH_FORMAT(HttpStatus.BAD_REQUEST, "월 형식이 올바르지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

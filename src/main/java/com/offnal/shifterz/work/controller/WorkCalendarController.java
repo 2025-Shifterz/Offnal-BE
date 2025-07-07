@@ -11,8 +11,12 @@ import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
 import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.service.WorkCalendarService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -66,6 +70,32 @@ public class WorkCalendarController {
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.CALENDAR_CREATED));
     }
 
+    @Operation(summary = "근무일 조회", description = "입력한 연도와 월에 해당하는 모든 날짜의 근무유형 정보를 반환합니다.")
+    @SuccessApiResponses.WorkDay
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.WorkDay
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "근무일 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = WorkDayResponseDto.class)),
+                            examples = @ExampleObject(
+                                    name = "근무일 조회 예시",
+                                    value = """
+                                        [
+                                          { "day": "2025-07-01", "workTypeName": "오후" },
+                                          { "day": "2025-07-02", "workTypeName": "오후" },
+                                          { "day": "2025-07-03", "workTypeName": "야간" },
+                                          { "day": "2025-07-04", "workTypeName": "휴무" }
+                                        ]
+                                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
 
     @GetMapping
     public ResponseEntity<List<WorkDayResponseDto>> getWorkDaysByMonth(

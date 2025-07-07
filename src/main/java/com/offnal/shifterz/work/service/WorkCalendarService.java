@@ -40,8 +40,11 @@ public class WorkCalendarService {
 
 
     public List<WorkDayResponseDto> getWorkDaysByYearAndMonth(String year, String month) {
+
+        Long memberId = AuthService.getCurrentUserId();
+
         List<WorkInstance> instances =
-                workInstanceRepository.findByWorkCalendar_YearAndWorkCalendar_Month(year, month);
+                workInstanceRepository.findByWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(memberId,year, month);
 
         return WorkCalendarConverter.toDayResponseDtoList(instances);
     }

@@ -52,7 +52,6 @@ public class WorkCalendarConverter {
                 .toList();
 
     }
-
     public static List<WorkDayResponseDto> toDayResponseDtoList(List<WorkInstance> instances) {
         return instances.stream()
                 .map(instance -> WorkDayResponseDto.builder()

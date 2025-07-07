@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,11 +24,13 @@ public class WorkCalendarRequestDto {
 
     @NotEmpty
     @NotNull
+    @Pattern(regexp = "\\d{4}", message = "연도 형식이 올바르지 않습니다.")
     @Schema(description = "연도")
     private String year;
 
     @NotEmpty
     @NotNull
+    @Pattern(regexp = "^(0?[1-9]|1[0-2])$", message = "월 형식이 올바르지 않습니다.")
     @Schema(description = "월")
     private String month;
 

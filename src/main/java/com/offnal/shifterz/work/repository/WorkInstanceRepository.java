@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface WorkInstanceRepository extends JpaRepository<WorkInstance, Long> {
-    List<WorkInstance> findByWorkCalendar_YearAndWorkCalendar_Month(String year, String month);
+    List<WorkInstance> findByWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(
+            Long memberId, String year, String month);
 }
 
