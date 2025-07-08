@@ -1,5 +1,8 @@
 package com.offnal.shifterz.work.domain;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "근무 유형", example = "DAY")
 public enum WorkTimeType {
     DAY,    // 주간
     EVENING, // 오후
