@@ -5,6 +5,7 @@ import com.offnal.shifterz.work.converter.WorkCalendarConverter;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
 import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
+import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.repository.WorkCalendarRepository;
 import com.offnal.shifterz.work.repository.WorkInstanceRepository;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class WorkCalendarService {
     private final WorkCalendarRepository workCalendarRepository;
@@ -29,5 +31,16 @@ public class WorkCalendarService {
 
         List<WorkInstance> instances = WorkCalendarConverter.toWorkInstances(workCalendarRequestDto, savedCalendar);
         workInstanceRepository.saveAll(instances);
+    }
+
+
+    public List<WorkDayResponseDto> getWorkDaysByYearAndMonth(String year, String month) {
+
+        Long memberId = AuthService.getCurrentUserId();
+
+        List<WorkInstance> instances =
+                workInstanceRepository.findByWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(memberId,year, month);
+
+        return WorkCalendarConverter.toDayResponseDtoList(instances);
     }
 }

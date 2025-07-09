@@ -25,4 +25,10 @@ public class ErrorResponse {
                 .message(errorCode.getMessage())
                 .build();
     }
+
+    public ErrorResponse(String code, String message) {
+        this.code = code;
+        this.message = message;
+        this.errors = null;
+    }
 }

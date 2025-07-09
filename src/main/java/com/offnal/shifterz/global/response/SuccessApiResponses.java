@@ -50,4 +50,28 @@ public @interface SuccessApiResponses {
                     ))
     })
     public @interface Calendar {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "근무일 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "근무일 조회 성공 예시", value = """
+                                    {
+                                      "code": "WORK_DAY_FETCHED",
+                                      "message": "근무일 조회에 성공했습니다.",
+                                      "data": [
+                                        { "day": "1", "workTypeName": "오후" },
+                                        { "day": "2", "workTypeName": "오후" },
+                                        { "day": "3", "workTypeName": "야간" },
+                                        { "day": "4", "workTypeName": "휴무" }
+                                      ]
+                                    }
+                                    """)
+                    )
+            )
+    })
+    public @interface WorkDay {}
 }

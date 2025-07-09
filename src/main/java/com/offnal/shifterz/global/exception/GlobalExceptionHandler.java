@@ -1,7 +1,9 @@
 package com.offnal.shifterz.global.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,4 +52,13 @@ public class GlobalExceptionHandler {
         ErrorResponse response = ErrorResponse.from(ErrorCode.INTERNAL_SERVER_ERROR);
         return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus()).body(response);
     }
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ErrorResponse> handleBindException(BindException e) {
+        log.error("[BindException] {}", e.getMessage(), e);
+        String message = e.getBindingResult().getFieldError().getDefaultMessage();
+        ErrorResponse response = new ErrorResponse(ErrorCode.INVALID_REQUEST.name(), message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+
 }
