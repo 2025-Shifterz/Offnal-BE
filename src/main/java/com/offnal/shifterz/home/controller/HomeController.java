@@ -1,7 +1,6 @@
 package com.offnal.shifterz.home.controller;
 
 import com.offnal.shifterz.global.exception.ErrorApiResponses;
-import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.home.dto.HomeDetailResDto;

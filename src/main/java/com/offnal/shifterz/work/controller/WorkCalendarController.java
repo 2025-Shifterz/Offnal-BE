@@ -4,9 +4,6 @@ import com.offnal.shifterz.global.exception.ErrorApiResponses;
 import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
-import com.offnal.shifterz.work.converter.WorkCalendarConverter;
-import com.offnal.shifterz.work.domain.WorkInstance;
-import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
 import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.service.WorkCalendarService;
@@ -22,7 +19,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
+
 import java.util.List;
 
 @RestController

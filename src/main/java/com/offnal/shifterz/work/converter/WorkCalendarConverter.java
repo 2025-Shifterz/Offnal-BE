@@ -2,17 +2,17 @@ package com.offnal.shifterz.work.converter;
 
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
-import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.domain.WorkTime;
 import com.offnal.shifterz.work.domain.WorkTimeType;
 import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
+import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.dto.WorkTimeDto;
 
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.Map;
+import java.util.stream.Collectors;
 public class WorkCalendarConverter {
 
     // WorkCalendarRequestDto -> WorkCalendar
