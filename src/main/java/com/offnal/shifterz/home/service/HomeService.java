@@ -1,5 +1,7 @@
 package com.offnal.shifterz.home.service;
 
+import com.offnal.shifterz.global.exception.CustomException;
+import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.home.dto.*;
 import com.offnal.shifterz.work.domain.WorkInstance;
 import com.offnal.shifterz.work.domain.WorkTime;
@@ -38,14 +40,14 @@ public class HomeService {
                 .findByWorkDayAndWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(
                         day, memberId, year, month
                 )
-                .orElseThrow(() -> new RuntimeException("오늘의 근무 정보가 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.WORK_INSTANCE_NOT_FOUND));
 
         WorkTime workTime = null;
         if (todayType != WorkTimeType.OFF) {
             String typeKey = convertTypeToKey(todayType);
             workTime = todayWork.getWorkCalendar().getWorkTimes().get(typeKey);
             if (workTime == null) {
-                throw new RuntimeException("오늘의 근무 시간 정보가 없습니다.");
+                throw new CustomException(ErrorCode.WORK_TIME_NOT_FOUND);
             }
         }
 

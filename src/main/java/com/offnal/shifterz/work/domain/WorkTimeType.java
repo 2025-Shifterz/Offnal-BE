@@ -4,10 +4,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "근무 유형", example = "DAY")
 public enum WorkTimeType {
-    DAY,    // 주간
-    EVENING, // 오후
-    NIGHT,   // 야간
-    OFF; // 휴무
+    DAY("주간"),
+    EVENING("오후"),
+    NIGHT("야간"),
+    OFF("휴무");
+
+    private final String koreanName;
+
+    WorkTimeType(String koreanName) {
+        this.koreanName = koreanName;
+    }
+
+    public String getKoreanName() {
+        return koreanName;
+    }
 
     public static WorkTimeType fromSymbol(String symbol) {
         return switch (symbol) {

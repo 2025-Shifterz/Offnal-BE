@@ -1,7 +1,8 @@
 spring:
   application:
     name: shifterz
-
+  config:
+    import: optional:file:.env[.properties]
   # SQL
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
