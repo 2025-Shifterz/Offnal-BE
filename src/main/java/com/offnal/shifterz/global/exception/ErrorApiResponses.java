@@ -138,4 +138,42 @@ public @interface ErrorApiResponses {
                     ))
     })
     @interface WorkCalendar {}
+
+    // 근무일 조회 관련 에러
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식 (연도/월)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "INVALID_YEAR_FORMAT", value = """
+                                    {
+                                      "code": "INVALID_YEAR_FORMAT",
+                                      "message": "연도 형식이 올바르지 않습니다."
+                                    }
+                                    """),
+                                    @ExampleObject(name = "INVALID_MONTH_FORMAT", value = """
+                                    {
+                                      "code": "INVALID_MONTH_FORMAT",
+                                      "message": "월 형식이 올바르지 않습니다."
+                                    }
+                                    """)
+                            }
+                    )),
+            @ApiResponse(responseCode = "404", description = "근무일 정보 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(name = "WORK_DAY_NOT_FOUND", value = """
+                                {
+                                  "code": "WORK_DAY_NOT_FOUND",
+                                  "message": "해당 연도와 월에 대한 근무일이 존재하지 않습니다."
+                                }
+                                """)
+                    ))
+    })
+    @interface WorkDay {}
+
 }
