@@ -26,6 +26,12 @@ public class ErrorResponse {
                 .build();
     }
 
+    public ErrorResponse(String code, String message, Map<String, String> errors) {
+        this.code = code;
+        this.message = message;
+        this.errors = errors;
+    }
+
     public ErrorResponse(String code, String message) {
         this.code = code;
         this.message = message;
