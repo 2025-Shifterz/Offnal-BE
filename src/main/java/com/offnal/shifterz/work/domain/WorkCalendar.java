@@ -29,6 +29,7 @@ public class WorkCalendar {
 
     private String month;
 
+    @Builder.Default
     @ElementCollection
     @CollectionTable(name = "work_times", joinColumns = @JoinColumn(name = "work_sch_id"))
     private Map<String, WorkTime> workTimes = new HashMap<>();
