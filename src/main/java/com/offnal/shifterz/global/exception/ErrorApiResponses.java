@@ -89,7 +89,7 @@ public @interface ErrorApiResponses {
     })
     @interface Member {}
 
-    // 캘린더 저장 관련 에러
+    // 캘린더 생성 에러
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
@@ -141,9 +141,41 @@ public @interface ErrorApiResponses {
                                         }
                                         """)
                             }
+                    )),
+            @ApiResponse(responseCode = "404",  description = "근무표 수정 요청 오류",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ErrorResponse.class),
+                        examples = {
+                                @ExampleObject(name = "CALENDAR_NOT_FOUND", value = """
+                                        {
+                                          "code": "CALENDAR_NOT_FOUND",
+                                          "message": "해당하는 연도, 월의 캘린더를 찾을 수 없습니다."
+                                        }
+                                        """)
+                        }
+                ))
+    })
+    @interface CreateWorkCalendar {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404",  description = "근무표 수정 요청 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "CALENDAR_NOT_FOUND", value = """
+                                        {
+                                          "code": "CALENDAR_NOT_FOUND",
+                                          "message": "해당하는 연도, 월의 캘린더를 찾을 수 없습니다."
+                                        }
+                                        """)
+                            }
                     ))
     })
-    @interface WorkCalendar {}
+    @interface UpdateWorkCalendar {}
 
     // 근무일 조회 관련 에러
     @Target(ElementType.METHOD)

@@ -6,8 +6,10 @@ import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.work.converter.WorkCalendarConverter;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
+import com.offnal.shifterz.work.domain.WorkTimeType;
 import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
 import com.offnal.shifterz.work.dto.WorkCalendarUnitDto;
+import com.offnal.shifterz.work.dto.WorkCalendarUpdateDto;
 import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.repository.WorkCalendarRepository;
 import com.offnal.shifterz.work.repository.WorkInstanceRepository;
@@ -16,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -55,6 +59,49 @@ public class WorkCalendarService {
                 workInstanceRepository.findByWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(memberId, year, month);
 
         return WorkCalendarConverter.toDayResponseDtoList(instances);
+    }
+
+    @Transactional
+    public void updateWorkCalendar(String year, String month, WorkCalendarUpdateDto workCalendarUpdateDto) {
+        Long memberId = AuthService.getCurrentUserId();
+
+        WorkCalendar calendar = workCalendarRepository
+                .findByMemberIdAndYearAndMonth(memberId, year, month)
+                .orElseThrow(() -> new CustomException(ErrorCode.CALENDAR_NOT_FOUND));
+
+        List<WorkInstance> existingInstance = workInstanceRepository.findByWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(memberId, year, month);
+
+        Map<String, WorkInstance> existingMap = existingInstance.stream()
+                .collect(Collectors.toMap(WorkInstance::getWorkDay, wi -> wi));
+
+        for(Map.Entry<String, String> entry : workCalendarUpdateDto.getShifts().entrySet()){
+            String day = entry.getKey();
+            String workType = entry.getValue();
+
+            WorkInstance existing = existingMap.get(day);
+            WorkTimeType workTimeType = WorkTimeType.fromSymbol(workType);
+
+            if(existing != null){
+                workInstanceRepository.delete(existing);
+
+                WorkInstance newInstance = WorkInstance.builder()
+                        .workDay(day)
+                        .workTimeType(workTimeType)
+                        .workCalendar(calendar)
+                        .build();
+
+                workInstanceRepository.save(newInstance);
+            }
+            else{
+                WorkInstance newInstance = WorkInstance.builder()
+                        .workDay(day)
+                        .workTimeType(workTimeType)
+                        .workCalendar(calendar)
+                        .build();
+
+                workInstanceRepository.save(newInstance);
+            }
+        }
     }
 
 }
