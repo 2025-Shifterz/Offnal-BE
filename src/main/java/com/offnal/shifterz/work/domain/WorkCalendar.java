@@ -14,7 +14,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Builder
-@Table(name = "work_schedules")
+@Table(name = "work_calendar")
 public class WorkCalendar {
 
     @Id
