@@ -31,4 +31,10 @@ public class ErrorResponse {
         this.message = message;
         this.errors = null;
     }
+
+    public ErrorResponse(String code, String message, Map<String, String> errors) {
+        this.code = code;
+        this.message = message;
+        this.errors = errors;
+    }
 }

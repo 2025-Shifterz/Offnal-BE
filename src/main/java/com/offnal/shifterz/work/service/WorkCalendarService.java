@@ -1,6 +1,8 @@
 package com.offnal.shifterz.work.service;
 
 import com.offnal.shifterz.global.common.AuthService;
+import com.offnal.shifterz.global.exception.CustomException;
+import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.work.converter.WorkCalendarConverter;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
@@ -28,6 +30,14 @@ public class WorkCalendarService {
         Long memberId = AuthService.getCurrentUserId();
 
         for (WorkCalendarUnitDto unitDto : workCalendarRequestDto.getCalendars()) {
+            // 중복 년도,달의 캘린더 체크 (memberId, year, month 중복 체크)
+            boolean exists = workCalendarRepository.existsByMemberIdAndYearAndMonth(
+                    memberId, unitDto.getYear(), unitDto.getMonth());
+
+            if (exists) {
+                throw new CustomException(ErrorCode.CALENDAR_DUPLICATION);
+            }
+
             WorkCalendar calendar = WorkCalendarConverter.toEntity(memberId, workCalendarRequestDto, unitDto);
             WorkCalendar savedCalendar = workCalendarRepository.save(calendar);
 
