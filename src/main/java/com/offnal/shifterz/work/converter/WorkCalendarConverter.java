@@ -5,6 +5,7 @@ import com.offnal.shifterz.work.domain.WorkInstance;
 import com.offnal.shifterz.work.domain.WorkTime;
 import com.offnal.shifterz.work.domain.WorkTimeType;
 import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
+import com.offnal.shifterz.work.dto.WorkCalendarUnitDto;
 import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.dto.WorkTimeDto;
 
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 public class WorkCalendarConverter {
 
     // WorkCalendarRequestDto -> WorkCalendar
-    public static WorkCalendar toEntity(Long memberId, WorkCalendarRequestDto workCalendarRequestDto) {
+    public static WorkCalendar toEntity(Long memberId, WorkCalendarRequestDto workCalendarRequestDto, WorkCalendarUnitDto unitDto) {
 
         Map<String, WorkTime> workTimeMap = new HashMap<>();
         for (Map.Entry<String, WorkTimeDto> entry : workCalendarRequestDto.getWorkTimes().entrySet()) {
@@ -33,8 +34,8 @@ public class WorkCalendarConverter {
 
         return WorkCalendar.builder()
                 .calendarName(workCalendarRequestDto.getCalendarName())
-                .year(workCalendarRequestDto.getYear())
-                .month(workCalendarRequestDto.getMonth())
+                .year(unitDto.getYear())
+                .month(unitDto.getMonth())
                 .memberId(memberId)
                 .workGroup(workCalendarRequestDto.getWorkGroup())
                 .workTimes(workTimeMap)
@@ -42,8 +43,8 @@ public class WorkCalendarConverter {
     }
 
     // WorkCalendarRequestDto -> List<WorkInstance>
-    public static List<WorkInstance> toWorkInstances(WorkCalendarRequestDto workCalendarRequestDto, WorkCalendar calendar) {
-        return workCalendarRequestDto.getShifts().entrySet().stream()
+    public static List<WorkInstance> toWorkInstances(WorkCalendarUnitDto unitDto, WorkCalendar calendar) {
+        return unitDto.getShifts().entrySet().stream()
                 .map(entry -> WorkInstance.builder()
                         .workDay(entry.getKey())
                         .workTimeType(WorkTimeType.fromSymbol(entry.getValue()))

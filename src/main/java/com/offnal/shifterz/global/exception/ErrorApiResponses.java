@@ -133,6 +133,12 @@ public @interface ErrorApiResponses {
                                           "code": "CALENDAR_SHIFT_REQUIRED",
                                           "message": "근무일 정보는 필수입니다."
                                         }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_DUPLICATION", value = """
+                                        {
+                                          "code": "CALENDAR_DUPLICATION",
+                                          "message": "이미 존재하는 연도/월의 캘린더입니다."
+                                        }
                                         """)
                             }
                     ))
