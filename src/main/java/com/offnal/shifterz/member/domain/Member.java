@@ -32,7 +32,7 @@ public class Member{
     @Column(name = "kakao_profile_image_url")
     private String profileImageUrl;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workCalendar_id")
-    private List<WorkCalendar> workCalendars;
+//    @OneToMany(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "workCalendar_id")
+//    private List<WorkCalendar> workCalendars;
 }
