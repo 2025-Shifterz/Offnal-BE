@@ -5,6 +5,7 @@ import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
+import com.offnal.shifterz.work.dto.WorkCalendarUnitDto;
 import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.service.WorkCalendarService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/works/calendar")
@@ -42,28 +44,50 @@ public class WorkCalendarController {
                     examples = @ExampleObject(
                             name = "근무표 등록 예시",
                             value = """
-                                        {
-                                          "calendarName": "병원 근무표",
-                                          "year": "2025",
-                                          "month": "7",
-                                          "workGroup": "1조",
-                                          "workTimes": {
-                                            "D": { "startTime": "08:00", "endTime": "16:00" },
-                                            "E": { "startTime": "16:00", "endTime": "00:00" },
-                                            "N": { "startTime": "00:00", "endTime": "08:00" }
-                                          },
-                                          "shifts": {
-                                            "1": "E",
-                                            "2": "E",
-                                            "3": "N",
-                                            "4": "-"
-                                          }
-                                        }
-                                        """
+                            {
+                              "calendarName": "병원 근무표",
+                              "workGroup": "1조",
+                              "workTimes": {
+                                "D": { "startTime": "08:00", "endTime": "16:00" },
+                                "E": { "startTime": "16:00", "endTime": "00:00" },
+                                "N": { "startTime": "00:00", "endTime": "08:00" }
+                              },
+                              "calendars": [
+                                {
+                                  "year": "2025",
+                                  "month": "7",
+                                  "shifts": {
+                                    "1": "E",
+                                    "2": "E",
+                                    "3": "N",
+                                    "4": "-"
+                                  }
+                                },
+                                {
+                                  "year": "2025",
+                                  "month": "8",
+                                  "shifts": {
+                                    "1": "E",
+                                    "2": "E",
+                                    "3": "N",
+                                    "4": "-"
+                                  }
+                                }
+                              ]
+                            }
+                            """
                     )
             )
     )@RequestBody @Valid WorkCalendarRequestDto workCalendarRequestDto) {
-        workCalendarService.saveWorkCalendar(workCalendarRequestDto);
+        for(WorkCalendarUnitDto unitDto : workCalendarRequestDto.getCalendars()){
+            WorkCalendarRequestDto requestDto = WorkCalendarRequestDto.builder()
+                    .calendarName(workCalendarRequestDto.getCalendarName())
+                    .workGroup(workCalendarRequestDto.getWorkGroup())
+                    .workTimes(workCalendarRequestDto.getWorkTimes())
+                    .calendars(List.of(unitDto))
+                    .build();
+            workCalendarService.saveWorkCalendar(requestDto);
+        }
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.CALENDAR_CREATED));
     }
 
