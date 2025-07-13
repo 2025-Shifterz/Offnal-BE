@@ -5,6 +5,7 @@ import com.offnal.shifterz.global.exception.ErrorResponse;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.member.dto.AuthResponseDto;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -84,6 +85,7 @@ public class KakaoLoginController {
                                     """)
                     ))
     })
+    @Hidden
     @GetMapping("/callback")
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
             // 서비스 호출

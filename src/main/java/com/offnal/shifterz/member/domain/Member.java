@@ -1,13 +1,10 @@
 package com.offnal.shifterz.member.domain;
 
-import com.offnal.shifterz.work.domain.WorkCalendar;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 @AllArgsConstructor

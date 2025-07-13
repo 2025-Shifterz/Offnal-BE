@@ -5,6 +5,7 @@ import com.offnal.shifterz.work.converter.WorkCalendarConverter;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
 import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
+import com.offnal.shifterz.work.dto.WorkCalendarUnitDto;
 import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.repository.WorkCalendarRepository;
 import com.offnal.shifterz.work.repository.WorkInstanceRepository;
@@ -26,21 +27,32 @@ public class WorkCalendarService {
 
         Long memberId = AuthService.getCurrentUserId();
 
-        WorkCalendar calendar = WorkCalendarConverter.toEntity(memberId, workCalendarRequestDto);
-        WorkCalendar savedCalendar = workCalendarRepository.save(calendar);
+        for (WorkCalendarUnitDto unitDto : workCalendarRequestDto.getCalendars()) {
+            // 중복 년도,달의 캘린더 체크 (memberId, year, month 중복 체크)
+            boolean exists = workCalendarRepository.existsByMemberIdAndYearAndMonth(
+                    memberId, unitDto.getYear(), unitDto.getMonth());
 
-        List<WorkInstance> instances = WorkCalendarConverter.toWorkInstances(workCalendarRequestDto, savedCalendar);
-        workInstanceRepository.saveAll(instances);
+            if (exists) {
+                throw new CustomException(ErrorCode.CALENDAR_DUPLICATION);
+            }
+
+            WorkCalendar calendar = WorkCalendarConverter.toEntity(memberId, workCalendarRequestDto, unitDto);
+            WorkCalendar savedCalendar = workCalendarRepository.save(calendar);
+
+            List<WorkInstance> instances = WorkCalendarConverter.toWorkInstances(unitDto, savedCalendar);
+            workInstanceRepository.saveAll(instances);
+        }
+
     }
-
 
     public List<WorkDayResponseDto> getWorkDaysByYearAndMonth(String year, String month) {
 
         Long memberId = AuthService.getCurrentUserId();
 
         List<WorkInstance> instances =
-                workInstanceRepository.findByWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(memberId,year, month);
+                workInstanceRepository.findByWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(memberId, year, month);
 
         return WorkCalendarConverter.toDayResponseDtoList(instances);
     }
+
 }
