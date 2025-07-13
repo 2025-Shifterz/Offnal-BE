@@ -145,7 +145,7 @@ public class WorkCalendarController {
                                           { "day": "1", "workTypeName": "오후" },
                                           { "day": "2", "workTypeName": "오후" },
                                           { "day": "3", "workTypeName": "야간" },
-                                          { "day": "4", "workTypeName": "휴무" }
+                                          { "day": "4", "workTypeName": "휴일" }
                                         ]
                                         """
                             )
@@ -169,7 +169,8 @@ public class WorkCalendarController {
                                         "1": "N",
                                         "2": "D",
                                         "3": "-",
-                                        "4": "E"
+                                        "4": "E",
+                                        "5": "N"
                                       }
                                     }
                                     """))
@@ -177,6 +178,21 @@ public class WorkCalendarController {
             @RequestBody @Valid WorkCalendarUpdateDto workCalendarUpdateDto){
         workCalendarService.updateWorkCalendar(year, month, workCalendarUpdateDto);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.CALENDAR_UPDATED));
+    }
+
+
+    @Operation(summary = "근무표 삭제", description = "특정 연도와 월의 근무표를 삭제합니다.")
+    @SuccessApiResponses.DeleteCalendar
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.DeleteWorkCalendar
+    @DeleteMapping
+    public ResponseEntity<SuccessResponse<Void>> deleteWorkCalendar(
+            @RequestParam String year,
+            @RequestParam String month
+    ){
+        workCalendarService.deleteWorkCalendar(year, month);
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.CALENDAR_DELETED));
     }
 
 }

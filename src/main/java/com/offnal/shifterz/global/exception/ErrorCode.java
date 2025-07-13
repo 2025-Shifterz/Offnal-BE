@@ -33,6 +33,9 @@ public enum ErrorCode {
     // 캘린더 수정 관련
     CALENDAR_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 연도, 월의 캘린더를 찾을 수 없습니다."),
 
+    // 캘린더 삭제 관련
+    CALENDAR_DELETE_FAILED(HttpStatus.BAD_REQUEST, "근무표 삭제에 실패하였습니다."),
+
     //근무 관련
     WORK_INSTANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 일자에 저장된 근무 정보가 없습니다."),
     WORK_TIME_NOT_FOUND(HttpStatus.NOT_FOUND, "오늘의 근무 시간 정보가 없습니다."),

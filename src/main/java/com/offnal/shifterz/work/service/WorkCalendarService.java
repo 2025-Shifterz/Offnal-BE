@@ -104,4 +104,16 @@ public class WorkCalendarService {
         }
     }
 
+    @Transactional
+    public void deleteWorkCalendar(String year, String month) {
+        Long memberId = AuthService.getCurrentUserId();
+
+        WorkCalendar calendar = workCalendarRepository
+                .findByMemberIdAndYearAndMonth(memberId, year, month)
+                .orElseThrow(() -> new CustomException(ErrorCode.CALENDAR_NOT_FOUND));
+
+        workInstanceRepository.deleteAllByWorkCalendar(calendar);
+        workCalendarRepository.delete(calendar);
+    }
+
 }
