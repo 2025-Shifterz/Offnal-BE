@@ -28,6 +28,13 @@ public enum ErrorCode {
     CALENDAR_WORK_GROUP_REQUIRED(HttpStatus.BAD_REQUEST, "근무조는 필수입니다."),
     CALENDAR_WORK_TIME_REQUIRED(HttpStatus.BAD_REQUEST, "근무 시간 정보는 필수입니다."),
     CALENDAR_SHIFT_REQUIRED(HttpStatus.BAD_REQUEST, "근무일 정보는 필수입니다."),
+    CALENDAR_DUPLICATION(HttpStatus.BAD_REQUEST, "이미 존재하는 연도/월의 캘린더입니다."),
+
+    // 캘린더 수정 관련
+    CALENDAR_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 연도, 월의 캘린더를 찾을 수 없습니다."),
+
+    // 캘린더 삭제 관련
+    CALENDAR_DELETE_FAILED(HttpStatus.BAD_REQUEST, "근무표 삭제에 실패하였습니다."),
 
     //근무 관련
     WORK_INSTANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 일자에 저장된 근무 정보가 없습니다."),

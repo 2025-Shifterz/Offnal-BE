@@ -1,13 +1,10 @@
 package com.offnal.shifterz.member.domain;
 
-import com.offnal.shifterz.work.domain.WorkCalendar;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -31,8 +28,4 @@ public class Member{
 
     @Column(name = "kakao_profile_image_url")
     private String profileImageUrl;
-
-//    @OneToMany(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "workCalendar_id")
-//    private List<WorkCalendar> workCalendars;
 }
