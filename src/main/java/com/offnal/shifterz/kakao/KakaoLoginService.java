@@ -16,7 +16,7 @@ public class KakaoLoginService {
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public KakaoLoginResult loginWithKakao(String code) {
+    public AuthResponseDto loginWithKakao(String code) {
         // 1. 카카오 액세스 토큰 조회
         String kakaoAccessToken = kakaoService.getKakaoAccessToken(code);
         if (kakaoAccessToken == null || kakaoAccessToken.isBlank()) {
@@ -44,10 +44,10 @@ public class KakaoLoginService {
         String jwtAccessToken = jwtTokenProvider.createToken(result.getMember().getId());
         String jwtRefreshToken = jwtTokenProvider.createRefreshToken(result.getMember().getEmail());
 
-        AuthResponseDto responseDto = AuthResponseDto.from(result.getMember(), result.isNewMember());
-
-        return new KakaoLoginResult(responseDto, jwtAccessToken, jwtRefreshToken);
+        // 5. DTO에 토큰 포함하여 반환
+        return AuthResponseDto.from(result.getMember(), result.isNewMember(), jwtAccessToken, jwtRefreshToken);
     }
+
 
 
 }

@@ -88,19 +88,18 @@ public class KakaoLoginController {
     @Hidden
     @GetMapping("/callback")
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
-            // 서비스 호출
-             KakaoLoginResult result = kakaoLoginService.loginWithKakao(code);
 
-            // 헤더 설정
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + result.getAccessToken());
-            headers.set("Refresh-Token", result.getRefreshToken());
+        AuthResponseDto dto = kakaoLoginService.loginWithKakao(code);
 
-            // 헤더 + 바디 응답
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(SuccessResponse.success(SuccessCode.LOGIN_SUCCESS, result.getAuthResponseDto()));
+        // 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + dto.getAccessToken());
+        headers.set("Refresh-Token", dto.getRefreshToken());
 
-
+        // 헤더 + 바디 응답
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(SuccessResponse.success(SuccessCode.LOGIN_SUCCESS, dto));
     }
+
 }
