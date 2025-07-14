@@ -1,6 +1,8 @@
 package com.offnal.shifterz.work.service;
 
 import com.offnal.shifterz.global.common.AuthService;
+import com.offnal.shifterz.global.exception.CustomException;
+import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.work.converter.WorkCalendarConverter;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
