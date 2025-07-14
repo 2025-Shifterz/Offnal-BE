@@ -89,7 +89,7 @@ public @interface ErrorApiResponses {
     })
     @interface Member {}
 
-    // 캘린더 저장 관련 에러
+    // 캘린더 생성 에러
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
@@ -143,7 +143,58 @@ public @interface ErrorApiResponses {
                             }
                     ))
     })
-    @interface WorkCalendar {}
+    @interface CreateWorkCalendar {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404",  description = "근무표 수정 요청 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "CALENDAR_NOT_FOUND", value = """
+                                        {
+                                          "code": "CALENDAR_NOT_FOUND",
+                                          "message": "해당하는 연도, 월의 캘린더를 찾을 수 없습니다."
+                                        }
+                                        """)
+                            }
+                    ))
+    })
+    @interface UpdateWorkCalendar {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404",  description = "근무표 삭제 요청 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "CALENDAR_NOT_FOUND", value = """
+                                        {
+                                          "code": "CALENDAR_NOT_FOUND",
+                                          "message": "해당하는 연도, 월의 캘린더를 찾을 수 없습니다."
+                                        }
+                                        """)
+                            }
+                    )),
+            @ApiResponse(responseCode = "500",  description = "근무표 삭제 요청 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "CALENDAR_DELETE_FAILED", value = """
+                                        {
+                                          "code": "CALENDAR_DELETE_FAILED",
+                                          "message": "근무표 삭제에 실패하였습니다."
+                                        }
+                                        """)
+                            }
+                    ))
+    })
+    @interface DeleteWorkCalendar {}
 
     // 근무일 조회 관련 에러
     @Target(ElementType.METHOD)

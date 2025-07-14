@@ -49,7 +49,45 @@ public @interface SuccessApiResponses {
                                 """)
                     ))
     })
-    public @interface Calendar {}
+    public @interface CreateCalendar {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "근무표 수정 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "근무표 수정 성공 예시", value = """
+                                    {
+                                      "code": "CALENDAR_UPDATED",
+                                      "message": "근무표 수정에 성공했습니다.",
+                                      "data": null
+                                    }
+                                    """)}
+                    ))
+    })
+    public @interface UpdateCalendar {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "근무표 삭제 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "근무표 삭제 성공 예시", value = """
+                                    {
+                                      "code": "CALENDAR_DELETED",
+                                      "message": "근무표 삭제에 성공했습니다.",
+                                      "data": null
+                                    }
+                                    """)}
+                    ))
+    })
+    public @interface DeleteCalendar {}
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)

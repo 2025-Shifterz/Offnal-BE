@@ -24,8 +24,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .cors().and() // ✅ CORS 활성화 추가
+        http.cors().and() // ✅ CORS 활성화 추가
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.requestMatchers(
                                         "/login",
