@@ -3,6 +3,7 @@ package com.offnal.shifterz.config;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
@@ -31,9 +32,12 @@ public class SwaggerConfig {
         SecurityRequirement securityRequirement = new SecurityRequirement()
                 .addList(SECURITY_SCHEME_NAME);
 
+
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes(SECURITY_SCHEME_NAME, securityScheme))
                 .addSecurityItem(securityRequirement)
+                .addServersItem(new Server().url("https://api.offnal.site").description("Production Server"))
+                .addServersItem(new Server().url("http://localhost:8080/").description("Local Server"))
                 .info(info);
     }
 }
