@@ -63,7 +63,7 @@
 | 이름 | 역할 | GitHub |
 |------|------|--------|
 | 구혜승 | Backend / Leader | [@guhyesung](https://github.com/GOOHAESEUNG) |
-| 박윤지 | Backend | [@yunnij](https://github.com/yunnij) |
+| 정세윤 | Backend | [@yunnij](https://github.com/yunnij) |
 | 최재영 | Backend | [@jjaeroong](https://github.com/jjaeroong) |
 
 ---
