@@ -17,15 +17,13 @@ public class Member{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "kakao_id", unique = true)
-    private Long kakaoId;
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
 
-    @Column(name = "kakao_nickname")
-    private String kakaoNickname;
-
-    @Column(name = "kakao_email")
+    private String providerId;
     private String email;
+    private String memberName;
+    private String phoneNumber;
 
-    @Column(name = "kakao_profile_image_url")
     private String profileImageUrl;
 }
