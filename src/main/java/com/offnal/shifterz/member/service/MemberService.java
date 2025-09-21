@@ -1,13 +1,22 @@
 package com.offnal.shifterz.member.service;
 
+import com.offnal.shifterz.global.common.AuthService;
+import com.offnal.shifterz.global.exception.CustomException;
+import com.offnal.shifterz.global.exception.ErrorCode;
+import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.jwt.CustomUserDetails;
+import com.offnal.shifterz.member.converter.MemberConverter;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.domain.Provider;
+import com.offnal.shifterz.member.dto.MemberRequestDto;
+import com.offnal.shifterz.member.dto.MemberResponseDto;
 import com.offnal.shifterz.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -92,4 +101,40 @@ public class MemberService {
             return isNewMember;
         }
     }
+    @Transactional
+    public MemberResponseDto.MemberUpdateResponseDto updateProfile(MemberRequestDto.MemberUpdateRequestDto request) {
+        Long memberId = AuthService.getCurrentUserId();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        member.updateMemberInfo(
+                request.getEmail(),
+                request.getName(),
+                request.getPhoneNumber(),
+                request.getProfileImageUrl()
+
+        );
+
+        return MemberConverter.toResponse(member);
+    }
+
+    @Transactional
+    public MemberResponseDto.MemberUpdateResponseDto getMyInfo() {
+        Long memberId = AuthService.getCurrentUserId();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+        return MemberConverter.toResponse(member);
+    }
+    @Getter
+    @AllArgsConstructor
+    public enum MemberErrorCode implements ErrorReason {
+        MEMBER_NOT_FOUND("MEM001", HttpStatus.NOT_FOUND, "해당 회원을 찾을 수 없습니다."),
+        MEMBER_SAVE_FAILED("MEM002", HttpStatus.INTERNAL_SERVER_ERROR, "회원 저장에 실패했습니다."),
+        MEMBER_ACCESS_DENIED("MEM003", HttpStatus.FORBIDDEN, "회원 접근 권한이 없습니다.");
+
+        private final String code;
+        private final HttpStatus status;
+        private final String message;
+    }
+
 }
