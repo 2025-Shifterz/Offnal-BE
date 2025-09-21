@@ -2,6 +2,7 @@ package com.offnal.shifterz.member.service;
 
 import com.offnal.shifterz.jwt.CustomUserDetails;
 import com.offnal.shifterz.member.domain.Member;
+import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
@@ -24,31 +25,42 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     /**
-     * 카카오 로그인 회원 등록 또는 업데이트
-     * @param kakaoId 카카오 ID
+     * 소셜 로그인 회원 등록 또는 업데이트
+     * @param provider 소셜 제공자 (KAKAO, GOOGLE, NAVER ...)
+     * @param providerId 제공자 ID
      * @param email 이메일
-     * @param nickname 닉네임
-     * @param profileImageUrl 프로필 이미지 URL
+     * @param memberName 이름
+     * @param phoneNumber 전화번호
+     * @param profileImageUrl 프로필 이미지
      * @return 등록/업데이트된 Member와 신규 가입 여부
      */
     @Transactional
-    public MemberResult registerOrUpdateKakaoMember(Long kakaoId, String email, String nickname, String profileImageUrl) {
-        Optional<Member> existingMember = memberRepository.findByKakaoId(kakaoId);
+    public MemberResult registerOrUpdateMember(
+            Provider provider,
+            String providerId,
+            String email,
+            String memberName,
+            String phoneNumber,
+            String profileImageUrl
+    ) {
+        Optional<Member> existingMember = memberRepository.findByProviderAndProviderId(provider, providerId);
 
         if (existingMember.isPresent()) {
             // 기존 회원 정보 업데이트
             Member member = existingMember.get();
-            member.setEmail(email);
-            member.setProfileImageUrl(profileImageUrl);
+            member.updateMemberInfo(email, memberName, phoneNumber, profileImageUrl);
 
             return new MemberResult(member, false);
         } else {
-            // 신규 회원 등록 (카카오 로그인만 가능)
-            Member newMember = new Member();
-            newMember.setKakaoId(kakaoId);
-            newMember.setEmail(email);
-            newMember.setKakaoNickname(nickname);
-            newMember.setProfileImageUrl(profileImageUrl);
+            // 신규 회원 등록 (Builder 활용)
+            Member newMember = Member.builder()
+                    .provider(provider)
+                    .providerId(providerId)
+                    .email(email)
+                    .memberName(memberName)
+                    .phoneNumber(phoneNumber)
+                    .profileImageUrl(profileImageUrl)
+                    .build();
 
             Member savedMember = memberRepository.save(newMember);
 
