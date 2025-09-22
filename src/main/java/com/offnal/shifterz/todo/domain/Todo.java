@@ -3,8 +3,11 @@ package com.offnal.shifterz.todo.domain;
 import com.offnal.shifterz.global.BaseTimeEntity;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.organization.domain.Organization;
+import com.offnal.shifterz.todo.dto.TodoRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "todo")
@@ -19,11 +22,15 @@ public class Todo extends BaseTimeEntity {
     private Long id;
 
     @Lob
+    @Column(nullable = false)
     private String content;
 
-    private Boolean isSuccess;
+    @Column(nullable = false)
+    private Boolean isSuccess = false; // 기본값 false
 
-    private Long targetDate;
+    @Column(nullable = false)
+    private LocalDate targetDate;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -32,5 +39,11 @@ public class Todo extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id")
     private Organization organization; // nullable
+
+    public void update(TodoRequestDto.UpdateDto request) {
+        if (request.getContent() != null) this.content = request.getContent();
+        if (request.getIsSuccess() != null) this.isSuccess = request.getIsSuccess();
+        if (request.getTargetDate() != null) this.targetDate = request.getTargetDate();
+    }
 }
 

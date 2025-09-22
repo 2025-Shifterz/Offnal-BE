@@ -3,6 +3,7 @@ package com.offnal.shifterz.global.common;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.jwt.CustomUserDetails;
+import com.offnal.shifterz.member.domain.Member;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -19,7 +20,7 @@ public class AuthService {
         return userDetails.getId();
     }
 
-    public static com.offnal.shifterz.member.domain.Member getCurrentMember() {
+    public static Member getCurrentMember() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {

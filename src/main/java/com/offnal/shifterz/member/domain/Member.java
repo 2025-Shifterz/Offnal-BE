@@ -34,6 +34,7 @@ public class Member extends BaseTimeEntity {
         this.memberName = memberName;
         this.phoneNumber = phoneNumber;
         this.profileImageUrl = profileImageUrl;
+
     }
 
 

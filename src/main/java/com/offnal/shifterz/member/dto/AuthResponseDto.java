@@ -28,14 +28,17 @@ public class AuthResponseDto {
     private String refreshToken;
 
 
-    public static AuthResponseDto from(Member member, boolean isNewMember, String accessToken, String refreshToken) {
+    public static AuthResponseDto from(MemberResponseDto.MemberRegisterResponseDto dto,
+                                       String accessToken,
+                                       String refreshToken) {
         return AuthResponseDto.builder()
-                .memberName(member.getMemberName())
-                .email(member.getEmail())
-                .profileImageUrl(member.getProfileImageUrl())
-                .newMember(isNewMember)
+                .memberName(dto.getMemberName())
+                .email(dto.getEmail())
+                .profileImageUrl(dto.getProfileImageUrl())
+                .newMember(dto.isNewMember())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
     }
+
 }
