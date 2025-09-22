@@ -19,9 +19,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -55,8 +57,8 @@ public class WorkCalendarController {
                               },
                               "calendars": [
                                 {
-                                  "year": "2025",
-                                  "month": "7",
+                                  "startDate": "2025-09-01",
+                                  "endDate": "2025-09-30",
                                   "shifts": {
                                     "1": "E",
                                     "2": "E",
@@ -65,8 +67,8 @@ public class WorkCalendarController {
                                   }
                                 },
                                 {
-                                  "year": "2025",
-                                  "month": "8",
+                                  "startDate": "2025-09-01",
+                                  "endDate": "2025-09-30",
                                   "shifts": {
                                     "1": "E",
                                     "2": "E",
@@ -83,7 +85,6 @@ public class WorkCalendarController {
         for(WorkCalendarUnitDto unitDto : workCalendarRequestDto.getCalendars()){
             WorkCalendarRequestDto requestDto = WorkCalendarRequestDto.builder()
                     .calendarName(workCalendarRequestDto.getCalendarName())
-                    .workGroup(workCalendarRequestDto.getWorkGroup())
                     .workTimes(workCalendarRequestDto.getWorkTimes())
                     .calendars(List.of(unitDto))
                     .build();
@@ -120,11 +121,11 @@ public class WorkCalendarController {
     })
 
     @GetMapping
-    public ResponseEntity<SuccessResponse<List<WorkDayResponseDto>>> getWorkDaysByMonth(
-            @RequestParam String year,
-            @RequestParam String month
+    public ResponseEntity<SuccessResponse<List<WorkDayResponseDto>>> getWorkDaysByStartDateAndEndDate(
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate
     ) {
-        List<WorkDayResponseDto> response = workCalendarService.getWorkDaysByYearAndMonth(year, month);
+        List<WorkDayResponseDto> response = workCalendarService.getWorkDaysByStartDateAndEndDate(startDate, endDate);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.DATA_FETCHED, response));
 
     }
@@ -157,8 +158,8 @@ public class WorkCalendarController {
     })
     @PatchMapping
     public ResponseEntity<SuccessResponse<Void>> updateWorkCalendar(
-            @RequestParam String year,
-            @RequestParam String month,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate,
 
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
@@ -176,7 +177,7 @@ public class WorkCalendarController {
                                     """))
             )
             @RequestBody @Valid WorkCalendarUpdateDto workCalendarUpdateDto){
-        workCalendarService.updateWorkCalendar(year, month, workCalendarUpdateDto);
+        workCalendarService.updateWorkCalendar(startDate, endDate, workCalendarUpdateDto);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.CALENDAR_UPDATED));
     }
 
@@ -188,10 +189,10 @@ public class WorkCalendarController {
     @ErrorApiResponses.DeleteWorkCalendar
     @DeleteMapping
     public ResponseEntity<SuccessResponse<Void>> deleteWorkCalendar(
-            @RequestParam String year,
-            @RequestParam String month
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate
     ){
-        workCalendarService.deleteWorkCalendar(year, month);
+        workCalendarService.deleteWorkCalendar(startDate, endDate);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.CALENDAR_DELETED));
     }
 

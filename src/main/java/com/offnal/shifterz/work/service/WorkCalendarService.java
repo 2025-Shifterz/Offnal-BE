@@ -15,8 +15,10 @@ import com.offnal.shifterz.work.repository.WorkCalendarRepository;
 import com.offnal.shifterz.work.repository.WorkInstanceRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,9 +36,9 @@ public class WorkCalendarService {
         Long memberId = AuthService.getCurrentUserId();
 
         for (WorkCalendarUnitDto unitDto : workCalendarRequestDto.getCalendars()) {
-            // 중복 년도,달의 캘린더 체크 (memberId, year, month 중복 체크)
-            boolean exists = workCalendarRepository.existsByMemberIdAndYearAndMonth(
-                    memberId, unitDto.getYear(), unitDto.getMonth());
+            // 중복 시작일, 종료일의 캘린더 체크 (memberId, startDate, endDate 중복 체크)
+            boolean exists = workCalendarRepository.existsByMemberIdAndStartDateAndEndDate(
+                    memberId, unitDto.getStartDate(), unitDto.getEndDate());
 
             if (exists) {
                 throw new CustomException(ErrorCode.CALENDAR_DUPLICATION);
@@ -51,31 +53,32 @@ public class WorkCalendarService {
 
     }
 
-    public List<WorkDayResponseDto> getWorkDaysByYearAndMonth(String year, String month) {
+    public List<WorkDayResponseDto> getWorkDaysByStartDateAndEndDate(LocalDate startDate, LocalDate endDate) {
 
         Long memberId = AuthService.getCurrentUserId();
 
         List<WorkInstance> instances =
-                workInstanceRepository.findByWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(memberId, year, month);
+                workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(memberId, startDate, endDate);
 
         return WorkCalendarConverter.toDayResponseDtoList(instances);
     }
 
     @Transactional
-    public void updateWorkCalendar(String year, String month, WorkCalendarUpdateDto workCalendarUpdateDto) {
+    public void updateWorkCalendar(LocalDate startDate, LocalDate endDate, WorkCalendarUpdateDto workCalendarUpdateDto) {
         Long memberId = AuthService.getCurrentUserId();
 
         WorkCalendar calendar = workCalendarRepository
-                .findByMemberIdAndYearAndMonth(memberId, year, month)
+                .findByMemberIdAndStartDateAndEndDate(memberId, startDate, endDate)
                 .orElseThrow(() -> new CustomException(ErrorCode.CALENDAR_NOT_FOUND));
 
-        List<WorkInstance> existingInstance = workInstanceRepository.findByWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(memberId, year, month);
+        // 캘린더 범위 내 근무 일정 조회
+        List<WorkInstance> existingInstances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(memberId, startDate, endDate);
 
-        Map<String, WorkInstance> existingMap = existingInstance.stream()
-                .collect(Collectors.toMap(WorkInstance::getWorkDay, wi -> wi));
+        Map<LocalDate, WorkInstance> existingMap = existingInstances.stream()
+                .collect(Collectors.toMap(WorkInstance::getWorkDate, wi -> wi));
 
-        for(Map.Entry<String, String> entry : workCalendarUpdateDto.getShifts().entrySet()){
-            String day = entry.getKey();
+        for(Map.Entry<LocalDate, String> entry : workCalendarUpdateDto.getShifts().entrySet()){
+            LocalDate day = entry.getKey();
             String workType = entry.getValue();
 
             WorkInstance existing = existingMap.get(day);
@@ -85,7 +88,7 @@ public class WorkCalendarService {
                 workInstanceRepository.delete(existing);
 
                 WorkInstance newInstance = WorkInstance.builder()
-                        .workDay(day)
+                        .workDate(day)
                         .workTimeType(workTimeType)
                         .workCalendar(calendar)
                         .build();
@@ -94,7 +97,7 @@ public class WorkCalendarService {
             }
             else{
                 WorkInstance newInstance = WorkInstance.builder()
-                        .workDay(day)
+                        .workDate(day)
                         .workTimeType(workTimeType)
                         .workCalendar(calendar)
                         .build();
@@ -105,11 +108,11 @@ public class WorkCalendarService {
     }
 
     @Transactional
-    public void deleteWorkCalendar(String year, String month) {
+    public void deleteWorkCalendar(LocalDate startDate, LocalDate endDate) {
         Long memberId = AuthService.getCurrentUserId();
 
         WorkCalendar calendar = workCalendarRepository
-                .findByMemberIdAndYearAndMonth(memberId, year, month)
+                .findByMemberIdAndStartDateAndEndDate(memberId, startDate, endDate)
                 .orElseThrow(() -> new CustomException(ErrorCode.CALENDAR_NOT_FOUND));
 
         workInstanceRepository.deleteAllByWorkCalendar(calendar);

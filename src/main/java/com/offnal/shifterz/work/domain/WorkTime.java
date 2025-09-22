@@ -1,5 +1,6 @@
 package com.offnal.shifterz.work.domain;
 
+import com.offnal.shifterz.global.BaseTimeEntity;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorCode;
 import jakarta.persistence.Column;
@@ -19,7 +20,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class WorkTime {
+public class WorkTime extends BaseTimeEntity {
 
     @Column(name = "time_type", nullable = false)
     @Enumerated(EnumType.STRING)

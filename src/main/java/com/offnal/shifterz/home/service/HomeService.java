@@ -38,13 +38,9 @@ public class HomeService {
         WorkTimeType tomorrowType = findWorkTypeOrNull(tomorrow, memberId);
 
         // 오늘 근무 정보 조회
-        String day = String.valueOf(today.getDayOfMonth());
-        String year = String.valueOf(today.getYear());
-        String month = String.valueOf(today.getMonthValue());
-
         WorkInstance todayWork = workInstanceRepository
-                .findByWorkDayAndWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(
-                        day, memberId, year, month
+                .findByWorkDateAndMemberIdThroughWorkCalendar(
+                        today, memberId, today, today
                 )
                 .orElseThrow(() -> new CustomException(ErrorCode.WORK_INSTANCE_NOT_FOUND));
 
@@ -79,13 +75,9 @@ public class HomeService {
 
     // 특정 날짜의 근무 형태 조회
     private WorkTimeType findWorkTypeOrNull(LocalDate date, Long memberId) {
-        String day = String.valueOf(date.getDayOfMonth());
-        String year = String.valueOf(date.getYear());
-        String month = String.valueOf(date.getMonthValue());
-
         return workInstanceRepository
-                .findByWorkDayAndWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(
-                        day, memberId, year, month
+                .findByWorkDateAndMemberIdThroughWorkCalendar(
+                        date, memberId, date, date
                 )
                 .map(WorkInstance::getWorkTimeType)
                 .orElse(null);

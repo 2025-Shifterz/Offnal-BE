@@ -23,11 +23,6 @@ public class WorkCalendarRequestDto {
     @Schema(description = "근무표 이름")
     private String calendarName;
 
-    @NotEmpty(message = "근무조는 필수입니다.")
-    @NotNull
-    @Schema(description = "근무조")
-    private String workGroup;
-
     @Valid
     @NotEmpty(message = "근무 시간 정보는 필수입니다.")
     @NotNull

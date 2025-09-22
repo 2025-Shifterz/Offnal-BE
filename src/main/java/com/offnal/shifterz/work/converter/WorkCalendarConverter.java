@@ -38,10 +38,9 @@ public class WorkCalendarConverter {
 
         return WorkCalendar.builder()
                 .calendarName(workCalendarRequestDto.getCalendarName())
-                .year(unitDto.getYear())
-                .month(unitDto.getMonth())
+                .startDate(unitDto.getStartDate())
+                .endDate(unitDto.getEndDate())
                 .memberId(memberId)
-                .workGroup(workCalendarRequestDto.getWorkGroup())
                 .workTimes(workTimeMap)
                 .build();
     }
@@ -50,7 +49,7 @@ public class WorkCalendarConverter {
     public static List<WorkInstance> toWorkInstances(WorkCalendarUnitDto unitDto, WorkCalendar calendar) {
         return unitDto.getShifts().entrySet().stream()
                 .map(entry -> WorkInstance.builder()
-                        .workDay(entry.getKey())
+                        .workDate(entry.getKey())
                         .workTimeType(WorkTimeType.fromSymbol(entry.getValue()))
                         .workCalendar(calendar)
                         .build())
@@ -60,7 +59,7 @@ public class WorkCalendarConverter {
     public static List<WorkDayResponseDto> toDayResponseDtoList(List<WorkInstance> instances) {
         return instances.stream()
                 .map(instance -> WorkDayResponseDto.builder()
-                        .day(String.valueOf(Integer.parseInt(instance.getWorkDay())))
+                        .date(instance.getWorkDate())
                         .workTypeName(instance.getWorkTimeType().getKoreanName())
                         .build())
                 .collect(Collectors.toList());
