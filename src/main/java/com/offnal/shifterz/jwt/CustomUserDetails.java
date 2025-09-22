@@ -19,7 +19,7 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(Member member) {
         this.member = member; // Member 객체 저장
         this.id = member.getId();
-        this.username = member.getKakaoId().toString();
+        this.username = member.getId().toString();
         this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
@@ -30,7 +30,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return member.getKakaoId().toString();
+        return member.getId().toString();
     }
 
     @Override

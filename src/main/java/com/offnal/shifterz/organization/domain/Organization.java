@@ -1,0 +1,26 @@
+package com.offnal.shifterz.organization.domain;
+
+import com.offnal.shifterz.global.BaseTimeEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import com.offnal.shifterz.member.domain.Member;
+@Entity
+@Table(name = "organization")
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Organization extends BaseTimeEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String organizationName;
+    private String team;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member organizationMember;
+}
+
