@@ -101,11 +101,23 @@ public @interface SuccessApiResponses {
                                       "code": "WORK_DAY_FETCHED",
                                       "message": "근무일 조회에 성공했습니다.",
                                       "data": [
-                                        { "day": "1", "workTypeName": "오후" },
-                                        { "day": "2", "workTypeName": "오후" },
-                                        { "day": "3", "workTypeName": "야간" },
-                                        { "day": "4", "workTypeName": "휴무" }
-                                      ]
+                                           {
+                                             "date": "2025-09-01",
+                                             "workTypeName": "오후"
+                                           },
+                                           {
+                                             "date": "2025-09-02",
+                                             "workTypeName": "오후"
+                                           },
+                                           {
+                                             "date": "2025-09-03",
+                                             "workTypeName": "야간"
+                                           },
+                                           {
+                                             "date": "2025-09-04",
+                                             "workTypeName": "휴일"
+                                           }
+                                         ]
                                     }
                                     """)
                     )

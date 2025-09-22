@@ -40,7 +40,7 @@ public class WorkCalendarController {
     @ErrorApiResponses.Auth
     @ErrorApiResponses.CreateWorkCalendar
     @PostMapping
-    public ResponseEntity<SuccessResponse<Void>> createWorkCalendar(
+    public SuccessResponse<Void> createWorkCalendar(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(
                     mediaType = "application/json",
                     examples = @ExampleObject(
@@ -88,7 +88,7 @@ public class WorkCalendarController {
                     .build();
             workCalendarService.saveWorkCalendar(requestDto);
         }
-        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.CALENDAR_CREATED));
+        return SuccessResponse.success(SuccessCode.CALENDAR_CREATED);
     }
 
     @Operation(summary = "근무일 조회", description = "입력한 연도와 월에 해당하는 모든 날짜의 근무유형 정보를 반환합니다.")
@@ -119,12 +119,12 @@ public class WorkCalendarController {
     })
 
     @GetMapping
-    public ResponseEntity<SuccessResponse<List<WorkDayResponseDto>>> getWorkDaysByStartDateAndEndDate(
+    public SuccessResponse<List<WorkDayResponseDto>> getWorkDaysByStartDateAndEndDate(
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate
     ) {
         List<WorkDayResponseDto> response = workCalendarService.getWorkDaysByStartDateAndEndDate(startDate, endDate);
-        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.DATA_FETCHED, response));
+        return SuccessResponse.success(SuccessCode.DATA_FETCHED, response);
 
     }
 
@@ -158,7 +158,7 @@ public class WorkCalendarController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PatchMapping
-    public ResponseEntity<SuccessResponse<Void>> updateWorkCalendar(
+    public SuccessResponse<Void> updateWorkCalendar(
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate,
 
@@ -179,7 +179,7 @@ public class WorkCalendarController {
             )
             @RequestBody @Valid WorkCalendarUpdateDto workCalendarUpdateDto){
         workCalendarService.updateWorkCalendar(startDate, endDate, workCalendarUpdateDto);
-        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.CALENDAR_UPDATED));
+        return SuccessResponse.success(SuccessCode.CALENDAR_UPDATED);
     }
 
 
@@ -189,12 +189,12 @@ public class WorkCalendarController {
     @ErrorApiResponses.Auth
     @ErrorApiResponses.DeleteWorkCalendar
     @DeleteMapping
-    public ResponseEntity<SuccessResponse<Void>> deleteWorkCalendar(
+    public SuccessResponse<Void> deleteWorkCalendar(
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate
     ){
         workCalendarService.deleteWorkCalendar(startDate, endDate);
-        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.CALENDAR_DELETED));
+        return SuccessResponse.success(SuccessCode.CALENDAR_DELETED);
     }
 
 }
