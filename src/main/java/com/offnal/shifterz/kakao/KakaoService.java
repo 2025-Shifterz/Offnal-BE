@@ -1,5 +1,6 @@
 package com.offnal.shifterz.kakao;
 
+import com.offnal.shifterz.member.service.SocialService;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class KakaoService {
+public class KakaoService implements SocialService<KakaoUserInfoResponseDto>  {
 
     private String clientId;
 
@@ -32,9 +33,10 @@ public class KakaoService {
         KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
     }
 
-    public String getKakaoAccessToken(String code) {
+    @Override
+    public String getAccessToken(String code) {
 
-        KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
+        TokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
                 .uri(uriBuilder -> uriBuilder
                         .path("/oauth/token")
                         .queryParam("grant_type", "authorization_code")
@@ -47,13 +49,14 @@ public class KakaoService {
                 // 4xx, 5xx 예외처리
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
-                .bodyToMono(KakaoTokenResponseDto.class)
+                .bodyToMono(TokenResponseDto.class)
                 .block();
 
 
         return kakaoTokenResponseDto.getAccessToken();
     }
 
+    @Override
     public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
         KakaoUserInfoResponseDto userInfo = WebClient.create(KAUTH_USER_URL_HOST)
                 .get()

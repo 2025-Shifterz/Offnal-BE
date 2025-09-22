@@ -4,6 +4,7 @@ import com.offnal.shifterz.global.exception.ErrorApiResponses;
 import com.offnal.shifterz.global.exception.ErrorResponse;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
+import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.dto.AuthResponseDto;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("")
 public class KakaoLoginController {
 
-    private final KakaoLoginService kakaoLoginService;
+    private final LoginService loginService;
 
 
     @Operation(summary = "카카오 로그인 콜백 처리", description = "카카오 인가 코드(code)를 기반으로 JWT 토큰과 사용자 정보를 반환합니다.")
@@ -89,7 +90,7 @@ public class KakaoLoginController {
     @GetMapping("/callback")
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
 
-        AuthResponseDto dto = kakaoLoginService.loginWithKakao(code);
+        AuthResponseDto dto = loginService.loginWithSocial(Provider.KAKAO,code);
 
         // 헤더 설정
         HttpHeaders headers = new HttpHeaders();
