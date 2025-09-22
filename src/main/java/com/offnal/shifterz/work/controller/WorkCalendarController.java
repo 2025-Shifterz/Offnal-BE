@@ -34,6 +34,9 @@ public class WorkCalendarController {
 
     private final WorkCalendarService workCalendarService;
 
+    /**
+     * 근무표 생성
+     */
     @Operation(summary = "근무표 등록", description = "사용자의 근무표를 월별로 등록합니다.")
     @SuccessApiResponses.CreateCalendar
     @ErrorApiResponses.Common
@@ -91,6 +94,9 @@ public class WorkCalendarController {
         return SuccessResponse.success(SuccessCode.CALENDAR_CREATED);
     }
 
+    /**
+     * 근무일 조회
+     */
     @Operation(summary = "근무일 조회", description = "입력한 연도와 월에 해당하는 모든 날짜의 근무유형 정보를 반환합니다.")
     @SuccessApiResponses.WorkDay
     @ErrorApiResponses.Common
@@ -117,7 +123,6 @@ public class WorkCalendarController {
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-
     @GetMapping
     public SuccessResponse<List<WorkDayResponseDto>> getWorkDaysByStartDateAndEndDate(
             @RequestParam LocalDate startDate,
@@ -128,6 +133,9 @@ public class WorkCalendarController {
 
     }
 
+    /**
+     * 근무일 수정
+     */
     @Operation(summary = "근무일 수정", description = "특정 연도와 월의 근무 일정을 수정합니다.")
     @SuccessApiResponses.UpdateCalendar
     @ErrorApiResponses.Common
@@ -183,6 +191,9 @@ public class WorkCalendarController {
     }
 
 
+    /**
+     * 근무표 삭제
+     */
     @Operation(summary = "근무표 삭제", description = "특정 연도와 월의 근무표를 삭제합니다.")
     @SuccessApiResponses.DeleteCalendar
     @ErrorApiResponses.Common

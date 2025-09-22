@@ -32,7 +32,11 @@ public class WorkCalendarConverter {
             Duration duration = Duration.ofHours(Integer.parseInt(hm[0]))
                                         .plusMinutes(Integer.parseInt(hm[1]));
 
-            WorkTime workTime = WorkTime.of(timeType, startTime, duration);
+            WorkTime workTime = WorkTime.builder()
+                    .timeType(timeType)
+                    .startTime(startTime)
+                    .duration(duration)
+                    .build();
             workTimeMap.put(symbol, workTime);
         }
 

@@ -2,6 +2,7 @@ package com.offnal.shifterz.home.service;
 
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorCode;
+import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.home.dto.DailyRoutineResDto;
 import com.offnal.shifterz.home.dto.HealthGuideDto;
 import com.offnal.shifterz.home.dto.HomeDetailResDto;
@@ -10,7 +11,10 @@ import com.offnal.shifterz.work.domain.WorkInstance;
 import com.offnal.shifterz.work.domain.WorkTime;
 import com.offnal.shifterz.work.domain.WorkTimeType;
 import com.offnal.shifterz.work.repository.WorkInstanceRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -42,14 +46,14 @@ public class HomeService {
                 .findByWorkDateAndMemberIdThroughWorkCalendar(
                         today, memberId, today, today
                 )
-                .orElseThrow(() -> new CustomException(ErrorCode.WORK_INSTANCE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(HomeErrorCode.WORK_INSTANCE_NOT_FOUND));
 
         WorkTime workTime = null;
         if (todayType != WorkTimeType.OFF) {
             String typeKey = todayType.getSymbol();
             workTime = todayWork.getWorkCalendar().getWorkTimes().get(typeKey);
             if (workTime == null) {
-                throw new CustomException(ErrorCode.WORK_TIME_NOT_FOUND);
+                throw new CustomException(HomeErrorCode.WORK_TIME_NOT_FOUND);
             }
         }
 
@@ -228,5 +232,18 @@ public class HomeService {
     // 분 단위 차이 계산
     private long minutesBetween(LocalTime t1, LocalTime t2) {
         return Math.abs(t1.toSecondOfDay() - t2.toSecondOfDay()) / 60;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum HomeErrorCode implements ErrorReason {
+
+        //근무 관련
+        WORK_INSTANCE_NOT_FOUND("HOME001", HttpStatus.NOT_FOUND, "해당 일자에 저장된 근무 정보가 없습니다."),
+        WORK_TIME_NOT_FOUND("HOME002",HttpStatus.NOT_FOUND, "오늘의 근무 시간 정보가 없습니다.");
+
+        private final String code;
+        private final HttpStatus status;
+        private final String message;
     }
 }

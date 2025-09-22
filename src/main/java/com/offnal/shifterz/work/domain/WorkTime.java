@@ -3,11 +3,13 @@ package com.offnal.shifterz.work.domain;
 import com.offnal.shifterz.global.BaseTimeEntity;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorCode;
+import com.offnal.shifterz.work.service.WorkCalendarService;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.Duration;
@@ -17,6 +19,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 public class WorkTime extends BaseTimeEntity {
 
     @Column(name = "time_type", nullable = false)
@@ -30,14 +33,4 @@ public class WorkTime extends BaseTimeEntity {
     private Duration duration;
 
 
-    // 유효성 검증
-    public static WorkTime of(WorkTimeType type, LocalTime start, Duration duration) {
-        if (start == null) {
-            throw new CustomException(ErrorCode.CALENDAR_WORK_TIME_REQUIRED);
-        }
-        if (duration == null) {
-            throw new CustomException(ErrorCode.CALENDAR_WORK_TIME_REQUIRED);
-        }
-        return new WorkTime(type, start, duration);
-    }
 }

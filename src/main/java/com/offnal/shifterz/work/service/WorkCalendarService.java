@@ -3,6 +3,7 @@ package com.offnal.shifterz.work.service;
 import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorCode;
+import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.work.converter.WorkCalendarConverter;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
@@ -14,7 +15,10 @@ import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.repository.WorkCalendarRepository;
 import com.offnal.shifterz.work.repository.WorkInstanceRepository;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -40,7 +44,7 @@ public class WorkCalendarService {
                     memberId, unitDto.getStartDate(), unitDto.getEndDate());
 
             if (exists) {
-                throw new CustomException(ErrorCode.CALENDAR_DUPLICATION);
+                throw new CustomException(WorkCalendarErrorCode.CALENDAR_DUPLICATION);
             }
 
             WorkCalendar calendar = WorkCalendarConverter.toEntity(memberId, workCalendarRequestDto, unitDto);
@@ -68,7 +72,7 @@ public class WorkCalendarService {
 
         WorkCalendar calendar = workCalendarRepository
                 .findByMemberIdAndStartDateAndEndDate(memberId, startDate, endDate)
-                .orElseThrow(() -> new CustomException(ErrorCode.CALENDAR_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
 
         // 캘린더 범위 내 근무 일정 조회
         List<WorkInstance> existingInstances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(memberId, startDate, endDate);
@@ -112,10 +116,42 @@ public class WorkCalendarService {
 
         WorkCalendar calendar = workCalendarRepository
                 .findByMemberIdAndStartDateAndEndDate(memberId, startDate, endDate)
-                .orElseThrow(() -> new CustomException(ErrorCode.CALENDAR_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
 
         workInstanceRepository.deleteAllByWorkCalendar(calendar);
         workCalendarRepository.delete(calendar);
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum WorkCalendarErrorCode implements ErrorReason {
+        // 캘린더 저장 관련
+        CALENDAR_DUPLICATION("CAL001",HttpStatus.BAD_REQUEST, "이미 존재하는 연도/월의 캘린더입니다."),
+        CALENDAR_NAME_REQUIRED("CAL002",HttpStatus.BAD_REQUEST, "근무표 이름은 필수입니다."),
+        CALENDAR_STARTDAY_REQUIRED("CAL003",HttpStatus.BAD_REQUEST, "시작일은 필수입니다."),
+        CALENDAR_DURATION_REQUIRED("CAL004",HttpStatus.BAD_REQUEST, "근무 소요 시간은 필수입니다."),
+        CALENDAR_ORGANIZATION_REQUIRED("CAL005",HttpStatus.BAD_REQUEST, "조직은 필수입니다."),
+        CALENDAR_WORK_TIME_REQUIRED("CAL006",HttpStatus.BAD_REQUEST, "근무 시간 정보는 필수입니다."),
+        CALENDAR_SHIFT_REQUIRED("CAL007",HttpStatus.BAD_REQUEST, "근무일 정보는 필수입니다."),
+
+
+        // 캘린더 수정 관련
+        CALENDAR_NOT_FOUND("CAL008",HttpStatus.NOT_FOUND, "해당하는 연도, 월의 캘린더를 찾을 수 없습니다."),
+
+        // 캘린더 삭제 관련
+        CALENDAR_DELETE_FAILED("CAL009",HttpStatus.BAD_REQUEST, "근무표 삭제에 실패하였습니다."),
+
+        //근무 관련
+        WORK_INSTANCE_NOT_FOUND("CAL010",HttpStatus.NOT_FOUND, "해당 일자에 저장된 근무 정보가 없습니다."),
+        WORK_TIME_NOT_FOUND("CAL011",HttpStatus.NOT_FOUND, "오늘의 근무 시간 정보가 없습니다."),
+
+        // 근무일 조회 관련
+        INVALID_YEAR_FORMAT("CAL012",HttpStatus.BAD_REQUEST, "연도 형식이 올바르지 않습니다."),
+        INVALID_MONTH_FORMAT("CAL013",HttpStatus.BAD_REQUEST, "월 형식이 올바르지 않습니다.");
+
+        private final String code;
+        private final HttpStatus status;
+        private final String message;
     }
 
 }
