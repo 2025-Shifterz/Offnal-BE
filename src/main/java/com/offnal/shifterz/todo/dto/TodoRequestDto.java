@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 public class TodoRequestDto {
 
     @Getter
@@ -14,8 +16,18 @@ public class TodoRequestDto {
     public static class CreateDto {
         private String content;
         private Boolean isSuccess;
-        private Long targetDate;       // 없으면 오늘 날짜로
-        private Long organizationId;   // 선택값 (nullable)
+        private LocalDate targetDate;
+        private Long organizationId; // 선택 필드
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateDto {
+        private String content;
+        private Boolean isSuccess;
+        private LocalDate targetDate;
     }
 }
 
