@@ -9,11 +9,12 @@ import com.offnal.shifterz.todo.service.TodoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import com.offnal.shifterz.global.response.SuccessApiResponses;
-
+@Tag(name = "Todo", description  = "Todo 관련 API")
 @RestController
 @RequestMapping("/todos")
 @RequiredArgsConstructor
