@@ -112,4 +112,52 @@ public @interface SuccessApiResponses {
             )
     })
     public @interface WorkDay {}
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 수정 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "프로필 수정 성공 예시", value = """
+                                {
+                                  "code": "MEMBER_UPDATE_SUCCESS",
+                                  "message": "프로필 수정에 성공했습니다.",
+                                  "data": {
+                                    "memberId": 1,
+                                    "memberName": "홍길동",
+                                    "email": "test@example.com",
+                                    "phoneNumber": "010-1234-5678",
+                                    "profileImageUrl": "https://cdn.com/profile.jpg"
+                                  }
+                                }
+                                """)
+                    )
+            )
+    })
+    public @interface UpdateProfile {}
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "내 정보 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "내 정보 조회 성공 예시", value = """
+                                {
+                                  "code": "MEM002",
+                                  "message": "내 정보 조회에 성공했습니다.",
+                                  "data": {
+                                    "email": "example@kkukmoa.com",
+                                    "name": "홍길동",
+                                    "phoneNumber": "010-1234-5678",
+                                    "profileImageUrl": "https://cdn.example.com/image.jpg"
+                                  }
+                                }
+                                """)
+                    )
+            )
+    })
+    public @interface MyInfo {}
+
 }
