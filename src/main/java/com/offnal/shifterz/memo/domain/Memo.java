@@ -2,12 +2,15 @@ package com.offnal.shifterz.memo.domain;
 
 import com.offnal.shifterz.global.BaseTimeEntity;
 import com.offnal.shifterz.member.domain.Member;
+import com.offnal.shifterz.memo.dto.MemoRequestDto;
 import com.offnal.shifterz.organization.domain.Organization;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "memo")
@@ -22,9 +25,11 @@ public class Memo extends BaseTimeEntity {
     private Long id;
 
     @Lob
+    @Column(nullable = false)
     private String content;
 
-    private Long targetDate;
+    @Column(nullable = false)
+    private LocalDate targetDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -33,5 +38,10 @@ public class Memo extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizationI_id")
     private Organization organization; // nullable
+
+    public void update(MemoRequestDto.UpdateMemoDto request) {
+        if (request.getContent() != null) this.content = request.getContent();
+        if (request.getTargetDate() != null) this.targetDate = request.getTargetDate();
+    }
 }
 

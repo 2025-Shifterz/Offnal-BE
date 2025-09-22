@@ -1,5 +1,6 @@
 package com.offnal.shifterz.global.response;
 
+import com.offnal.shifterz.memo.dto.MemoResponseDto;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -176,7 +177,7 @@ public @interface SuccessApiResponses {
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                         {
-                          "isSuccess": true,
+     
                           "code": "TODO201",
                           "message": "할 일이 생성되었습니다.",
                           "result": {
@@ -198,7 +199,7 @@ public @interface SuccessApiResponses {
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                         {
-                          "isSuccess": true,
+            
                           "code": "TODO200",
                           "message": "할 일이 수정되었습니다.",
                           "result": {
@@ -220,7 +221,7 @@ public @interface SuccessApiResponses {
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                         {
-                          "isSuccess": true,
+                 
                           "code": "TODO200",
                           "message": "할 일을 조회했습니다.",
                           "result": {
@@ -242,7 +243,7 @@ public @interface SuccessApiResponses {
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                         {
-                          "isSuccess": true,
+                 
                           "code": "TODO204",
                           "message": "할 일이 삭제되었습니다.",
                           "result": null
@@ -251,4 +252,106 @@ public @interface SuccessApiResponses {
     })
     public @interface TodoDelete {}
 
+    @ApiResponse(
+            responseCode = "201",
+            description = "메모 생성 성공",
+            content = @Content(
+                    schema = @Schema(implementation = MemoResponseDto.MemoDto.class),
+                    examples = @ExampleObject(
+                            name = "메모 생성 성공 예시",
+                            value = """
+                {
+       
+                  "code": "MEMO001",
+                  "message": "메모가 성공적으로 생성되었습니다.",
+                  "result": {
+                    "id": 1,
+                    "content": "야간 근무 교대",
+                    "targetDate": "2025-09-23",
+                    "organizationId": 5
+                  }
+                }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface MemoCreate {}
+
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "메모 수정 성공",
+            content = @Content(
+                    schema = @Schema(implementation = MemoResponseDto.MemoDto.class),
+                    examples = @ExampleObject(
+                            name = "메모 수정 성공 예시",
+                            value = """
+                {
+                  "code": "MEMO002",
+                  "message": "메모가 성공적으로 수정되었습니다.",
+                  "result": {
+                    "id": 1,
+                    "content": "야간 근무 -> 주간 근무",
+                    "targetDate": "2025-09-24",
+                    "organizationId": 5
+                  }
+                }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface MemoUpdate {}
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "메모 조회 성공",
+            content = @Content(
+                    schema = @Schema(implementation = MemoResponseDto.MemoDto.class),
+                    examples = @ExampleObject(
+                            name = "메모 조회 성공 예시",
+                            value = """
+                {
+
+                  "code": "MEMO003",
+                  "message": "메모가 성공적으로 조회되었습니다.",
+                  "result": {
+                    "id": 1,
+                    "content": "야간 근무 교대",
+                    "targetDate": "2025-09-23",
+                    "organizationId": 5
+                  }
+                }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface MemoGet {}
+
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "메모 삭제 성공",
+            content = @Content(
+                    schema = @Schema(implementation = Void.class),
+                    examples = @ExampleObject(
+                            name = "메모 삭제 성공 예시",
+                            value = """
+                {
+                  "code": "MEMO004",
+                  "message": "메모가 성공적으로 삭제되었습니다.",
+                  "result": null
+                }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface MemoDelete {}
 }

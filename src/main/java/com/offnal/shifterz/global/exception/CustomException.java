@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 public class CustomException extends RuntimeException {
-    private final ErrorCode errorCode;
-    private final ErrorReason errorReason;
+    private final ErrorCode errorCode;     // 공통 에러코드
+    private final ErrorReason errorReason; // 도메인별 에러코드
 
     public CustomException(ErrorCode errorCode) {
         super(errorCode.getMessage());
@@ -18,5 +18,13 @@ public class CustomException extends RuntimeException {
         super(errorReason.getMessage());
         this.errorReason = errorReason;
         this.errorCode = null;
+    }
+
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
+
+    public ErrorReason getErrorReason() {
+        return errorReason;
     }
 }

@@ -8,10 +8,12 @@ import com.offnal.shifterz.member.dto.MemberRequestDto;
 import com.offnal.shifterz.member.dto.MemberResponseDto;
 import com.offnal.shifterz.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "User", description  = "User 관련 API")
 @RestController
 @RequestMapping("/members")
 @RequiredArgsConstructor

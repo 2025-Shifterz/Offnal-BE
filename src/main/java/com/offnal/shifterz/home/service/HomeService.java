@@ -1,7 +1,6 @@
 package com.offnal.shifterz.home.service;
 
 import com.offnal.shifterz.global.exception.CustomException;
-import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.home.dto.DailyRoutineResDto;
 import com.offnal.shifterz.home.dto.HealthGuideDto;

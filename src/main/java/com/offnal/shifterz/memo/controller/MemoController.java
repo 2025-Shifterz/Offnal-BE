@@ -1,12 +1,12 @@
-package com.offnal.shifterz.todo.controller;
+package com.offnal.shifterz.memo.controller;
 
 import com.offnal.shifterz.global.exception.ErrorApiResponses;
 import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
-import com.offnal.shifterz.todo.dto.TodoRequestDto;
-import com.offnal.shifterz.todo.dto.TodoResponseDto;
-import com.offnal.shifterz.todo.service.TodoService;
+import com.offnal.shifterz.memo.dto.MemoRequestDto;
+import com.offnal.shifterz.memo.dto.MemoResponseDto;
+import com.offnal.shifterz.memo.service.MemoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -14,29 +14,28 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-@Tag(name = "Todo", description  = "Todo 관련 API")
 
+@Tag(name = "MEMO", description  = "MEMO 관련 API")
 @RestController
-@RequestMapping("/todos")
+@RequestMapping("/memos")
 @RequiredArgsConstructor
-public class TodoController {
+public class MemoController {
 
-    private final TodoService todoService;
+    private final MemoService memoService;
 
     /**
-     * Todo 생성
+     * Memo 생성
      */
     @Operation(
-            summary = "할 일 생성",
-            description = "새로운 할 일을 생성합니다.\n\n" +
+            summary = "메모 생성",
+            description = "새로운 메모를 생성합니다.\n\n" +
                     "✅ 요청 본문에 포함할 수 있는 값:\n" +
-                    "- content: 할 일 내용 (String)\n" +
-                    "- isSuccess: 완료 여부 (Boolean, 기본 false)\n" +
+                    "- content: 메모 내용 (String)\n" +
                     "- targetDate: 목표 날짜 (LocalDate, 기본 오늘 날짜)\n" +
                     "- organizationId: 소속 조직 ID (Long, 선택, **없으면 null로 보내세요**)"
     )
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "할 일 생성 요청 예시",
+            description = "메모 생성 요청 예시",
             required = true,
             content = @Content(
                     mediaType = "application/json",
@@ -45,8 +44,7 @@ public class TodoController {
                                     name = "조직 포함",
                                     value = """
                 {
-                  "content": "스터디 준비",
-                  "isSuccess": false,
+                  "content": "야간 근무 교대",
                   "targetDate": "2025-09-23",
                   "organizationId": 10
                 }
@@ -57,7 +55,6 @@ public class TodoController {
                                     value = """
                 {
                   "content": "스터디 준비",
-                  "isSuccess": false,
                   "targetDate": "2025-09-23",
                   "organizationId": null
                 }
@@ -66,53 +63,52 @@ public class TodoController {
                     }
             )
     )
-
-    @SuccessApiResponses.TodoCreate
+    @SuccessApiResponses.MemoCreate
     @ErrorApiResponses.Common
     @PostMapping
-    public SuccessResponse<TodoResponseDto.TodoDto> createTodo(
-            @RequestBody @Valid TodoRequestDto.CreateDto request
+    public SuccessResponse<MemoResponseDto.MemoDto> createMemo(
+            @RequestBody @Valid MemoRequestDto.CreateDto request
     ) {
-        return SuccessResponse.success(SuccessCode.TODO_CREATED, todoService.createTodo(request));
+        return SuccessResponse.success(SuccessCode.MEMO_CREATED, memoService.createMemo(request));
     }
 
     /**
-     * Todo 수정
+     * Memo 수정
      */
-    @Operation(summary = "할 일 수정", description = "기존 할 일을 수정합니다.")
-    @SuccessApiResponses.TodoUpdate
+    @Operation(summary = "메모 수정", description = "기존 메모를 수정합니다.")
+    @SuccessApiResponses.MemoUpdate
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @PatchMapping ("/{id}")
-    public SuccessResponse<TodoResponseDto.TodoDto> updateTodo(
+    @PatchMapping("/{id}")
+    public SuccessResponse<MemoResponseDto.MemoDto> updateMemo(
             @PathVariable Long id,
-            @RequestBody @Valid TodoRequestDto.UpdateDto request
+            @RequestBody @Valid MemoRequestDto.UpdateMemoDto request
     ) {
-        return SuccessResponse.success(SuccessCode.TODO_UPDATED, todoService.updateTodo(id, request));
+        return SuccessResponse.success(SuccessCode.MEMO_UPDATED, memoService.updateMemo(id, request));
     }
 
     /**
-     * Todo 단건 조회
+     * Memo 단건 조회
      */
-    @Operation(summary = "할 일 단건 조회", description = "특정 할 일을 조회합니다.")
-    @SuccessApiResponses.TodoGet
+    @Operation(summary = "메모 단건 조회", description = "특정 메모를 조회합니다.")
+    @SuccessApiResponses.MemoGet
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @GetMapping("/{id}")
-    public SuccessResponse<TodoResponseDto.TodoDto> getTodo(@PathVariable Long id) {
-        return SuccessResponse.success(SuccessCode.TODO_FETCHED, todoService.getTodo(id));
+    public SuccessResponse<MemoResponseDto.MemoDto> getMemo(@PathVariable Long id) {
+        return SuccessResponse.success(SuccessCode.MEMO_FETCHED, memoService.getMemo(id));
     }
 
     /**
-     * Todo 삭제
+     * Memo 삭제
      */
-    @Operation(summary = "할 일 삭제", description = "특정 할 일을 삭제합니다.")
-    @SuccessApiResponses.TodoDelete
+    @Operation(summary = "메모 삭제", description = "특정 메모를 삭제합니다.")
+    @SuccessApiResponses.MemoDelete
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @DeleteMapping("/{id}")
-    public SuccessResponse<Void> deleteTodo(@PathVariable Long id) {
-        todoService.deleteTodo(id);
-        return SuccessResponse.success(SuccessCode.TODO_DELETED, null);
+    public SuccessResponse<Void> deleteMemo(@PathVariable Long id) {
+        memoService.deleteMemo(id);
+        return SuccessResponse.success(SuccessCode.MEMO_DELETED, null);
     }
 }

@@ -1,9 +1,6 @@
 package com.offnal.shifterz.work.domain;
 
 import com.offnal.shifterz.global.BaseTimeEntity;
-import com.offnal.shifterz.global.exception.CustomException;
-import com.offnal.shifterz.global.exception.ErrorCode;
-import com.offnal.shifterz.work.service.WorkCalendarService;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
@@ -12,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.time.Duration;
 import java.time.LocalTime;
 
