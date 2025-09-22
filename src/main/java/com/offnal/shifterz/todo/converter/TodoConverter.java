@@ -9,30 +9,30 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public class TodoConverter {
-//    public static Todo toEntity(TodoRequestDto.CreateDto request, Member member, Organization organization) {
-//        Long targetDate = Optional.ofNullable(request.getTargetDate())
-//                .orElse(LocalDate.now().toEpochDay());
-//
-//        return Todo.builder()
-//                .content(request.getContent())
-//                .isSuccess(Optional.ofNullable(request.getIsSuccess()).orElse(false))
-//                .targetDate(targetDate)
-//                .member(member)
-//                .organization(organization)
-//                .build();
-//    }
-//
-//    public static TodoResponseDto toDto(Todo todo) {
-//        return TodoResponseDto.builder()
-//                .id(todo.getId())
-//                .content(todo.getContent())
-//                .isSuccess(todo.getIsSuccess())
-//                .targetDate(todo.getTargetDate())
-//                .organizationId(
-//                        todo.getOrganization() != null ? todo.getOrganization().getId() : null
-//                )
-//                .createdAt(todo.getCreatedAt())
-//                .updatedAt(todo.getUpdatedAt())
-//                .build();
-//    }
+
+    public static Todo toEntity(TodoRequestDto.CreateDto request, Member member, Organization organization) {
+        LocalDate targetDate = Optional.ofNullable(request.getTargetDate())
+                .orElse(LocalDate.now());
+
+        return Todo.builder()
+                .content(request.getContent())
+                .isSuccess(request.getIsSuccess())
+                .targetDate(targetDate)
+                .member(member)
+                .organization(organization)
+                .build();
+    }
+
+
+    public static TodoResponseDto.TodoDto toDto(Todo todo) {
+        return TodoResponseDto.TodoDto.builder()
+                .id(todo.getId())
+                .content(todo.getContent())
+                .isSuccess(todo.getIsSuccess())
+                .targetDate(todo.getTargetDate())
+                .organizationId(
+                        todo.getOrganization() != null ? todo.getOrganization().getId() : null
+                )
+                .build();
+    }
 }

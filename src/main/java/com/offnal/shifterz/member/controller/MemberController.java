@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
 
-    @PatchMapping("/me")
+    @PatchMapping("/profile")
     @Operation(summary = "프로필 수정", description = "내 프로필 정보를 수정합니다.")
     @SuccessApiResponses.UpdateProfile
     @ErrorApiResponses.Common
@@ -34,7 +34,7 @@ public class MemberController {
     @SuccessApiResponses.MyInfo
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @GetMapping("/me")
+    @GetMapping("/profile")
     public SuccessResponse<MemberResponseDto.MemberUpdateResponseDto> getMyInfo() {
         return SuccessResponse.success(SuccessCode.MY_INFO_FETCHED, memberService.getMyInfo());
     }

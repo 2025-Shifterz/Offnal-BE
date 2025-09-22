@@ -159,5 +159,84 @@ public @interface SuccessApiResponses {
             )
     })
     public @interface MyInfo {}
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "할 일 생성 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                        {
+                          "isSuccess": true,
+                          "code": "TODO201",
+                          "message": "할 일이 생성되었습니다.",
+                          "result": {
+                            "id": 1,
+                            "content": "스터디 준비",
+                            "isSuccess": false,
+                            "targetDate": "2025-09-23",
+                            "organizationId": 10,
+                            "createdAt": "2025-09-22T10:12:45",
+                            "updatedAt": "2025-09-22T10:12:45"
+                          }
+                        }
+                        """)))
+    })
+    public @interface TodoCreate {}
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "할 일 수정 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                        {
+                          "isSuccess": true,
+                          "code": "TODO200",
+                          "message": "할 일이 수정되었습니다.",
+                          "result": {
+                            "id": 1,
+                            "content": "스터디 준비 - 수정",
+                            "isSuccess": true,
+                            "targetDate": "2025-09-24",
+                            "organizationId": 10,
+                            "createdAt": "2025-09-22T10:12:45",
+                            "updatedAt": "2025-09-22T11:30:00"
+                          }
+                        }
+                        """)))
+    })
+    public @interface TodoUpdate {}
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "할 일 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                        {
+                          "isSuccess": true,
+                          "code": "TODO200",
+                          "message": "할 일을 조회했습니다.",
+                          "result": {
+                            "id": 1,
+                            "content": "스터디 준비",
+                            "isSuccess": false,
+                            "targetDate": "2025-09-23",
+                            "organizationId": 10,
+                            "createdAt": "2025-09-22T10:12:45",
+                            "updatedAt": "2025-09-22T10:12:45"
+                          }
+                        }
+                        """)))
+    })
+    public @interface TodoGet {}
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "할 일 삭제 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                        {
+                          "isSuccess": true,
+                          "code": "TODO204",
+                          "message": "할 일이 삭제되었습니다.",
+                          "result": null
+                        }
+                        """)))
+    })
+    public @interface TodoDelete {}
 
 }
