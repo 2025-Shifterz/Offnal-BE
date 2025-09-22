@@ -30,7 +30,7 @@ public class TodoService {
     private final OrganizationRepository organizationRepository;
 
     @Transactional
-    public TodoResponseDto createTodo(TodoRequestDto.CreateDto request) {
+    public TodoResponseDto.TodoDto createTodo(TodoRequestDto.CreateDto request) {
         Member member = AuthService.getCurrentMember();
 
         Organization organization = null;
@@ -44,7 +44,7 @@ public class TodoService {
     }
 
     @Transactional
-    public TodoResponseDto updateTodo(Long id, TodoRequestDto.UpdateDto request) {
+    public TodoResponseDto.TodoDto updateTodo(Long id, TodoRequestDto.UpdateDto request) {
         Member member = AuthService.getCurrentMember();
 
         Todo todo = todoRepository.findById(id)
@@ -60,7 +60,7 @@ public class TodoService {
     }
 
     @Transactional(readOnly = true)
-    public TodoResponseDto getTodo(Long id) {
+    public TodoResponseDto.TodoDto getTodo(Long id) {
         Member member = AuthService.getCurrentMember();
 
         Todo todo = todoRepository.findById(id)

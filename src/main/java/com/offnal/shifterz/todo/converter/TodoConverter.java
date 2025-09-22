@@ -16,14 +16,15 @@ public class TodoConverter {
 
         return Todo.builder()
                 .content(request.getContent())
-                .isSuccess(Optional.ofNullable(request.getIsSuccess()).orElse(false))
+                .isSuccess(request.getIsSuccess())
                 .targetDate(targetDate)
                 .member(member)
                 .organization(organization)
                 .build();
     }
 
-    public static TodoResponseDto toDto(Todo todo) {
+
+    public static TodoResponseDto.TodoDto toDto(Todo todo) {
         return TodoResponseDto.TodoDto.builder()
                 .id(todo.getId())
                 .content(todo.getContent())
@@ -32,8 +33,6 @@ public class TodoConverter {
                 .organizationId(
                         todo.getOrganization() != null ? todo.getOrganization().getId() : null
                 )
-                .createdAt(todo.getCreatedAt())
-                .updatedAt(todo.getUpdatedAt())
                 .build();
     }
 }

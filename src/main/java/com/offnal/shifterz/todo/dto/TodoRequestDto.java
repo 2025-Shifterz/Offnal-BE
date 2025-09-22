@@ -1,5 +1,6 @@
 package com.offnal.shifterz.todo.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,9 +15,15 @@ public class TodoRequestDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateDto {
+        @NotNull(message = "할 일 내용은 필수입니다.")
         private String content;
-        private Boolean isSuccess;
+
+        @Builder.Default
+        private Boolean isSuccess = false;
+
+        @NotNull(message = "목표 날짜는 필수입니다.")
         private LocalDate targetDate;
+
         private Long organizationId; // 선택 필드
     }
 

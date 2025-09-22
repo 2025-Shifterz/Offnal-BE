@@ -7,6 +7,8 @@ import com.offnal.shifterz.todo.dto.TodoRequestDto;
 import com.offnal.shifterz.todo.dto.TodoResponseDto;
 import com.offnal.shifterz.todo.service.TodoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +24,51 @@ public class TodoController {
     /**
      * Todo 생성
      */
-    @Operation(summary = "할 일 생성", description = "새로운 할 일을 생성합니다.")
+    @Operation(
+            summary = "할 일 생성",
+            description = "새로운 할 일을 생성합니다.\n\n" +
+                    "✅ 요청 본문에 포함할 수 있는 값:\n" +
+                    "- content: 할 일 내용 (String)\n" +
+                    "- isSuccess: 완료 여부 (Boolean, 기본 false)\n" +
+                    "- targetDate: 목표 날짜 (LocalDate, 기본 오늘 날짜)\n" +
+                    "- organizationId: 소속 조직 ID (Long, 선택, **없으면 null로 보내세요**)"
+    )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "할 일 생성 요청 예시",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = {
+                            @ExampleObject(
+                                    name = "조직 포함",
+                                    value = """
+                {
+                  "content": "스터디 준비",
+                  "isSuccess": false,
+                  "targetDate": "2025-09-23",
+                  "organizationId": 10
+                }
+                """
+                            ),
+                            @ExampleObject(
+                                    name = "조직 없음",
+                                    value = """
+                {
+                  "content": "스터디 준비",
+                  "isSuccess": false,
+                  "targetDate": "2025-09-23",
+                  "organizationId": null
+                }
+                """
+                            )
+                    }
+            )
+    )
+
     @SuccessApiResponses.TodoCreate
     @ErrorApiResponses.Common
     @PostMapping
-    public SuccessResponse<TodoResponseDto> createTodo(
+    public SuccessResponse<TodoResponseDto.TodoDto> createTodo(
             @RequestBody @Valid TodoRequestDto.CreateDto request
     ) {
         return SuccessResponse.success(SuccessCode.TODO_CREATED, todoService.createTodo(request));
@@ -39,8 +81,8 @@ public class TodoController {
     @SuccessApiResponses.TodoUpdate
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @PutMapping("/{id}")
-    public SuccessResponse<TodoResponseDto> updateTodo(
+    @PatchMapping ("/{id}")
+    public SuccessResponse<TodoResponseDto.TodoDto> updateTodo(
             @PathVariable Long id,
             @RequestBody @Valid TodoRequestDto.UpdateDto request
     ) {
@@ -55,7 +97,7 @@ public class TodoController {
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @GetMapping("/{id}")
-    public SuccessResponse<TodoResponseDto> getTodo(@PathVariable Long id) {
+    public SuccessResponse<TodoResponseDto.TodoDto> getTodo(@PathVariable Long id) {
         return SuccessResponse.success(SuccessCode.TODO_FETCHED, todoService.getTodo(id));
     }
 

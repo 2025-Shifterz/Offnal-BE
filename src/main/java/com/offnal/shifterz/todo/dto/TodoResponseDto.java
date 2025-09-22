@@ -14,7 +14,7 @@ public class TodoResponseDto {
         private String content;
         private Boolean isSuccess;
         private LocalDate targetDate;
-        private Long memberId;
+//        private Long memberId;
         private Long organizationId;
     }
 }

@@ -22,11 +22,15 @@ public class Todo extends BaseTimeEntity {
     private Long id;
 
     @Lob
+    @Column(nullable = false)
     private String content;
 
-    private Boolean isSuccess;
+    @Column(nullable = false)
+    private Boolean isSuccess = false; // 기본값 false
 
+    @Column(nullable = false)
     private LocalDate targetDate;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
