@@ -10,8 +10,6 @@ import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.Duration;
 import java.time.LocalTime;
 
@@ -19,7 +17,6 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 public class WorkTime extends BaseTimeEntity {
 
     @Column(name = "time_type", nullable = false)

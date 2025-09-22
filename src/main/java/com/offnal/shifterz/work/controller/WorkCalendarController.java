@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,31 +48,30 @@ public class WorkCalendarController {
                             value = """
                             {
                               "calendarName": "병원 근무표",
-                              "workGroup": "1조",
                               "workTimes": {
-                                "D": { "startTime": "08:00", "endTime": "16:00" },
-                                "E": { "startTime": "16:00", "endTime": "00:00" },
-                                "N": { "startTime": "00:00", "endTime": "08:00" }
+                                "D": { "startTime": "08:00", "duration": "8:00" },
+                                "E": { "startTime": "16:00", "duration": "8:00" },
+                                "N": { "startTime": "00:00", "duration": "8:00" }
                               },
                               "calendars": [
                                 {
                                   "startDate": "2025-09-01",
                                   "endDate": "2025-09-30",
                                   "shifts": {
-                                    "1": "E",
-                                    "2": "E",
-                                    "3": "N",
-                                    "4": "-"
+                                    "2025-09-01": "E",
+                                    "2025-09-02": "E",
+                                    "2025-09-03": "N",
+                                    "2025-09-04": "-"
                                   }
                                 },
                                 {
-                                  "startDate": "2025-09-01",
-                                  "endDate": "2025-09-30",
+                                  "startDate": "2025-10-01",
+                                  "endDate": "2025-10-30",
                                   "shifts": {
-                                    "1": "E",
-                                    "2": "E",
-                                    "3": "N",
-                                    "4": "-"
+                                    "2025-10-01": "E",
+                                    "2025-10-02": "E",
+                                    "2025-10-03": "N",
+                                    "2025-10-04": "-"
                                   }
                                 }
                               ]
@@ -106,10 +104,10 @@ public class WorkCalendarController {
                                     name = "근무일 조회 예시",
                                     value = """
                                         [
-                                          { "day": "1", "workTypeName": "오후" },
-                                          { "day": "2", "workTypeName": "오후" },
-                                          { "day": "3", "workTypeName": "야간" },
-                                          { "day": "4", "workTypeName": "휴무" }
+                                            { "date": "2025-09-01", "workTypeName": "오후" },
+                                            { "date": "2025-09-02", "workTypeName": "오후" },
+                                            { "date": "2025-09-03", "workTypeName": "야간" },
+                                            { "date": "2025-09-04", "workTypeName": "휴무" }
                                         ]
                                         """
                             )
@@ -142,12 +140,15 @@ public class WorkCalendarController {
                             examples = @ExampleObject(
                                     name = "근무일 수정 예시",
                                     value = """
-                                        [
-                                          { "day": "1", "workTypeName": "오후" },
-                                          { "day": "2", "workTypeName": "오후" },
-                                          { "day": "3", "workTypeName": "야간" },
-                                          { "day": "4", "workTypeName": "휴일" }
-                                        ]
+                                        {
+                                            "shifts": {
+                                                "2025-09-01": "N",
+                                                "2025-09-02": "D",
+                                                "2025-09-03": "-",
+                                                "2025-09-04": "E",
+                                                "2025-09-05": "N"
+                                            }
+                                        }
                                         """
                             )
                     )
@@ -166,13 +167,13 @@ public class WorkCalendarController {
                             mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
-                                      "shifts": {
-                                        "1": "N",
-                                        "2": "D",
-                                        "3": "-",
-                                        "4": "E",
-                                        "5": "N"
-                                      }
+                                        "shifts": {
+                                            "2025-09-01": "N",
+                                            "2025-09-02": "D",
+                                            "2025-09-03": "-",
+                                            "2025-09-04": "E",
+                                            "2025-09-05": "N"
+                                        }
                                     }
                                     """))
             )

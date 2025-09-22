@@ -1,6 +1,5 @@
 package com.offnal.shifterz.member.dto;
 
-import com.offnal.shifterz.member.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;

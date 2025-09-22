@@ -1,9 +1,12 @@
 package com.offnal.shifterz.log.domain;
 
 import com.offnal.shifterz.global.BaseTimeEntity;
-import jakarta.persistence.*;
-import lombok.*;
 import com.offnal.shifterz.member.domain.Member;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "log")
