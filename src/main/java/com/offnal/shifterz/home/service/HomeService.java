@@ -50,7 +50,7 @@ public class HomeService {
 
         WorkTime workTime = null;
         if (todayType != WorkTimeType.OFF) {
-            String typeKey = convertTypeToKey(todayType);
+            String typeKey = todayType.getSymbol();
             workTime = todayWork.getWorkCalendar().getWorkTimes().get(typeKey);
             if (workTime == null) {
                 throw new CustomException(ErrorCode.WORK_TIME_NOT_FOUND);
@@ -74,16 +74,6 @@ public class HomeService {
             case DAY -> buildDayRoutine(workTime);
             case EVENING -> buildEveningRoutine(workTime);
             case NIGHT -> buildNightRoutine(workTime);
-        };
-    }
-
-    // 근무 타입을 키값으로 변환 (ex: DAY -> D)
-    private String convertTypeToKey(WorkTimeType type) {
-        return switch (type) {
-            case DAY -> "D";
-            case EVENING -> "E";
-            case NIGHT -> "N";
-            case OFF -> "-";
         };
     }
 
@@ -134,7 +124,7 @@ public class HomeService {
     // DAY 근무 루틴 구성
     private DailyRoutineResDto buildDayRoutine(WorkTime workTime) {
         LocalTime start = workTime.getStartTime();
-        LocalTime end = workTime.getEndTime();
+        LocalTime end = start.plus(workTime.getDuration());
 
         LocalTime sleepStart = end.plusHours(6);
         LocalTime sleepEnd = end.plusHours(13);
@@ -157,7 +147,7 @@ public class HomeService {
     // EVENING 근무 루틴 구성
     private DailyRoutineResDto buildEveningRoutine(WorkTime workTime) {
         LocalTime start = workTime.getStartTime();
-        LocalTime end = workTime.getEndTime();
+        LocalTime end = start.plus(workTime.getDuration());
 
         LocalTime sleepStart = end.plusHours(15);
         LocalTime fastingTime = end.plusHours(1);
@@ -180,7 +170,7 @@ public class HomeService {
     // NIGHT 근무 루틴 구성
     private DailyRoutineResDto buildNightRoutine(WorkTime workTime) {
         LocalTime start = workTime.getStartTime();
-        LocalTime end = workTime.getEndTime();
+        LocalTime end = start.plus(workTime.getDuration());
 
         LocalTime preSleepStart = start.minusHours(11);
         LocalTime preSleepEnd = start.minusHours(6);

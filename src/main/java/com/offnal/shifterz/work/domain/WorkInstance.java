@@ -1,5 +1,6 @@
 package com.offnal.shifterz.work.domain;
 
+import com.offnal.shifterz.global.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 @Table(name = "work_instance")
-public class WorkInstance {
+public class WorkInstance extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

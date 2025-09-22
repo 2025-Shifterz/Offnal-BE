@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Duration;
 import java.time.LocalTime;
 
 @Embeddable
@@ -28,16 +29,17 @@ public class WorkTime {
     private LocalTime startTime;
 
     @Column(nullable = false)
-    private LocalTime endTime;
+    private Duration duration;
+
 
     // 유효성 검증
-    public static WorkTime of(WorkTimeType type, LocalTime start, LocalTime end) {
+    public static WorkTime of(WorkTimeType type, LocalTime start, Duration duration) {
         if (start == null) {
             throw new CustomException(ErrorCode.CALENDAR_WORK_TIME_REQUIRED);
         }
-        if (end == null) {
+        if (duration == null) {
             throw new CustomException(ErrorCode.CALENDAR_WORK_TIME_REQUIRED);
         }
-        return new WorkTime(type, start, end);
+        return new WorkTime(type, start, duration);
     }
 }

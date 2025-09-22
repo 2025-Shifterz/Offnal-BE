@@ -21,6 +21,6 @@ public class WorkTimeDto {
 
     @NotEmpty(message = "근무 시간 정보는 필수입니다.")
     @NotNull
-    @Schema(description = "근무 종료 시간", example = "16:00")
-    private String endTime;
+    @Schema(description = "근무 시간", example = "3:00")
+    private String duration;
 }

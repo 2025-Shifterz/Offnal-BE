@@ -9,6 +9,7 @@ import com.offnal.shifterz.work.dto.WorkCalendarUnitDto;
 import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.dto.WorkTimeDto;
 
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
@@ -26,9 +27,12 @@ public class WorkCalendarConverter {
 
             WorkTimeType timeType = WorkTimeType.fromSymbol(symbol);
             LocalTime startTime = LocalTime.parse(workTimeDto.getStartTime());
-            LocalTime endTime = LocalTime.parse(workTimeDto.getEndTime());
 
-            WorkTime workTime = WorkTime.of(timeType, startTime, endTime);
+            String[] hm = workTimeDto.getDuration().split(":");
+            Duration duration = Duration.ofHours(Integer.parseInt(hm[0]))
+                                        .plusMinutes(Integer.parseInt(hm[1]));
+
+            WorkTime workTime = WorkTime.of(timeType, startTime, duration);
             workTimeMap.put(symbol, workTime);
         }
 
