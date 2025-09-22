@@ -44,7 +44,7 @@ public class MemberService {
      * @return 등록/업데이트된 Member와 신규 가입 여부
      */
     @Transactional
-    public MemberResult registerOrUpdateMember(
+    public MemberResponseDto.MemberRegisterResponseDto registerOrUpdateMember(
             Provider provider,
             String providerId,
             String email,
@@ -59,9 +59,9 @@ public class MemberService {
             Member member = existingMember.get();
             member.updateMemberInfo(email, memberName, phoneNumber, profileImageUrl);
 
-            return new MemberResult(member, false);
+            return MemberConverter.toRegisterResponse(member, false);
         } else {
-            // 신규 회원 등록 (Builder 활용)
+            // 신규 회원 등록
             Member newMember = Member.builder()
                     .provider(provider)
                     .providerId(providerId)
@@ -73,34 +73,13 @@ public class MemberService {
 
             Member savedMember = memberRepository.save(newMember);
 
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    new CustomUserDetails(savedMember),
-                    null,
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            return new MemberResult(savedMember, true);
+
+            return MemberConverter.toRegisterResponse(savedMember, true);
         }
     }
 
-    /**
-     * Member와 신규 가입 여부를 담는 결과 클래스
-     */
-    @Getter
-    public static class MemberResult {
-        private final Member member;
-        private final boolean isNewMember;
 
-        public MemberResult(Member member, boolean isNewMember) {
-            this.member = member;
-            this.isNewMember = isNewMember;
-        }
-
-        public boolean isNewMember() {
-            return isNewMember;
-        }
-    }
     @Transactional
     public MemberResponseDto.MemberUpdateResponseDto updateProfile(MemberRequestDto.MemberUpdateRequestDto request) {
         Long memberId = AuthService.getCurrentUserId();
