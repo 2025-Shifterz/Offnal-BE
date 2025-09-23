@@ -33,6 +33,7 @@ public class OrganizationService {
         return OrganizationConverter.toDto(organizationRepository.save(org));
     }
 
+    // 조직 하나 조회
     @Transactional(readOnly = true)
     public OrganizationResponseDto.OrganizationDto getOrganization(Long id) {
         Member member = AuthService.getCurrentMember();
@@ -45,6 +46,18 @@ public class OrganizationService {
         }
 
         return OrganizationConverter.toDto(org);
+    }
+
+    // 회원의 조직 전체 조회
+    @Transactional(readOnly = true)
+    public List<OrganizationResponseDto.OrganizationDto> getAllOrganizations() {
+        Member member = AuthService.getCurrentMember();
+
+        List<Organization> organizations = organizationRepository.findAllByOrganizationMember(member);
+
+        return organizations.stream()
+                .map(OrganizationConverter::toDto)
+                .toList();
     }
 
     @Transactional

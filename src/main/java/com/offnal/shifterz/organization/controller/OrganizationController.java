@@ -15,6 +15,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "Organization", description = "Organization(조직) 관련 API")
 @RestController
 @RequestMapping("/organizations")
@@ -95,15 +97,28 @@ public class OrganizationController {
     }
 
     /**
-     * Organization 조회
+     * 특정 Organization 조회
      */
-    @Operation(summary = "조직 조회", description = "조직 정보를 조회합니다.")
+    @Operation(summary = "특정 조직 조회", description = "특정 조직의 정보를 조회합니다.")
     @SuccessApiResponses.OrganizationGet
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @GetMapping("/{id}")
     public SuccessResponse<OrganizationResponseDto.OrganizationDto> getOrganization(@PathVariable Long id){
         return SuccessResponse.success(SuccessCode.ORGANIZATION_FETCHED, organizationService.getOrganization(id));
+    }
+
+    /**
+     * 전체 Organization 조회
+     */
+    @Operation(summary = "회원의 전체 조직 조회", description = "회원의 모든 조직의 정보를 조회합니다.")
+    @SuccessApiResponses.AllOrganizationGet
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @GetMapping
+    public SuccessResponse<List<OrganizationResponseDto.OrganizationDto>> getAllOrganization(){
+        List<OrganizationResponseDto.OrganizationDto> orgs = organizationService.getAllOrganizations();
+        return SuccessResponse.success(SuccessCode.ORGANIZATION_FETCHED, orgs);
     }
 
     /**

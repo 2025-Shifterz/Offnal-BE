@@ -409,11 +409,11 @@ public @interface SuccessApiResponses {
 
     @ApiResponse(
             responseCode = "200",
-            description = "조직 조회 성공",
+            description = "특정 조직 조회 성공",
             content = @Content(
                     schema = @Schema(implementation = OrganizationResponseDto.OrganizationDto.class),
                     examples = @ExampleObject(
-                            name = "조직 조회 성공 예시",
+                            name = "특정 조직 조회 성공 예시",
                             value = """
                 {
 
@@ -433,6 +433,31 @@ public @interface SuccessApiResponses {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface OrganizationGet {}
 
+    @ApiResponse(
+            responseCode = "200",
+            description = "전체 조직 조회 성공",
+            content = @Content(
+                    schema = @Schema(implementation = OrganizationResponseDto.OrganizationDto.class),
+                    examples = @ExampleObject(
+                            name = "전체 조직 조회 성공 예시",
+                            value = """
+                {
+
+                  "code": "ORG004",
+                  "message": "전체 조직이 성공적으로 조회되었습니다.",
+                  "result": {
+                    "id": 1,
+                    "organizationName": "옾날 병원",
+                    "team": "1조"
+                  }
+                }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface AllOrganizationGet{}
 
     @ApiResponse(
             responseCode = "200",
@@ -443,7 +468,7 @@ public @interface SuccessApiResponses {
                             name = "조직 삭제 성공 예시",
                             value = """
                 {
-                  "code": "ORG004",
+                  "code": "ORG005",
                   "message": "조직이 성공적으로 삭제되었습니다.",
                   "result": null
                 }
