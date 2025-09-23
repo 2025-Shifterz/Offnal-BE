@@ -1,6 +1,7 @@
 package com.offnal.shifterz.work.domain;
 
 import com.offnal.shifterz.global.BaseTimeEntity;
+import com.offnal.shifterz.organization.domain.Organization;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,10 @@ public class WorkCalendar extends BaseTimeEntity {
     private LocalDate startDate;
 
     private LocalDate endDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization;
 
     @Builder.Default
     @ElementCollection

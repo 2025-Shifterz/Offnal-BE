@@ -42,53 +42,62 @@ public class WorkCalendarController {
     @ErrorApiResponses.Auth
     @ErrorApiResponses.CreateWorkCalendar
     @PostMapping
-    public SuccessResponse<Void> createWorkCalendar(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "근무표 등록 예시",
+            required = true,
+            content = @Content(
                     mediaType = "application/json",
-                    examples = @ExampleObject(
+                    examples =
+                    @ExampleObject(
                             name = "근무표 등록 예시",
                             value = """
-                            {
-                              "calendarName": "병원 근무표",
-                              "workTimes": {
-                                "D": { "startTime": "08:00", "duration": "8:00" },
-                                "E": { "startTime": "16:00", "duration": "8:00" },
-                                "N": { "startTime": "00:00", "duration": "8:00" }
-                              },
-                              "calendars": [
                                 {
-                                  "startDate": "2025-09-01",
-                                  "endDate": "2025-09-30",
-                                  "shifts": {
-                                    "2025-09-01": "E",
-                                    "2025-09-02": "E",
-                                    "2025-09-03": "N",
-                                    "2025-09-04": "-"
-                                  }
-                                },
-                                {
-                                  "startDate": "2025-10-01",
-                                  "endDate": "2025-10-30",
-                                  "shifts": {
-                                    "2025-10-01": "E",
-                                    "2025-10-02": "E",
-                                    "2025-10-03": "N",
-                                    "2025-10-04": "-"
-                                  }
+                                  "calendarName": "병원 근무표",
+                                  "organizationId": 1,
+                                  "workTimes": {
+                                    "D": { "startTime": "08:00", "duration": "8:00" },
+                                    "E": { "startTime": "16:00", "duration": "8:00" },
+                                    "N": { "startTime": "00:00", "duration": "8:00" }
+                                  },
+                                  "calendars": [
+                                    {
+                                      "startDate": "2025-09-01",
+                                      "endDate": "2025-09-30",
+                                      "shifts": {
+                                        "2025-09-01": "E",
+                                        "2025-09-02": "E",
+                                        "2025-09-03": "N",
+                                        "2025-09-04": "-"
+                                      }
+                                    },
+                                    {
+                                      "startDate": "2025-10-01",
+                                      "endDate": "2025-10-30",
+                                      "shifts": {
+                                        "2025-10-01": "E",
+                                        "2025-10-02": "E",
+                                        "2025-10-03": "N",
+                                        "2025-10-04": "-"
+                                      }
+                                    }
+                                  ]
                                 }
-                              ]
-                            }
-                            """
+                                """
                     )
             )
-    )@RequestBody @Valid WorkCalendarRequestDto workCalendarRequestDto) {
+    )
+    public SuccessResponse<Void> createWorkCalendar(
+            @RequestParam Long organizationId,
+            @RequestBody @Valid WorkCalendarRequestDto workCalendarRequestDto
+    ) {
         for(WorkCalendarUnitDto unitDto : workCalendarRequestDto.getCalendars()){
             WorkCalendarRequestDto requestDto = WorkCalendarRequestDto.builder()
                     .calendarName(workCalendarRequestDto.getCalendarName())
+                    .organizationId(organizationId)
                     .workTimes(workCalendarRequestDto.getWorkTimes())
                     .calendars(List.of(unitDto))
                     .build();
-            workCalendarService.saveWorkCalendar(requestDto);
+            workCalendarService.saveWorkCalendar(requestDto, organizationId);
         }
         return SuccessResponse.success(SuccessCode.CALENDAR_CREATED);
     }
@@ -123,11 +132,13 @@ public class WorkCalendarController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping
-    public SuccessResponse<List<WorkDayResponseDto>> getWorkDaysByStartDateAndEndDate(
+    public SuccessResponse<List<WorkDayResponseDto>> getWorkDaysByOrganizationAndDateRange(
+            @RequestParam Long organizationId,
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate
     ) {
-        List<WorkDayResponseDto> response = workCalendarService.getWorkDaysByStartDateAndEndDate(startDate, endDate);
+        List<WorkDayResponseDto> response = workCalendarService.getWorkDaysByOrganizationAndDateRange(
+                organizationId, startDate, endDate);
         return SuccessResponse.success(SuccessCode.DATA_FETCHED, response);
 
     }
@@ -166,6 +177,7 @@ public class WorkCalendarController {
     })
     @PatchMapping
     public SuccessResponse<Void> updateWorkCalendar(
+            @RequestParam Long organizationId,
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate,
 
@@ -185,7 +197,7 @@ public class WorkCalendarController {
                                     """))
             )
             @RequestBody @Valid WorkCalendarUpdateDto workCalendarUpdateDto){
-        workCalendarService.updateWorkCalendar(startDate, endDate, workCalendarUpdateDto);
+        workCalendarService.updateWorkCalendar(organizationId, startDate, endDate, workCalendarUpdateDto);
         return SuccessResponse.success(SuccessCode.CALENDAR_UPDATED);
     }
 
@@ -200,10 +212,11 @@ public class WorkCalendarController {
     @ErrorApiResponses.DeleteWorkCalendar
     @DeleteMapping
     public SuccessResponse<Void> deleteWorkCalendar(
+            @RequestParam Long organizationId,
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate
     ){
-        workCalendarService.deleteWorkCalendar(startDate, endDate);
+        workCalendarService.deleteWorkCalendar(organizationId, startDate, endDate);
         return SuccessResponse.success(SuccessCode.CALENDAR_DELETED);
     }
 

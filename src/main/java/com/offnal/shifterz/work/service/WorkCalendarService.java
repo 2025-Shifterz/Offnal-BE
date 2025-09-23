@@ -3,6 +3,8 @@ package com.offnal.shifterz.work.service;
 import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
+import com.offnal.shifterz.organization.domain.Organization;
+import com.offnal.shifterz.organization.repository.OrganizationRepository;
 import com.offnal.shifterz.work.converter.WorkCalendarConverter;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
@@ -31,50 +33,63 @@ import java.util.stream.Collectors;
 public class WorkCalendarService {
     private final WorkCalendarRepository workCalendarRepository;
     private final WorkInstanceRepository workInstanceRepository;
+    private final OrganizationRepository organizationRepository;
 
     @Transactional
-    public void saveWorkCalendar(WorkCalendarRequestDto workCalendarRequestDto) {
+    public void saveWorkCalendar(WorkCalendarRequestDto workCalendarRequestDto, Long organizationId) {
 
         Long memberId = AuthService.getCurrentUserId();
 
+        Organization org = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
+
         for (WorkCalendarUnitDto unitDto : workCalendarRequestDto.getCalendars()) {
             // 중복 시작일, 종료일의 캘린더 체크 (memberId, startDate, endDate 중복 체크)
-            boolean exists = workCalendarRepository.existsByMemberIdAndStartDateAndEndDate(
-                    memberId, unitDto.getStartDate(), unitDto.getEndDate());
+            boolean exists = workCalendarRepository.existsByMemberIdAndOrganizationAndStartDateAndEndDate(
+                    memberId, org, unitDto.getStartDate(), unitDto.getEndDate());
 
             if (exists) {
                 throw new CustomException(WorkCalendarErrorCode.CALENDAR_DUPLICATION);
             }
 
-            WorkCalendar calendar = WorkCalendarConverter.toEntity(memberId, workCalendarRequestDto, unitDto);
+            WorkCalendar calendar = WorkCalendarConverter.toEntity(memberId, org, workCalendarRequestDto, unitDto);
             WorkCalendar savedCalendar = workCalendarRepository.save(calendar);
 
             List<WorkInstance> instances = WorkCalendarConverter.toWorkInstances(unitDto, savedCalendar);
             workInstanceRepository.saveAll(instances);
         }
-
     }
 
-    public List<WorkDayResponseDto> getWorkDaysByStartDateAndEndDate(LocalDate startDate, LocalDate endDate) {
-
+    public List<WorkDayResponseDto> getWorkDaysByOrganizationAndDateRange(Long organizationId, LocalDate startDate, LocalDate endDate) {
         Long memberId = AuthService.getCurrentUserId();
 
+        Organization org = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
+
+
         List<WorkInstance> instances =
-                workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(memberId, startDate, endDate);
+                workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(
+                        memberId, org, startDate, endDate
+                );
 
         return WorkCalendarConverter.toDayResponseDtoList(instances);
     }
 
     @Transactional
-    public void updateWorkCalendar(LocalDate startDate, LocalDate endDate, WorkCalendarUpdateDto workCalendarUpdateDto) {
+    public void updateWorkCalendar(Long organizationId, LocalDate startDate, LocalDate endDate, WorkCalendarUpdateDto workCalendarUpdateDto) {
         Long memberId = AuthService.getCurrentUserId();
 
+        Organization org = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
+
         WorkCalendar calendar = workCalendarRepository
-                .findByMemberIdAndStartDateAndEndDate(memberId, startDate, endDate)
+                .findByMemberIdAndOrganizationAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                        memberId, org, startDate, endDate)
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
 
         // 캘린더 범위 내 근무 일정 조회
-        List<WorkInstance> existingInstances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(memberId, startDate, endDate);
+        List<WorkInstance> existingInstances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(
+                memberId, org, startDate, endDate);
 
         Map<LocalDate, WorkInstance> existingMap = existingInstances.stream()
                 .collect(Collectors.toMap(WorkInstance::getWorkDate, wi -> wi));
@@ -88,7 +103,7 @@ public class WorkCalendarService {
 
             if(existing != null){
                 workInstanceRepository.delete(existing);
-
+            }
                 WorkInstance newInstance = WorkInstance.builder()
                         .workDate(day)
                         .workTimeType(workTimeType)
@@ -96,25 +111,20 @@ public class WorkCalendarService {
                         .build();
 
                 workInstanceRepository.save(newInstance);
-            }
-            else{
-                WorkInstance newInstance = WorkInstance.builder()
-                        .workDate(day)
-                        .workTimeType(workTimeType)
-                        .workCalendar(calendar)
-                        .build();
 
-                workInstanceRepository.save(newInstance);
-            }
         }
     }
 
     @Transactional
-    public void deleteWorkCalendar(LocalDate startDate, LocalDate endDate) {
+    public void deleteWorkCalendar(Long organizationId, LocalDate startDate, LocalDate endDate) {
         Long memberId = AuthService.getCurrentUserId();
 
+        Organization org = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
+
         WorkCalendar calendar = workCalendarRepository
-                .findByMemberIdAndStartDateAndEndDate(memberId, startDate, endDate)
+                .findByMemberIdAndOrganizationAndStartDateLessThanEqualAndEndDateGreaterThanEqual
+                        (memberId, org, startDate, endDate)
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
 
         workInstanceRepository.deleteAllByWorkCalendar(calendar);

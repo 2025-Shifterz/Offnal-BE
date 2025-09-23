@@ -1,5 +1,6 @@
 package com.offnal.shifterz.work.repository;
 
+import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,6 +30,9 @@ public interface WorkInstanceRepository extends JpaRepository<WorkInstance, Long
 
     List<WorkInstance> findByWorkCalendarMemberIdAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(
             Long memberId, LocalDate startDate, LocalDate endDate);
+
+    List<WorkInstance> findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(
+            Long memberId, Organization organization, LocalDate startDate, LocalDate endDate);
 
     void deleteAllByWorkCalendar(WorkCalendar workCalendar);
 }

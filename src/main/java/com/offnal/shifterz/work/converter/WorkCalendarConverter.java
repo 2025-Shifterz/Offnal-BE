@@ -1,5 +1,6 @@
 package com.offnal.shifterz.work.converter;
 
+import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
 import com.offnal.shifterz.work.domain.WorkTime;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 public class WorkCalendarConverter {
 
     // WorkCalendarRequestDto -> WorkCalendar
-    public static WorkCalendar toEntity(Long memberId, WorkCalendarRequestDto workCalendarRequestDto, WorkCalendarUnitDto unitDto) {
+    public static WorkCalendar toEntity(Long memberId, Organization organization, WorkCalendarRequestDto workCalendarRequestDto, WorkCalendarUnitDto unitDto) {
 
         Map<String, WorkTime> workTimeMap = new HashMap<>();
         for (Map.Entry<String, WorkTimeDto> entry : workCalendarRequestDto.getWorkTimes().entrySet()) {
@@ -45,6 +46,7 @@ public class WorkCalendarConverter {
                 .startDate(unitDto.getStartDate())
                 .endDate(unitDto.getEndDate())
                 .memberId(memberId)
+                .organization(organization)
                 .workTimes(workTimeMap)
                 .build();
     }
