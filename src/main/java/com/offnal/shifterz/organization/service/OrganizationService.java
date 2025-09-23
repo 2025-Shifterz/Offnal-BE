@@ -4,18 +4,17 @@ import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.member.domain.Member;
-import com.offnal.shifterz.member.repository.MemberRepository;
 import com.offnal.shifterz.organization.converter.OrganizationConverter;
 import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.organization.dto.OrganizationRequestDto;
 import com.offnal.shifterz.organization.dto.OrganizationResponseDto;
 import com.offnal.shifterz.organization.repository.OrganizationRepository;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
