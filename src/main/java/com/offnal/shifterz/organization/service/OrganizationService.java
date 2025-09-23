@@ -29,6 +29,11 @@ public class OrganizationService {
     public OrganizationResponseDto.OrganizationDto createOrganization(OrganizationRequestDto.CreateDto request) {
         Member member = AuthService.getCurrentMember();
 
+        if (organizationRepository.existsByOrganizationName(request.getOrganizationName())){
+            throw new CustomException(OrganizationErrorCode.ORGANIZATION_DUPLICATE_NAME);
+        }
+
+
         Organization org = OrganizationConverter.toEntity(request, member);
         return OrganizationConverter.toDto(organizationRepository.save(org));
     }
@@ -95,7 +100,9 @@ public class OrganizationService {
     public enum OrganizationErrorCode implements ErrorReason {
         ORGANIZATION_NOT_FOUND("ORG001", HttpStatus.NOT_FOUND, "소속 조직을 찾을 수 없습니다."),
         ORGANIZATION_SAVE_FAILED("ORG002", HttpStatus.INTERNAL_SERVER_ERROR, "조직 저장에 실패했습니다."),
-        ORGANIZATION_ACCESS_DENIED("ORG003", HttpStatus.FORBIDDEN, "해당 조직에 접근 권한이 없습니다.");
+        ORGANIZATION_ACCESS_DENIED("ORG003", HttpStatus.FORBIDDEN, "해당 조직에 접근 권한이 없습니다."),
+        ORGANIZATION_DUPLICATE_NAME("ORG004", HttpStatus.INTERNAL_SERVER_ERROR, "이미 존재하는 조직입니다.");
+
         private final String code;
         private final HttpStatus status;
         private final String message;

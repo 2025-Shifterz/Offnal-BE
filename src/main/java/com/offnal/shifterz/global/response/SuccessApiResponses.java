@@ -2,6 +2,7 @@ package com.offnal.shifterz.global.response;
 
 import com.offnal.shifterz.memo.dto.MemoResponseDto;
 import com.offnal.shifterz.organization.dto.OrganizationResponseDto;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -364,16 +365,16 @@ public @interface SuccessApiResponses {
                     examples = @ExampleObject(
                             name = "조직 생성 성공 예시",
                             value = """
-                {
-                  "code": "ORG001",
-                  "message": "조직이 성공적으로 생성되었습니다.",
-                  "result": {
-                    "id": 1,
-                    "organizationName": "옾날 병원",
-                    "team": "1조"
-                  }
-                }
-                """
+                                    {
+                                      "code": "ORGANIZATION_CREATED",
+                                      "message": "조직이 성공적으로 생성되었습니다.",
+                                      "result": {
+                                        "id": 1,
+                                        "organizationName": "옾날 병원",
+                                        "team": "1조"
+                                      }
+                                    }
+                                    """
                     )
             )
     )
@@ -389,16 +390,16 @@ public @interface SuccessApiResponses {
                     examples = @ExampleObject(
                             name = "조직 수정 성공 예시",
                             value = """
-                {
-                  "code": "ORG002",
-                  "message": "조직이 성공적으로 수정되었습니다.",
-                  "result": {
-                    "id": 1,
-                    "organizationName": "오프날 병원",
-                    "team": "2조"
-                  }
-                }
-                """
+                                    {
+                                      "code": "ORGANIZATION_UPDATED",
+                                      "message": "조직이 성공적으로 수정되었습니다.",
+                                      "result": {
+                                        "id": 1,
+                                        "organizationName": "오프날 병원",
+                                        "team": "2조"
+                                      }
+                                    }
+                                    """
                     )
             )
     )
@@ -415,16 +416,15 @@ public @interface SuccessApiResponses {
                     examples = @ExampleObject(
                             name = "특정 조직 조회 성공 예시",
                             value = """
-                {
-
-                  "code": "ORG003",
-                  "message": "조직이 성공적으로 조회되었습니다.",
-                  "result": {
-                    "id": 1,
-                    "organizationName": "옾날 병원",
-                    "team": "1조"
-                  }
-                }
+                                    {
+                                       "code": "ORGANIZATION_FETCHED",
+                                       "message": "조직이 성공적으로 조회되었습니다.",
+                                       "data": {
+                                         "id": 1,
+                                         "organizationName": "옾날 병원",
+                                         "team": "1조"
+                                       }
+                                     }
                 """
                     )
             )
@@ -437,21 +437,27 @@ public @interface SuccessApiResponses {
             responseCode = "200",
             description = "전체 조직 조회 성공",
             content = @Content(
-                    schema = @Schema(implementation = OrganizationResponseDto.OrganizationDto.class),
+                    array = @ArraySchema(schema = @Schema(implementation = OrganizationResponseDto.OrganizationDto.class)),
                     examples = @ExampleObject(
                             name = "전체 조직 조회 성공 예시",
                             value = """
-                {
-
-                  "code": "ORG004",
-                  "message": "전체 조직이 성공적으로 조회되었습니다.",
-                  "result": {
-                    "id": 1,
-                    "organizationName": "옾날 병원",
-                    "team": "1조"
-                  }
-                }
-                """
+                                    {
+                                      "code": "ORGANIZATION_FETCHED",
+                                      "message": "조직이 성공적으로 조회되었습니다.",
+                                      "data": [
+                                        {
+                                          "id": 1,
+                                          "organizationName": "옾날 병원",
+                                          "team": "1조"
+                                        },
+                                        {
+                                          "id": 2,
+                                          "organizationName": "오프날 병원",
+                                          "team": "2조"
+                                        }
+                                      ]
+                                    }
+                                    """
                     )
             )
     )
