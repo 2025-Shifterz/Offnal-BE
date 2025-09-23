@@ -24,7 +24,12 @@ public enum SuccessCode {
     MEMO_CREATED("MEMO001", HttpStatus.CREATED, "메모가 성공적으로 생성되었습니다."),
     MEMO_UPDATED("MEMO002", HttpStatus.OK,  "메모가 성공적으로 수정되었습니다."),
     MEMO_FETCHED("MEMO003",HttpStatus.OK,  "메모가 성공적으로 조회되었습니다."),
-    MEMO_DELETED("MEMO004", HttpStatus.OK, "메모가 성공적으로 삭제되었습니다.");
+    MEMO_DELETED("MEMO004", HttpStatus.OK, "메모가 성공적으로 삭제되었습니다."),
+
+    ORGANIZATION_CREATED("ORG001", HttpStatus.CREATED, "조직이 성공적으로 생성되었습니다."),
+    ORGANIZATION_UPDATED("ORG002", HttpStatus.OK,  "조직이 성공적으로 수정되었습니다."),
+    ORGANIZATION_FETCHED("ORG003",HttpStatus.OK,  "조직이 성공적으로 조회되었습니다."),
+    ORGANIZATION_DELETED("ORG004", HttpStatus.OK, "조직이 성공적으로 삭제되었습니다.");
 
     private final String code;
     private final HttpStatus httpStatus;
