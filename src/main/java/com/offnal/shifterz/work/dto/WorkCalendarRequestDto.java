@@ -19,18 +19,15 @@ import java.util.Map;
 public class WorkCalendarRequestDto {
 
     @NotEmpty(message = "근무표 이름은 필수입니다.")
-    @NotNull
     @Schema(description = "근무표 이름")
     private String calendarName;
 
-    @NotEmpty(message = "근무조는 필수입니다.")
     @NotNull
-    @Schema(description = "근무조")
-    private String workGroup;
+    @Schema(description = "조직 id")
+    private Long organizationId;
 
     @Valid
     @NotEmpty(message = "근무 시간 정보는 필수입니다.")
-    @NotNull
     @Schema(description = "근무타입별 시간 정보(D/E/N)")
     private Map<String, WorkTimeDto> workTimes;
 

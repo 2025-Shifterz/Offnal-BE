@@ -1,5 +1,6 @@
 package com.offnal.shifterz.work.converter;
 
+import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
 import com.offnal.shifterz.work.domain.WorkTime;
@@ -9,6 +10,7 @@ import com.offnal.shifterz.work.dto.WorkCalendarUnitDto;
 import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.dto.WorkTimeDto;
 
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.stream.Collectors;
 public class WorkCalendarConverter {
 
     // WorkCalendarRequestDto -> WorkCalendar
-    public static WorkCalendar toEntity(Long memberId, WorkCalendarRequestDto workCalendarRequestDto, WorkCalendarUnitDto unitDto) {
+    public static WorkCalendar toEntity(Long memberId, Organization organization, WorkCalendarRequestDto workCalendarRequestDto, WorkCalendarUnitDto unitDto) {
 
         Map<String, WorkTime> workTimeMap = new HashMap<>();
         for (Map.Entry<String, WorkTimeDto> entry : workCalendarRequestDto.getWorkTimes().entrySet()) {
@@ -26,18 +28,25 @@ public class WorkCalendarConverter {
 
             WorkTimeType timeType = WorkTimeType.fromSymbol(symbol);
             LocalTime startTime = LocalTime.parse(workTimeDto.getStartTime());
-            LocalTime endTime = LocalTime.parse(workTimeDto.getEndTime());
 
-            WorkTime workTime = WorkTime.of(timeType, startTime, endTime);
+            String[] hm = workTimeDto.getDuration().split(":");
+            Duration duration = Duration.ofHours(Integer.parseInt(hm[0]))
+                                        .plusMinutes(Integer.parseInt(hm[1]));
+
+            WorkTime workTime = WorkTime.builder()
+                    .timeType(timeType)
+                    .startTime(startTime)
+                    .duration(duration)
+                    .build();
             workTimeMap.put(symbol, workTime);
         }
 
         return WorkCalendar.builder()
                 .calendarName(workCalendarRequestDto.getCalendarName())
-                .year(unitDto.getYear())
-                .month(unitDto.getMonth())
+                .startDate(unitDto.getStartDate())
+                .endDate(unitDto.getEndDate())
                 .memberId(memberId)
-                .workGroup(workCalendarRequestDto.getWorkGroup())
+                .organization(organization)
                 .workTimes(workTimeMap)
                 .build();
     }
@@ -46,7 +55,7 @@ public class WorkCalendarConverter {
     public static List<WorkInstance> toWorkInstances(WorkCalendarUnitDto unitDto, WorkCalendar calendar) {
         return unitDto.getShifts().entrySet().stream()
                 .map(entry -> WorkInstance.builder()
-                        .workDay(entry.getKey())
+                        .workDate(entry.getKey())
                         .workTimeType(WorkTimeType.fromSymbol(entry.getValue()))
                         .workCalendar(calendar)
                         .build())
@@ -56,7 +65,7 @@ public class WorkCalendarConverter {
     public static List<WorkDayResponseDto> toDayResponseDtoList(List<WorkInstance> instances) {
         return instances.stream()
                 .map(instance -> WorkDayResponseDto.builder()
-                        .day(String.valueOf(Integer.parseInt(instance.getWorkDay())))
+                        .date(instance.getWorkDate())
                         .workTypeName(instance.getWorkTimeType().getKoreanName())
                         .build())
                 .collect(Collectors.toList());

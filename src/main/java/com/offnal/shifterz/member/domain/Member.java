@@ -1,31 +1,41 @@
 package com.offnal.shifterz.member.domain;
 
+import com.offnal.shifterz.global.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Getter
-@Setter
 @Table(name = "members")
-public class Member{
+public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "kakao_id", unique = true)
-    private Long kakaoId;
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
 
-    @Column(name = "kakao_nickname")
-    private String kakaoNickname;
-
-    @Column(name = "kakao_email")
+    private String providerId;
     private String email;
+    private String memberName;
+    private String phoneNumber;
 
-    @Column(name = "kakao_profile_image_url")
     private String profileImageUrl;
+
+    public void updateMemberInfo(String email, String memberName, String phoneNumber, String profileImageUrl) {
+        this.email = email;
+        this.memberName = memberName;
+        this.phoneNumber = phoneNumber;
+        this.profileImageUrl = profileImageUrl;
+
+    }
+
+
 }

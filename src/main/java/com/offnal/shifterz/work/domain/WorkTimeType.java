@@ -1,31 +1,31 @@
 package com.offnal.shifterz.work.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
-@Schema(description = "근무 유형", example = "DAY")
+@Getter
+@Schema(description = "근무 유형", example = "D")
 public enum WorkTimeType {
-    DAY("주간"),
-    EVENING("오후"),
-    NIGHT("야간"),
-    OFF("휴일");
+    DAY("D", "주간"),
+    EVENING("E", "오후"),
+    NIGHT("N", "야간"),
+    OFF("-", "휴일");
 
+    private final String symbol;
     private final String koreanName;
 
-    WorkTimeType(String koreanName) {
+    WorkTimeType(String symbol, String koreanName) {
+        this.symbol = symbol;
         this.koreanName = koreanName;
     }
 
-    public String getKoreanName() {
-        return koreanName;
+    public static WorkTimeType fromSymbol(String symbol) {
+        for (WorkTimeType type : WorkTimeType.values()) {
+            if (type.symbol.equals(symbol)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("Unknown shift type: " + symbol);
     }
 
-    public static WorkTimeType fromSymbol(String symbol) {
-        return switch (symbol) {
-            case "D" -> DAY;
-            case "E" -> EVENING;
-            case "N" -> NIGHT;
-            case "-" -> OFF;
-            default -> throw new IllegalArgumentException("Unknown shift type: " + symbol);
-        };
-    }
 }
