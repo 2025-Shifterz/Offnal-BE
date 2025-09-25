@@ -1,10 +1,13 @@
 package com.offnal.shifterz.work.domain;
 
+import com.offnal.shifterz.global.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Entity
 @AllArgsConstructor
@@ -12,14 +15,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 @Table(name = "work_instance")
-public class WorkInstance {
+public class WorkInstance extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     //근무 날짜
-    private String workDay;
+    private LocalDate workDate;
 
     //근무 유형
     @Enumerated(EnumType.STRING)

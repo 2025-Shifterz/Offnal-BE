@@ -1,6 +1,7 @@
 package com.offnal.shifterz.todo.controller;
 
 import com.offnal.shifterz.global.exception.ErrorApiResponses;
+import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.todo.dto.TodoRequestDto;
@@ -13,8 +14,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import com.offnal.shifterz.global.response.SuccessApiResponses;
 @Tag(name = "Todo", description  = "Todo 관련 API")
+
 @RestController
 @RequestMapping("/todos")
 @RequiredArgsConstructor

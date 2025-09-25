@@ -1,11 +1,14 @@
 package com.offnal.shifterz.work.domain;
 
+import com.offnal.shifterz.global.BaseTimeEntity;
+import com.offnal.shifterz.organization.domain.Organization;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +18,7 @@ import java.util.Map;
 @Getter
 @Builder
 @Table(name = "work_calendar")
-public class WorkCalendar {
+public class WorkCalendar extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,16 +26,18 @@ public class WorkCalendar {
 
     private Long memberId;
 
-    private String calendarName; // 근무표 이름
+    private String calendarName;
 
-    private String year;
+    private LocalDate startDate;
 
-    private String month;
+    private LocalDate endDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization;
 
     @Builder.Default
     @ElementCollection
     @CollectionTable(name = "work_times", joinColumns = @JoinColumn(name = "work_sch_id"))
     private Map<String, WorkTime> workTimes = new HashMap<>();
-
-    private String workGroup; // 유저의 근무 조 (예: A조, B조)
 }

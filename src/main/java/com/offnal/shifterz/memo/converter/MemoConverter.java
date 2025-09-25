@@ -5,9 +5,6 @@ import com.offnal.shifterz.memo.domain.Memo;
 import com.offnal.shifterz.memo.dto.MemoRequestDto;
 import com.offnal.shifterz.memo.dto.MemoResponseDto;
 import com.offnal.shifterz.organization.domain.Organization;
-import com.offnal.shifterz.todo.domain.Todo;
-import com.offnal.shifterz.todo.dto.TodoRequestDto;
-import com.offnal.shifterz.todo.dto.TodoResponseDto;
 
 import java.time.LocalDate;
 import java.util.Optional;

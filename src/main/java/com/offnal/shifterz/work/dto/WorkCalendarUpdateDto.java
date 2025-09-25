@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 @Getter
@@ -22,6 +23,6 @@ public class WorkCalendarUpdateDto {
     @NotNull
     @NotEmpty(message = "근무일 정보는 필수입니다.")
     @Schema(description = "근무표(날짜별 근무타입)")
-    private Map<String, String> shifts;
+    private Map<LocalDate, String> shifts;
 
 }

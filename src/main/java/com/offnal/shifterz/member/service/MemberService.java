@@ -2,9 +2,7 @@ package com.offnal.shifterz.member.service;
 
 import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
-import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.global.exception.ErrorReason;
-import com.offnal.shifterz.jwt.CustomUserDetails;
 import com.offnal.shifterz.member.converter.MemberConverter;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.domain.Provider;
@@ -17,13 +15,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Optional;
 
 @Slf4j

@@ -1,14 +1,12 @@
 package com.offnal.shifterz.kakao;
 
 import com.offnal.shifterz.global.exception.CustomException;
-import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.jwt.JwtTokenProvider;
 import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.dto.AuthResponseDto;
 import com.offnal.shifterz.member.dto.MemberResponseDto;
 import com.offnal.shifterz.member.service.MemberService;
-import com.offnal.shifterz.member.service.SocialService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

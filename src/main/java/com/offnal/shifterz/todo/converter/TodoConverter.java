@@ -1,10 +1,11 @@
 package com.offnal.shifterz.todo.converter;
 
+import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.todo.domain.Todo;
 import com.offnal.shifterz.todo.dto.TodoRequestDto;
 import com.offnal.shifterz.todo.dto.TodoResponseDto;
-import com.offnal.shifterz.member.domain.Member;
+
 import java.time.LocalDate;
 import java.util.Optional;
 
