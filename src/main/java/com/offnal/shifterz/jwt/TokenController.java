@@ -29,8 +29,6 @@ public class TokenController {
     @ErrorApiResponses.Auth
     @PostMapping("/reissue")
     public SuccessResponse<TokenDto.TokenResponse> reissue(@RequestBody TokenDto.TokenReissueRequest request) {
-        log.info(">>> 요청 DTO = {}", request);
-        log.info(">>> refreshToken 필드 = {}", request.getRefreshToken());
         TokenDto.TokenResponse response = tokenService.reissue(request);
         return SuccessResponse.success(SuccessCode.TOKEN_REISSUED, response);
     }
