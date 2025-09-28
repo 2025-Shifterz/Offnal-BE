@@ -31,6 +31,9 @@ public class JwtTokenProvider {
 
     private final UserDetailsService userDetailsService;
 
+    private final long accessTokenValidity = 1000L * 60 * 60 * 24 * 7;        // 7일
+    private final long refreshTokenValidity = 1000L * 60 * 60 * 24 * 14; // 14일
+
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
@@ -43,19 +46,19 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
                 .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000L)))// 토큰 유효시각 설정 (일주일)
+                .setExpiration(new Date(now.getTime() + accessTokenValidity))// 토큰 유효시각 설정 (일주일)
                 .signWith(SignatureAlgorithm.HS256, secretKey)  // 암호화 알고리즘과, secret 값
                 .compact();
     }
 
     // Refresh Token 생성
-    public String createRefreshToken(String email) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String createRefreshToken(Long memberId) {
+        Claims claims = Jwts.claims().setSubject(memberId.toString());
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + (604800 * 1000L))) // 7일
+                .setExpiration(new Date(now.getTime() + refreshTokenValidity))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }

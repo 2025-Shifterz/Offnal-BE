@@ -568,4 +568,20 @@ public @interface SuccessApiResponses {
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     public @interface OrganizationDelete {}
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "토큰 재발급 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                            {
+                              "code": "AUTH200",
+                              "message": "토큰이 재발급되었습니다.",
+                              "data": {
+                                "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+                                "refreshToken": "eyJhbGciOiJIUzI1NiJ9..."
+                              }
+                            }
+                            """)))
+    })
+    public @interface TokenReissue {}
 }

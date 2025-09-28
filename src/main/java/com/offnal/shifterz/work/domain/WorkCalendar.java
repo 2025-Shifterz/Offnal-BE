@@ -17,7 +17,6 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Builder
-@Table(name = "work_calendar")
 public class WorkCalendar extends BaseTimeEntity {
 
     @Id

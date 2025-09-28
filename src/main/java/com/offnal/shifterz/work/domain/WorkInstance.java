@@ -14,7 +14,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Builder
-@Table(name = "work_instance")
 public class WorkInstance extends BaseTimeEntity {
 
     @Id

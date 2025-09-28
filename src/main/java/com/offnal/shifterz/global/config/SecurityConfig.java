@@ -1,4 +1,4 @@
-package com.offnal.shifterz.config;
+package com.offnal.shifterz.global.config;
 
 import com.offnal.shifterz.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
