@@ -1,11 +1,12 @@
 package com.offnal.shifterz.work.dto;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 
 import java.time.LocalDate;
 
-@Getter
+@Data
 @Builder
 public class WorkDayResponseDto {
     private LocalDate date;

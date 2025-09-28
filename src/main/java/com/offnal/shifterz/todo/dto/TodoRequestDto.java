@@ -1,16 +1,14 @@
 package com.offnal.shifterz.todo.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
+
 public class TodoRequestDto {
 
-    @Getter
+    @Data
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
@@ -27,11 +25,13 @@ public class TodoRequestDto {
         private Long organizationId; // 선택 필드
     }
 
-    @Getter
+    @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateDto {
+        @NotNull(message = "할 일 ID는 필수입니다.")
+        private Long id;
         private String content;
         private Boolean isSuccess;
         private LocalDate targetDate;

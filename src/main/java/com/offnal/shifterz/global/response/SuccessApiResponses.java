@@ -1,5 +1,6 @@
 package com.offnal.shifterz.global.response;
 
+import com.offnal.shifterz.jwt.TokenDto;
 import com.offnal.shifterz.memo.dto.MemoResponseDto;
 import com.offnal.shifterz.todo.dto.TodoResponseDto;
 import com.offnal.shifterz.organization.dto.OrganizationResponseDto;
@@ -198,8 +199,6 @@ public @interface SuccessApiResponses {
                         "isSuccess": false,
                         "targetDate": "2025-09-23",
                         "organizationId": 10,
-                        "createdAt": "2025-09-22T10:12:45",
-                        "updatedAt": "2025-09-22T10:12:45"
                       }
                     }
                     """
@@ -234,8 +233,6 @@ public @interface SuccessApiResponses {
                         "isSuccess": true,
                         "targetDate": "2025-09-24",
                         "organizationId": 10,
-                        "createdAt": "2025-09-22T10:12:45",
-                        "updatedAt": "2025-09-22T11:30:00"
                       }
                     }
                     """
@@ -270,8 +267,7 @@ public @interface SuccessApiResponses {
                         "isSuccess": false,
                         "targetDate": "2025-09-23",
                         "organizationId": 10,
-                        "createdAt": "2025-09-22T10:12:45",
-                        "updatedAt": "2025-09-22T10:12:45"
+           
                       }
                     }
                     """
@@ -569,19 +565,28 @@ public @interface SuccessApiResponses {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface OrganizationDelete {}
 
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "토큰 재발급 성공",
-                    content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                            {
-                              "code": "AUTH200",
-                              "message": "토큰이 재발급되었습니다.",
-                              "data": {
-                                "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
-                                "refreshToken": "eyJhbGciOiJIUzI1NiJ9..."
-                              }
-                            }
-                            """)))
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = "토큰 재발급 성공",
+            content = @Content(
+                    schema = @Schema(implementation = TokenDto.TokenResponse.class),
+                    examples = @ExampleObject(
+                            name = "토큰 재발급 성공 예시",
+                            value = """
+                {
+                  "code": "TOKEN_REISSUED",
+                  "message": "토큰이 재발급되었습니다.",
+                  "data": {
+                    "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+                    "refreshToken": "eyJhbGciOiJIUzI1NiJ9..."
+                  }
+                }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
     public @interface TokenReissue {}
+
 }

@@ -42,10 +42,10 @@ public class MemoService {
     }
 
     @Transactional
-    public MemoResponseDto.MemoDto updateMemo(Long id, MemoRequestDto.UpdateMemoDto request) {
+    public MemoResponseDto.MemoDto updateMemo(MemoRequestDto.UpdateMemoDto request) {
         Member member = AuthService.getCurrentMember();
 
-        Memo memo = memoRepository.findById(id)
+        Memo memo = memoRepository.findById(request.getId())
                 .orElseThrow(() -> new CustomException(MemoErrorCode.MEMO_NOT_FOUND));
 
         if (!memo.getMember().getId().equals(member.getId())) {

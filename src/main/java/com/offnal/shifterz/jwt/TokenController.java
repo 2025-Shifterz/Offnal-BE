@@ -5,9 +5,10 @@ import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/tokens")
 @RequiredArgsConstructor
+@Slf4j
 public class TokenController {
 
     private final TokenService tokenService;
@@ -27,7 +29,10 @@ public class TokenController {
     @ErrorApiResponses.Auth
     @PostMapping("/reissue")
     public SuccessResponse<TokenDto.TokenResponse> reissue(@RequestBody TokenDto.TokenReissueRequest request) {
-        TokenDto.TokenResponse response = tokenService.reissue(request.refreshToken());
+        log.info(">>> 요청 DTO = {}", request);
+        log.info(">>> refreshToken 필드 = {}", request.getRefreshToken());
+        TokenDto.TokenResponse response = tokenService.reissue(request);
         return SuccessResponse.success(SuccessCode.TOKEN_REISSUED, response);
     }
+
 }

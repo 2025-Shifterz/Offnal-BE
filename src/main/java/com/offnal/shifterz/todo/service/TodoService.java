@@ -43,12 +43,11 @@ public class TodoService {
     }
 
     @Transactional
-    public TodoResponseDto.TodoDto updateTodo(Long id, TodoRequestDto.UpdateDto request) {
+    public TodoResponseDto.TodoDto updateTodo(TodoRequestDto.UpdateDto request) {
         Member member = AuthService.getCurrentMember();
 
-        Todo todo = todoRepository.findById(id)
+        Todo todo = todoRepository.findById(request.getId())
                 .orElseThrow(() -> new CustomException(TodoErrorCode.TODO_NOT_FOUND));
-
 
         if (!todo.getMember().getId().equals(member.getId())) {
             throw new CustomException(TodoErrorCode.TODO_ACCESS_DENIED);
@@ -57,6 +56,7 @@ public class TodoService {
         todo.update(request);
         return TodoConverter.toDto(todo);
     }
+
 
     @Transactional(readOnly = true)
     public TodoResponseDto.TodoDto getTodo(Long id) {

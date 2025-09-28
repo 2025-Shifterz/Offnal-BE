@@ -4,6 +4,7 @@ import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.repository.MemberRepository;
+import com.offnal.shifterz.member.repository.RefreshTokenRepository;
 import com.offnal.shifterz.member.service.MemberService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Component
@@ -31,8 +33,9 @@ public class JwtTokenProvider {
 
     private final UserDetailsService userDetailsService;
 
-    private final long accessTokenValidity = 1000L * 60 * 60 * 24 * 7;        // 7일
+    private final long accessTokenValidity = 1000L * 60 * 30;        // 30분
     private final long refreshTokenValidity = 1000L * 60 * 60 * 24 * 14; // 14일
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @PostConstruct
     protected void init() {
@@ -55,12 +58,16 @@ public class JwtTokenProvider {
     public String createRefreshToken(Long memberId) {
         Claims claims = Jwts.claims().setSubject(memberId.toString());
         Date now = new Date();
-        return Jwts.builder()
+        String refreshToken = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + refreshTokenValidity))
+                .setExpiration(new Date(now.getTime() + refreshTokenValidity)) // 예: 2주~4주
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+
+
+        refreshTokenRepository.save(memberId, refreshToken, refreshTokenValidity, TimeUnit.MILLISECONDS);
+        return refreshToken;
     }
 
     // 토큰에서 회원 정보 추출

@@ -1,13 +1,10 @@
 package com.offnal.shifterz.member.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 public class MemberResponseDto {
 
-    @Getter
+    @Data
     @Builder
     public static class MemberRegisterResponseDto {
         private Long id;
@@ -18,7 +15,7 @@ public class MemberResponseDto {
         private boolean isNewMember;
     }
 
-    @Getter
+    @Data
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor

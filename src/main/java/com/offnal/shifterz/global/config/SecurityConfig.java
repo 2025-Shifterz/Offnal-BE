@@ -29,6 +29,7 @@ public class SecurityConfig {
                         authorizeRequests.requestMatchers(
                                         "/login",
                                         "/login/page",
+                                        "/tokens/reissue",
                                         "/callback",
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",

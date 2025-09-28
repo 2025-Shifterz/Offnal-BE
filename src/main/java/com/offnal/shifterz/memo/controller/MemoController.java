@@ -79,12 +79,11 @@ public class MemoController {
     @SuccessApiResponses.MemoUpdate
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @PatchMapping("/{id}")
+    @PatchMapping
     public SuccessResponse<MemoResponseDto.MemoDto> updateMemo(
-            @PathVariable Long id,
             @RequestBody @Valid MemoRequestDto.UpdateMemoDto request
     ) {
-        return SuccessResponse.success(SuccessCode.MEMO_UPDATED, memoService.updateMemo(id, request));
+        return SuccessResponse.success(SuccessCode.MEMO_UPDATED, memoService.updateMemo(request));
     }
 
     /**

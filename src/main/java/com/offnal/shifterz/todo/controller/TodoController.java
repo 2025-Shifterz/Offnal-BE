@@ -83,12 +83,11 @@ public class TodoController {
     @SuccessApiResponses.TodoUpdate
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @PatchMapping ("/{id}")
+    @PatchMapping
     public SuccessResponse<TodoResponseDto.TodoDto> updateTodo(
-            @PathVariable Long id,
             @RequestBody @Valid TodoRequestDto.UpdateDto request
     ) {
-        return SuccessResponse.success(SuccessCode.TODO_UPDATED, todoService.updateTodo(id, request));
+        return SuccessResponse.success(SuccessCode.TODO_UPDATED, todoService.updateTodo(request));
     }
 
     /**
