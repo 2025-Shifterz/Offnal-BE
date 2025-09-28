@@ -280,6 +280,41 @@ public @interface SuccessApiResponses {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface TodoGet {}
 
+    @ApiResponse(
+            responseCode = "200",
+            description = "할 일 목록 조회 성공",
+            content = @Content(
+                    schema = @Schema(implementation = TodoResponseDto.TodoDto.class),
+                    examples = @ExampleObject(
+                            name = "할 일 목록 조회 성공 예시",
+                            value = """
+                {
+                  "code": "TODO004",
+                  "message": "할 일 목록을 성공적으로 조회했습니다.",
+                  "result": [
+                    {
+                      "id": 1,
+                      "content": "스터디 준비",
+                      "isSuccess": false,
+                      "targetDate": "2025-09-23",
+                      "organizationId": null,
+                    },
+                    {
+                      "id": 2,
+                      "content": "야간 근무 교대",
+                      "isSuccess": true,
+                      "targetDate": "2025-09-25",
+                      "organizationId": 10,
+                    }
+                  ]
+                }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface TodoGetAll {}
 
 
     @ApiResponses(value = {
@@ -433,6 +468,43 @@ public @interface SuccessApiResponses {
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     public @interface MemoDelete {}
+    @ApiResponse(
+            responseCode = "200",
+            description = "메모 전체 조회 성공",
+            content = @Content(
+                    schema = @Schema(implementation = MemoResponseDto.MemoDto.class),
+                    examples = @ExampleObject(
+                            name = "메모 전체 조회 성공 예시",
+                            value = """
+                {
+                  "code": "MEMO_LIST_FETCHED",
+                  "message": "메모 목록을 성공적으로 조회했습니다.",
+                  "result": [
+                    {
+                      "id": 1,
+                      "content": "스터디 준비",
+                      "targetDate": "2025-09-23",
+                      "organizationId": null,
+                      "createdAt": "2025-09-20T10:15:30",
+                      "updatedAt": "2025-09-21T12:00:00"
+                    },
+                    {
+                      "id": 2,
+                      "content": "야간 근무 교대",
+                      "targetDate": "2025-09-25",
+                      "organizationId": 10,
+                      "createdAt": "2025-09-22T09:00:00",
+                      "updatedAt": "2025-09-23T14:20:00"
+                    }
+                  ]
+                }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface MemoGetAll {}
 
 
     @ApiResponse(

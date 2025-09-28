@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -83,6 +85,35 @@ public class MemoService {
 
         memoRepository.delete(memo);
     }
+    @Transactional(readOnly = true)
+    public List<MemoResponseDto.MemoDto> getMemos(String filter, Long organizationId) {
+        Member member = AuthService.getCurrentMember();
+        List<Memo> memos;
+
+        if ("unassigned".equalsIgnoreCase(filter)) {
+            // 소속 없는 메모만
+            memos = memoRepository.findAllByMemberAndOrganizationIsNull(member);
+
+        } else if ("all".equalsIgnoreCase(filter)) {
+            // 모든 메모
+            memos = memoRepository.findAllByMember(member);
+
+        } else if (organizationId != null) {
+            // 특정 조직 메모
+            Organization organization = organizationRepository.findById(organizationId)
+                    .orElseThrow(() -> new CustomException(MemoErrorCode.ORGANIZATION_NOT_FOUND));
+            memos = memoRepository.findAllByMemberAndOrganization(member, organization);
+
+        } else {
+            // 기본값: 모든 메모
+            memos = memoRepository.findAllByMember(member);
+        }
+
+        return memos.stream()
+                .map(MemoConverter::toDto)
+                .toList();
+    }
+
 
     @Getter
     @AllArgsConstructor

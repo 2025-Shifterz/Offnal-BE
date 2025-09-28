@@ -18,7 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import java.util.List;
 
 
 @Service
@@ -70,6 +70,34 @@ public class TodoService {
         }
 
         return TodoConverter.toDto(todo);
+    }
+    @Transactional(readOnly = true)
+    public List<TodoResponseDto.TodoDto> getTodos(String filter, Long organizationId) {
+        Member member = AuthService.getCurrentMember();
+        List<Todo> todos;
+
+        if ("unassigned".equalsIgnoreCase(filter)) {
+            // 소속 없는 Todo만
+            todos = todoRepository.findAllByMemberAndOrganizationIsNull(member);
+
+        } else if ("all".equalsIgnoreCase(filter)) {
+            // 모든 Todo
+            todos = todoRepository.findAllByMember(member);
+
+        } else if (organizationId != null) {
+            // 특정 조직 Todo
+            Organization organization = organizationRepository.findById(organizationId)
+                    .orElseThrow(() -> new CustomException(TodoErrorCode.ORGANIZATION_NOT_FOUND));
+            todos = todoRepository.findAllByMemberAndOrganization(member, organization);
+
+        } else {
+            // 기본값: 모든 Todo
+            todos = todoRepository.findAllByMember(member);
+        }
+
+        return todos.stream()
+                .map(TodoConverter::toDto)
+                .toList();
     }
 
     @Transactional
