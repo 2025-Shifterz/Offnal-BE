@@ -36,7 +36,19 @@ public class WorkCalendarController {
     /**
      * 근무표 생성
      */
-    @Operation(summary = "근무표 등록", description = "사용자의 근무표를 월별로 등록합니다.")
+    @Operation(
+            summary = "근무표 등록",
+            description = "사용자의 근무표를 월별로 등록합니다.\n\n" +
+                    "✅ 요청 본문에 포함할 수 있는 값:\n" +
+                    "- calendarName: 근무표 이름\n" +
+                    "- organizationId: 소속 조직 ID\n" +
+                    "- workTimes: 근무 시간 정보\n" +
+                    "  - startTime: 근무 시작 시간\n" +
+                    "  - duration: 근무 지속 시간 (HH:mm 형식)\n" +
+                    "- calendars: 월별 근무 스케줄 목록\n" +
+                    "  - startDate, endDate: 스케줄 기간\n" +
+                    "  - shifts: 날짜별 근무 타입 지정 (D=Day, E=Evening, N=Night, -=Off)"
+    )
     @SuccessApiResponses.CreateCalendar
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
@@ -55,9 +67,9 @@ public class WorkCalendarController {
                                   "calendarName": "병원 근무표",
                                   "organizationId": 1,
                                   "workTimes": {
-                                    "D": { "startTime": "08:00", "duration": "8:00" },
-                                    "E": { "startTime": "16:00", "duration": "8:00" },
-                                    "N": { "startTime": "00:00", "duration": "8:00" }
+                                    "D": { "startTime": "08:00", "duration": "08:00" },
+                                    "E": { "startTime": "16:00", "duration": "08:00" },
+                                    "N": { "startTime": "00:00", "duration": "08:00" }
                                   },
                                   "calendars": [
                                     {
@@ -105,7 +117,14 @@ public class WorkCalendarController {
     /**
      * 근무일 조회
      */
-    @Operation(summary = "근무일 조회", description = "입력한 연도와 월에 해당하는 모든 날짜의 근무유형 정보를 반환합니다.")
+
+    @Operation(
+            summary = "근무일 조회",
+            description = "입력한 연도와 월에 해당하는 모든 날짜의 근무유형 정보를 반환합니다.\n\n" +
+                    "✅ 요청 파라미터:\n" +
+                    "- organizationId: 소속 조직 ID\n" +
+                    "- startDate, endDate: 스케줄 기간\n"
+    )
     @SuccessApiResponses.WorkDay
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
