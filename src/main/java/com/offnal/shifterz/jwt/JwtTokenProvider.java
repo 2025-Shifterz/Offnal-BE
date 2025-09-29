@@ -66,7 +66,7 @@ public class JwtTokenProvider {
                 .compact();
 
 
-        refreshTokenRepository.save(memberId, refreshToken, jwtProperties.refreshTokenValiditySecond(), TimeUnit.MILLISECONDS);
+        refreshTokenRepository.save(memberId, refreshToken, jwtProperties.refreshTokenValiditySecond(), TimeUnit.SECONDS);
         return refreshToken;
     }
 
