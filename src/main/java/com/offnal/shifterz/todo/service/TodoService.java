@@ -18,7 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import java.util.List;
 
 
 @Service
@@ -43,12 +43,11 @@ public class TodoService {
     }
 
     @Transactional
-    public TodoResponseDto.TodoDto updateTodo(Long id, TodoRequestDto.UpdateDto request) {
+    public TodoResponseDto.TodoDto updateTodo(TodoRequestDto.UpdateDto request) {
         Member member = AuthService.getCurrentMember();
 
-        Todo todo = todoRepository.findById(id)
+        Todo todo = todoRepository.findById(request.getId())
                 .orElseThrow(() -> new CustomException(TodoErrorCode.TODO_NOT_FOUND));
-
 
         if (!todo.getMember().getId().equals(member.getId())) {
             throw new CustomException(TodoErrorCode.TODO_ACCESS_DENIED);
@@ -57,6 +56,7 @@ public class TodoService {
         todo.update(request);
         return TodoConverter.toDto(todo);
     }
+
 
     @Transactional(readOnly = true)
     public TodoResponseDto.TodoDto getTodo(Long id) {
@@ -70,6 +70,34 @@ public class TodoService {
         }
 
         return TodoConverter.toDto(todo);
+    }
+    @Transactional(readOnly = true)
+    public List<TodoResponseDto.TodoDto> getTodos(String filter, Long organizationId) {
+        Member member = AuthService.getCurrentMember();
+        List<Todo> todos;
+
+        if ("unassigned".equalsIgnoreCase(filter)) {
+            // 소속 없는 Todo만
+            todos = todoRepository.findAllByMemberAndOrganizationIsNull(member);
+
+        } else if ("all".equalsIgnoreCase(filter)) {
+            // 모든 Todo
+            todos = todoRepository.findAllByMember(member);
+
+        } else if (organizationId != null) {
+            // 특정 조직 Todo
+            Organization organization = organizationRepository.findById(organizationId)
+                    .orElseThrow(() -> new CustomException(TodoErrorCode.ORGANIZATION_NOT_FOUND));
+            todos = todoRepository.findAllByMemberAndOrganization(member, organization);
+
+        } else {
+            // 기본값: 모든 Todo
+            todos = todoRepository.findAllByMember(member);
+        }
+
+        return todos.stream()
+                .map(TodoConverter::toDto)
+                .toList();
     }
 
     @Transactional

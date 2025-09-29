@@ -4,6 +4,7 @@ import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.repository.MemberRepository;
+import com.offnal.shifterz.member.repository.RefreshTokenRepository;
 import com.offnal.shifterz.member.service.MemberService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Component
@@ -30,6 +32,10 @@ public class JwtTokenProvider {
     private String secretKey;
 
     private final UserDetailsService userDetailsService;
+
+    private final long accessTokenValidity = 1000L * 60 * 30;        // 30분
+    private final long refreshTokenValidity = 1000L * 60 * 60 * 24 * 14; // 14일
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @PostConstruct
     protected void init() {
@@ -43,21 +49,25 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
                 .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000L)))// 토큰 유효시각 설정 (일주일)
+                .setExpiration(new Date(now.getTime() + accessTokenValidity))// 토큰 유효시각 설정 (일주일)
                 .signWith(SignatureAlgorithm.HS256, secretKey)  // 암호화 알고리즘과, secret 값
                 .compact();
     }
 
     // Refresh Token 생성
-    public String createRefreshToken(String email) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String createRefreshToken(Long memberId) {
+        Claims claims = Jwts.claims().setSubject(memberId.toString());
         Date now = new Date();
-        return Jwts.builder()
+        String refreshToken = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + (604800 * 1000L))) // 7일
+                .setExpiration(new Date(now.getTime() + refreshTokenValidity)) // 예: 2주~4주
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+
+
+        refreshTokenRepository.save(memberId, refreshToken, refreshTokenValidity, TimeUnit.MILLISECONDS);
+        return refreshToken;
     }
 
     // 토큰에서 회원 정보 추출

@@ -2,11 +2,12 @@ package com.offnal.shifterz.organization.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 
 
 public class OrganizationResponseDto {
-    @Getter
+    @Data
     @Builder
     @AllArgsConstructor
     public static class OrganizationDto{

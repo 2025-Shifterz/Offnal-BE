@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "todo")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

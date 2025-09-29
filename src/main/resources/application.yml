@@ -17,6 +17,11 @@ spring:
     url: ${URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: redis-container
+      #host: localhost
+      port: 6379
 
 # JWT
 jwt:
