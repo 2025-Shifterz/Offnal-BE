@@ -18,20 +18,9 @@ import reactor.core.publisher.Mono;
 @Service
 public class KakaoService implements SocialService<KakaoUserInfoResponseDto>  {
 
-    private String clientId;
-
-    @Value("${kakao.redirect_uri}")
-    private String redirectUri;
-
-    private final String KAUTH_TOKEN_URL_HOST;
-    private final String KAUTH_USER_URL_HOST;
-
-    @Autowired
-    public KakaoService(@Value("${kakao.client_id}") String clientId) {
-        this.clientId = clientId;
-        KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
-        KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
-    }
+    private final KakaoProperties kakaoProperties;
+    private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
+    private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
 
     @Override
     public String getAccessToken(String code) {
@@ -40,8 +29,8 @@ public class KakaoService implements SocialService<KakaoUserInfoResponseDto>  {
                 .uri(uriBuilder -> uriBuilder
                         .path("/oauth/token")
                         .queryParam("grant_type", "authorization_code")
-                        .queryParam("client_id", clientId)
-                        .queryParam("redirect_uri", redirectUri)
+                        .queryParam("client_id", kakaoProperties.clientId())
+                        .queryParam("redirect_uri", kakaoProperties.redirectUri())
                         .queryParam("code", code)
                         .build(true))
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
@@ -78,7 +67,8 @@ public class KakaoService implements SocialService<KakaoUserInfoResponseDto>  {
     public KakaoLoginPageResponse getKakaoAuthorizationUrl() {
         String url = String.format(
                 "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=%s&redirect_uri=%s",
-                clientId, redirectUri);
+                kakaoProperties.clientId(),
+                kakaoProperties.redirectUri());
         return new KakaoLoginPageResponse(url);
     }
 }
