@@ -4,7 +4,7 @@ import lombok.*;
 
 
 public class MemberRequestDto {
-
+    @ToString
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

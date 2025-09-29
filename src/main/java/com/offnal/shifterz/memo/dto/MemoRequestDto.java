@@ -8,6 +8,7 @@ import java.time.LocalDate;
 public class MemoRequestDto {
 
     @Data
+    @ToString
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
@@ -22,6 +23,7 @@ public class MemoRequestDto {
     }
 
     @Data
+    @ToString
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor

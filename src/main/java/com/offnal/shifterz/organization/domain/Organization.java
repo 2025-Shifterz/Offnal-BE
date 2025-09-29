@@ -4,13 +4,11 @@ import com.offnal.shifterz.global.BaseTimeEntity;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.organization.dto.OrganizationRequestDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Organization extends BaseTimeEntity {

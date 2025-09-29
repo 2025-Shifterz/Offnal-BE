@@ -6,6 +6,7 @@ import lombok.*;
 public class OrganizationRequestDto {
 
     @Data
+    @ToString
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
@@ -17,6 +18,7 @@ public class OrganizationRequestDto {
     }
 
     @Data
+    @ToString
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor

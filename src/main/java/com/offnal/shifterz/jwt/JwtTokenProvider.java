@@ -33,7 +33,7 @@ public class JwtTokenProvider {
 
     private final UserDetailsService userDetailsService;
 
-    private final long accessTokenValidity = 1000L * 60 * 30;        // 30분
+    private final long accessTokenValidity = 1000L * 60 * 60 * 24 * 7;        // 7일, 추후 30분으로 변경
     private final long refreshTokenValidity = 1000L * 60 * 60 * 24 * 14; // 14일
     private final RefreshTokenRepository refreshTokenRepository;
 
