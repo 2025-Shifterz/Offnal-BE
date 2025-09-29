@@ -3,11 +3,13 @@ package com.offnal.shifterz.home.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.List;
 
 @Getter
 @Builder
+@ToString
 public class DailyRoutineResDto {
 
     @Schema(description = "하루 동안의 식사 정보 리스트 (아침, 점심, 저녁 또는 간식 포함)")

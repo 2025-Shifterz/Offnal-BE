@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 @Data
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

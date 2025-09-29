@@ -3,10 +3,7 @@ package com.offnal.shifterz.work.domain;
 import com.offnal.shifterz.global.BaseTimeEntity;
 import com.offnal.shifterz.organization.domain.Organization;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -14,7 +11,7 @@ import java.util.Map;
 
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
 public class WorkCalendar extends BaseTimeEntity {

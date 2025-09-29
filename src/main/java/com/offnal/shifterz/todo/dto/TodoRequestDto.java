@@ -9,6 +9,7 @@ import java.time.LocalDate;
 public class TodoRequestDto {
 
     @Data
+    @ToString
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
@@ -26,6 +27,7 @@ public class TodoRequestDto {
     }
 
     @Data
+    @ToString
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor

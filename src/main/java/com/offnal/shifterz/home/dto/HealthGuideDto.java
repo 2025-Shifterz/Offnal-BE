@@ -3,11 +3,13 @@ package com.offnal.shifterz.home.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.List;
 
 @Getter
 @Builder
+@ToString
 public class HealthGuideDto {
     @Schema(description = "공복 유지 관련 설명 문구")
     private String fastingComment;
