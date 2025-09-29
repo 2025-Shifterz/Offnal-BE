@@ -29,9 +29,9 @@ public class WorkCalendarConverter {
             WorkTimeType timeType = WorkTimeType.fromSymbol(symbol);
             LocalTime startTime = LocalTime.parse(workTimeDto.getStartTime());
 
-            String[] hm = workTimeDto.getDuration().split(":");
-            Duration duration = Duration.ofHours(Integer.parseInt(hm[0]))
-                                        .plusMinutes(Integer.parseInt(hm[1]));
+            LocalTime lt = LocalTime.parse(workTimeDto.getDuration());
+            Duration duration = Duration.ofHours(lt.getHour())
+                                        .plusMinutes(lt.getMinute());
 
             WorkTime workTime = WorkTime.builder()
                     .timeType(timeType)
