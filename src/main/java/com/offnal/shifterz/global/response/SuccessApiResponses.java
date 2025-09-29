@@ -2,8 +2,8 @@ package com.offnal.shifterz.global.response;
 
 import com.offnal.shifterz.jwt.TokenDto;
 import com.offnal.shifterz.memo.dto.MemoResponseDto;
-import com.offnal.shifterz.todo.dto.TodoResponseDto;
 import com.offnal.shifterz.organization.dto.OrganizationResponseDto;
+import com.offnal.shifterz.todo.dto.TodoResponseDto;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
