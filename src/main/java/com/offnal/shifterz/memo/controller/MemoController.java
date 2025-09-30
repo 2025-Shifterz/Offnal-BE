@@ -15,6 +15,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "MEMO", description  = "MEMO 관련 API")
 @RestController
 @RequestMapping("/memos")
@@ -79,12 +81,11 @@ public class MemoController {
     @SuccessApiResponses.MemoUpdate
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @PatchMapping("/{id}")
+    @PatchMapping
     public SuccessResponse<MemoResponseDto.MemoDto> updateMemo(
-            @PathVariable Long id,
             @RequestBody @Valid MemoRequestDto.UpdateMemoDto request
     ) {
-        return SuccessResponse.success(SuccessCode.MEMO_UPDATED, memoService.updateMemo(id, request));
+        return SuccessResponse.success(SuccessCode.MEMO_UPDATED, memoService.updateMemo(request));
     }
 
     /**
@@ -97,6 +98,31 @@ public class MemoController {
     @GetMapping("/{id}")
     public SuccessResponse<MemoResponseDto.MemoDto> getMemo(@PathVariable Long id) {
         return SuccessResponse.success(SuccessCode.MEMO_FETCHED, memoService.getMemo(id));
+    }
+    /**
+     * Memo 전체 조회
+     */
+    @Operation(
+            summary = "메모 목록 조회",
+            description = """
+                조건에 따라 메모 목록을 조회합니다.
+
+                ✅ 요청 파라미터:
+                - filter=all : 내가 작성한 모든 메모
+                - filter=unassigned : 소속 조직이 없는 메모만
+                - organizationId : 특정 조직 ID에 속한 메모
+                """
+    )
+    @SuccessApiResponses.MemoGetAll
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @GetMapping
+    public SuccessResponse<List<MemoResponseDto.MemoDto>> getMemos(
+            @RequestParam(required = false) String filter,
+            @RequestParam(required = false) Long organizationId
+    ) {
+        List<MemoResponseDto.MemoDto> response = memoService.getMemos(filter, organizationId);
+        return SuccessResponse.success(SuccessCode.MEMO_LIST_FETCHED, response);
     }
 
     /**

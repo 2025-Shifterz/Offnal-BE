@@ -1,9 +1,12 @@
 package com.offnal.shifterz.kakao;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 
-@Getter
+@Data
+@ToString
 public class KakaoLoginPageResponse {
 
     @Schema(description = "카카오 로그인 리다이렉트 URL", example = "https://kauth.kakao.com/oauth/authorize?client_id=abc123&redirect_uri=http://localhost:8080/login/callback")

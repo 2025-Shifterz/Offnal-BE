@@ -14,6 +14,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @Tag(name = "Todo", description  = "Todo 관련 API")
 
 @RestController
@@ -83,12 +86,11 @@ public class TodoController {
     @SuccessApiResponses.TodoUpdate
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @PatchMapping ("/{id}")
+    @PatchMapping
     public SuccessResponse<TodoResponseDto.TodoDto> updateTodo(
-            @PathVariable Long id,
             @RequestBody @Valid TodoRequestDto.UpdateDto request
     ) {
-        return SuccessResponse.success(SuccessCode.TODO_UPDATED, todoService.updateTodo(id, request));
+        return SuccessResponse.success(SuccessCode.TODO_UPDATED, todoService.updateTodo(request));
     }
 
     /**
@@ -101,6 +103,31 @@ public class TodoController {
     @GetMapping("/{id}")
     public SuccessResponse<TodoResponseDto.TodoDto> getTodo(@PathVariable Long id) {
         return SuccessResponse.success(SuccessCode.TODO_FETCHED, todoService.getTodo(id));
+    }
+    /**
+     * Todo 목록 조회
+     */
+    @Operation(
+            summary = "할 일 목록 조회",
+            description = """
+                조건에 따라 할 일 목록을 조회합니다.
+
+                ✅ 요청 파라미터:
+                - filter=all : 내가 작성한 모든 할 일
+                - filter=unassigned : 소속 조직이 없는 할 일만
+                - organizationId : 특정 조직 ID에 속한 할 일
+                """
+    )
+    @SuccessApiResponses.TodoGetAll
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @GetMapping
+    public SuccessResponse<List<TodoResponseDto.TodoDto>> getTodos(
+            @RequestParam(required = false) String filter,
+            @RequestParam(required = false) Long organizationId
+    ) {
+        List<TodoResponseDto.TodoDto> response = todoService.getTodos(filter, organizationId);
+        return SuccessResponse.success(SuccessCode.TODO_LIST_FETCHED, response);
     }
 
     /**

@@ -1,14 +1,12 @@
 package com.offnal.shifterz.organization.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 public class OrganizationRequestDto {
 
-    @Getter
+    @Data
+    @ToString
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
@@ -19,7 +17,8 @@ public class OrganizationRequestDto {
         private String team;
     }
 
-    @Getter
+    @Data
+    @ToString
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor

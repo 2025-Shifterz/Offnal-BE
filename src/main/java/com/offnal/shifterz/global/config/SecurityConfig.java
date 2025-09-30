@@ -1,4 +1,4 @@
-package com.offnal.shifterz.config;
+package com.offnal.shifterz.global.config;
 
 import com.offnal.shifterz.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +29,7 @@ public class SecurityConfig {
                         authorizeRequests.requestMatchers(
                                         "/login",
                                         "/login/page",
+                                        "/tokens/reissue",
                                         "/callback",
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",

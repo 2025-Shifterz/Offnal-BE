@@ -2,9 +2,10 @@ package com.offnal.shifterz.member.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 
-@Getter
+@Data
 @Builder
 public class AuthResponseDto {
 

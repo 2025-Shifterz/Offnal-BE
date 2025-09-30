@@ -2,19 +2,15 @@ package com.offnal.shifterz.work.domain;
 
 import com.offnal.shifterz.global.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
-@Table(name = "work_instance")
 public class WorkInstance extends BaseTimeEntity {
 
     @Id

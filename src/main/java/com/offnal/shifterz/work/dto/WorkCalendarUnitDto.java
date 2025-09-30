@@ -4,12 +4,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.Map;
 
-@Getter
+@Data
+@ToString
 @Builder
 public class WorkCalendarUnitDto {
 

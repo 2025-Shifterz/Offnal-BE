@@ -1,17 +1,11 @@
 package com.offnal.shifterz.member.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
+
 public class MemberRequestDto {
-
-    @Getter
-    @Setter
+    @ToString
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MemberUpdateRequestDto {

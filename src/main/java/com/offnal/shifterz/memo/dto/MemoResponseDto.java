@@ -1,13 +1,16 @@
 package com.offnal.shifterz.memo.dto;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 
 public class MemoResponseDto {
 
-    @Getter
+    @Data
+    @ToString
     @Builder
     public static class MemoDto {
         private Long id;

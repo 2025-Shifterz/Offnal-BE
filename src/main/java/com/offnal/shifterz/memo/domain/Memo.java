@@ -5,17 +5,13 @@ import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.memo.dto.MemoRequestDto;
 import com.offnal.shifterz.organization.domain.Organization;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "memo")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Memo extends BaseTimeEntity {

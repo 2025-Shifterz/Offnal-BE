@@ -1,16 +1,14 @@
 package com.offnal.shifterz.memo.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 public class MemoRequestDto {
 
-    @Getter
+    @Data
+    @ToString
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
@@ -24,11 +22,15 @@ public class MemoRequestDto {
         private Long organizationId; // 선택 필드
     }
 
-    @Getter
+    @Data
+    @ToString
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateMemoDto {
+
+        @NotNull(message = "메모 ID는 필수입니다.")
+        private Long id;
         private String content;
         private LocalDate targetDate;
     }
