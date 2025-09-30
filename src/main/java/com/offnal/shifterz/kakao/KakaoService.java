@@ -18,13 +18,11 @@ import reactor.core.publisher.Mono;
 public class KakaoService implements SocialService<KakaoUserInfoResponseDto>  {
 
     private final KakaoProperties kakaoProperties;
-    private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
-    private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
 
     @Override
     public String getAccessToken(String code) {
 
-        TokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
+        TokenResponseDto kakaoTokenResponseDto = WebClient.create(kakaoProperties.url().token()).post()
                 .uri(uriBuilder -> uriBuilder
                         .path("/oauth/token")
                         .queryParam("grant_type", "authorization_code")
@@ -46,7 +44,7 @@ public class KakaoService implements SocialService<KakaoUserInfoResponseDto>  {
 
     @Override
     public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
-        KakaoUserInfoResponseDto userInfo = WebClient.create(KAUTH_USER_URL_HOST)
+        KakaoUserInfoResponseDto userInfo = WebClient.create(kakaoProperties.url().user())
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
