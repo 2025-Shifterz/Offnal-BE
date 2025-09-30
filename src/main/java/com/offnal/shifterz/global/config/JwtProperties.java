@@ -1,4 +1,4 @@
-package com.offnal.shifterz.jwt;
+package com.offnal.shifterz.global.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
