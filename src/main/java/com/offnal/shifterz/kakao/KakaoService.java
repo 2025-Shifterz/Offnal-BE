@@ -1,5 +1,6 @@
 package com.offnal.shifterz.kakao;
 
+import com.offnal.shifterz.global.config.KakaoProperties;
 import com.offnal.shifterz.member.service.SocialService;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
