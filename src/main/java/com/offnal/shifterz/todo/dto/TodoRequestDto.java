@@ -1,7 +1,10 @@
 package com.offnal.shifterz.todo.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
@@ -9,7 +12,6 @@ import java.time.LocalDate;
 public class TodoRequestDto {
 
     @Data
-    @ToString
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
@@ -27,7 +29,6 @@ public class TodoRequestDto {
     }
 
     @Data
-    @ToString
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor

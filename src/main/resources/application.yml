@@ -33,3 +33,6 @@ jwt:
 kakao:
   client_id: ${KAKAO_CLIENT_ID}
   redirect_uri: ${KAKAO_REDIRECT_URI}
+  url:
+    token: https://kauth.kakao.com
+    user: https://kapi.kakao.com
