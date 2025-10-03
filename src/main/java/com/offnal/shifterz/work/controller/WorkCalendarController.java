@@ -67,9 +67,9 @@ public class WorkCalendarController {
                                   "calendarName": "병원 근무표",
                                   "organizationId": 1,
                                   "workTimes": {
-                                    "D": { "startTime": "08:00", "duration": "08:00" },
-                                    "E": { "startTime": "16:00", "duration": "08:00" },
-                                    "N": { "startTime": "00:00", "duration": "08:00" }
+                                    "D": { "startTime": "08:00", "duration": "PT6H30M" },
+                                    "E": { "startTime": "16:00", "duration": "PT6H30M" },
+                                    "N": { "startTime": "00:00", "duration": "PT6H30M" }
                                   },
                                   "calendars": [
                                     {
