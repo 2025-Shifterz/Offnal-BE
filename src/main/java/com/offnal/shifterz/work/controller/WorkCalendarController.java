@@ -122,8 +122,13 @@ public class WorkCalendarController {
             summary = "근무일 조회",
             description = "입력한 연도와 월에 해당하는 모든 날짜의 근무유형 정보를 반환합니다.\n\n" +
                     "✅ 요청 파라미터:\n" +
-                    "- organizationId: 소속 조직 ID\n" +
-                    "- startDate, endDate: 스케줄 기간\n"
+                    "- organizationId: 소속 조직 ID (필수)\n" +
+                    "- startDate, endDate: 스케줄 기간 (yyyy-MM-dd 형식)\n\n" +
+                    "✅ startDate, endDate 참고사항:\n" +
+                    "- startDate, endDate 미입력: 전체 근무 일정 조회\n" +
+                    "- startDate, endDate 둘 다 입력: 범위 내 근무 일정 조회 (일치 시 그 날의 근무 일정)\n" +
+                    "- startDate만 입력: 해당 날짜 이후 조회\n" +
+                    "- endDate만 입력: 해당 날짜 이전 조회"
     )
     @SuccessApiResponses.WorkDay
     @ErrorApiResponses.Common
@@ -136,12 +141,36 @@ public class WorkCalendarController {
                             examples = @ExampleObject(
                                     name = "근무일 조회 예시",
                                     value = """
-                                        [
-                                            { "date": "2025-09-01", "workTypeName": "오후" },
-                                            { "date": "2025-09-02", "workTypeName": "오후" },
-                                            { "date": "2025-09-03", "workTypeName": "야간" },
-                                            { "date": "2025-09-04", "workTypeName": "휴무" }
-                                        ]
+                                            {
+                                              "code": "DATA_FETCHED",
+                                              "message": "데이터 조회에 성공했습니다.",
+                                              "data": [
+                                                {
+                                                  "date": "2025-09-01",
+                                                  "workTypeName": "오후",
+                                                  "startTime": "16:00",
+                                                  "duration": "PT6H30M"
+                                                },
+                                                {
+                                                  "date": "2025-09-02",
+                                                  "workTypeName": "오후",
+                                                  "startTime": "16:00",
+                                                  "duration": "PT6H30M"
+                                                },
+                                                {
+                                                  "date": "2025-09-03",
+                                                  "workTypeName": "야간",
+                                                  "startTime": "00:00",
+                                                  "duration": "PT6H30M"
+                                                },
+                                                {
+                                                  "date": "2025-09-04",
+                                                  "workTypeName": "휴일",
+                                                  "startTime": null,
+                                                  "duration": null
+                                                }
+                                              ]
+                                            }
                                         """
                             )
                     )
@@ -153,8 +182,8 @@ public class WorkCalendarController {
     @GetMapping
     public SuccessResponse<List<WorkDayResponseDto>> getWorkDaysByOrganizationAndDateRange(
             @RequestParam Long organizationId,
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate
     ) {
         List<WorkDayResponseDto> response = workCalendarService.getWorkDaysByOrganizationAndDateRange(
                 organizationId, startDate, endDate);

@@ -67,10 +67,22 @@ public class WorkCalendarService {
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
 
 
-        List<WorkInstance> instances =
-                workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(
-                        memberId, org, startDate, endDate
-                );
+        List<WorkInstance> instances;
+
+        if (startDate != null && endDate != null) { // startDate, endDate 둘 다 입력: 범위 내에서 조회
+            instances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(
+                    memberId, org, startDate, endDate);
+        } else if (startDate != null) { // startDay만 입력: 해당 날짜 이후 조회
+            instances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarEndDateGreaterThanEqual(
+                    memberId, org, startDate);
+        } else if (endDate != null) { // endDay만 입력: 해당 날짜 이전 조회
+            instances = workInstanceRepository
+                    .findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarStartDateLessThanEqual(
+                            memberId, org, endDate);
+        } else { // 미입력: 해당 조직의 전체 근무 일정 조회
+            instances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarOrganization(
+                    memberId, org);
+        }
 
         return WorkCalendarConverter.toDayResponseDtoList(instances);
     }

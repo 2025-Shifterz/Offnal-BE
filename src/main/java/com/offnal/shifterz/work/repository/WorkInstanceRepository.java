@@ -28,11 +28,30 @@ public interface WorkInstanceRepository extends JpaRepository<WorkInstance, Long
             @Param("endDate") LocalDate endDate
     );
 
-    List<WorkInstance> findByWorkCalendarMemberIdAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(
-            Long memberId, LocalDate startDate, LocalDate endDate);
+    // 조직과 멤버로 전체 근무 인스턴스 조회
+    List<WorkInstance> findByWorkCalendarMemberIdAndWorkCalendarOrganization(
+            Long memberId,
+            Organization organization);
 
+    //조직, 멤버, 날짜 범위로 근무 인스턴스 조회
     List<WorkInstance> findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(
-            Long memberId, Organization organization, LocalDate startDate, LocalDate endDate);
+            Long memberId,
+            Organization organization,
+            LocalDate startDate,
+            LocalDate endDate);
+
+    //시작일 이후 근무 인스턴스 조회 (endDate >= startDate)
+    List<WorkInstance> findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarEndDateGreaterThanEqual(
+            Long memberId,
+            Organization organization,
+            LocalDate startDate);
+
+
+    //종료일 이전 근무 인스턴스 조회 (startDate <= endDate)
+    List<WorkInstance> findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarStartDateLessThanEqual(
+            Long memberId,
+            Organization organization,
+            LocalDate endDate);
 
     void deleteAllByWorkCalendar(WorkCalendar workCalendar);
 }
