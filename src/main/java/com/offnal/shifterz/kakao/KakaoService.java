@@ -1,11 +1,10 @@
 package com.offnal.shifterz.kakao;
 
+import com.offnal.shifterz.global.config.KakaoProperties;
 import com.offnal.shifterz.member.service.SocialService;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -18,30 +17,17 @@ import reactor.core.publisher.Mono;
 @Service
 public class KakaoService implements SocialService<KakaoUserInfoResponseDto>  {
 
-    private String clientId;
-
-    @Value("${kakao.redirect_uri}")
-    private String redirectUri;
-
-    private final String KAUTH_TOKEN_URL_HOST;
-    private final String KAUTH_USER_URL_HOST;
-
-    @Autowired
-    public KakaoService(@Value("${kakao.client_id}") String clientId) {
-        this.clientId = clientId;
-        KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
-        KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
-    }
+    private final KakaoProperties kakaoProperties;
 
     @Override
     public String getAccessToken(String code) {
 
-        TokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
+        TokenResponseDto kakaoTokenResponseDto = WebClient.create(kakaoProperties.url().token()).post()
                 .uri(uriBuilder -> uriBuilder
                         .path("/oauth/token")
                         .queryParam("grant_type", "authorization_code")
-                        .queryParam("client_id", clientId)
-                        .queryParam("redirect_uri", redirectUri)
+                        .queryParam("client_id", kakaoProperties.clientId())
+                        .queryParam("redirect_uri", kakaoProperties.redirectUri())
                         .queryParam("code", code)
                         .build(true))
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
@@ -58,7 +44,7 @@ public class KakaoService implements SocialService<KakaoUserInfoResponseDto>  {
 
     @Override
     public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
-        KakaoUserInfoResponseDto userInfo = WebClient.create(KAUTH_USER_URL_HOST)
+        KakaoUserInfoResponseDto userInfo = WebClient.create(kakaoProperties.url().user())
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
@@ -78,7 +64,8 @@ public class KakaoService implements SocialService<KakaoUserInfoResponseDto>  {
     public KakaoLoginPageResponse getKakaoAuthorizationUrl() {
         String url = String.format(
                 "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=%s&redirect_uri=%s",
-                clientId, redirectUri);
+                kakaoProperties.clientId(),
+                kakaoProperties.redirectUri());
         return new KakaoLoginPageResponse(url);
     }
 }

@@ -1,14 +1,16 @@
 package com.offnal.shifterz.memo.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 public class MemoRequestDto {
 
     @Data
-    @ToString
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
@@ -23,7 +25,6 @@ public class MemoRequestDto {
     }
 
     @Data
-    @ToString
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor

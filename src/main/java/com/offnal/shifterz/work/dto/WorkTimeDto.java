@@ -3,11 +3,13 @@ package com.offnal.shifterz.work.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.time.Duration;
 
 
 @Data
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class WorkTimeDto {
@@ -19,6 +21,6 @@ public class WorkTimeDto {
 
     @NotEmpty(message = "근무 시간 정보는 필수입니다.")
     @NotNull
-    @Schema(description = "근무 시간", example = "3:00")
+    @Schema(description = "근무 시간", example = "PT6H30M")
     private String duration;
 }
