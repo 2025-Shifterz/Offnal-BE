@@ -1,9 +1,12 @@
 package com.offnal.shifterz.member.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class MemberResponseDto {
-    @ToString
+
     @Data
     @Builder
     public static class MemberRegisterResponseDto {
@@ -14,7 +17,7 @@ public class MemberResponseDto {
         private String profileImageUrl;
         private boolean isNewMember;
     }
-    @ToString
+
     @Data
     @Builder
     @AllArgsConstructor

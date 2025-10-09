@@ -2,9 +2,9 @@ package com.offnal.shifterz.log.service;
 
 import com.offnal.shifterz.log.domain.Log;
 import com.offnal.shifterz.log.repository.LogRepository;
+import com.offnal.shifterz.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.offnal.shifterz.member.domain.Member;
 @Service
 @RequiredArgsConstructor
 public class LogService {

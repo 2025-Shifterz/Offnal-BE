@@ -2,15 +2,12 @@ package com.offnal.shifterz.todo.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.ToString;
-
 
 import java.time.LocalDate;
 
 public class TodoResponseDto {
 
     @Data
-    @ToString
     @Builder
     public static class TodoDto {
         private Long id;
