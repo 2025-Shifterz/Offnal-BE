@@ -20,7 +20,7 @@ public class TodoRequestDto {
         private String content;
 
         @Builder.Default
-        private Boolean isSuccess = false;
+        private Boolean completed = false;
 
         @NotNull(message = "목표 날짜는 필수입니다.")
         private LocalDate targetDate;
@@ -36,7 +36,7 @@ public class TodoRequestDto {
         @NotNull(message = "할 일 ID는 필수입니다.")
         private Long id;
         private String content;
-        private Boolean isSuccess;
+        private Boolean completed;
         private LocalDate targetDate;
     }
 }
