@@ -24,8 +24,8 @@ public class Todo extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
-    private Boolean isSuccess = false; // 기본값 false
+    @Column(name = "is_success", nullable = false)
+    private Boolean completed = false; // 기본값 false
 
     @Column(nullable = false)
     private LocalDate targetDate;
@@ -41,7 +41,7 @@ public class Todo extends BaseTimeEntity {
 
     public void update(TodoRequestDto.UpdateDto request) {
         if (request.getContent() != null) this.content = request.getContent();
-        if (request.getIsSuccess() != null) this.isSuccess = request.getIsSuccess();
+        if (request.getCompleted() != null) this.completed = request.getCompleted();
         if (request.getTargetDate() != null) this.targetDate = request.getTargetDate();
     }
 }

@@ -5,14 +5,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.Map;
 
 @Data
-@ToString
 @Builder
 public class WorkCalendarUnitDto {
 

@@ -2,8 +2,8 @@ package com.offnal.shifterz.global.response;
 
 import com.offnal.shifterz.jwt.TokenDto;
 import com.offnal.shifterz.memo.dto.MemoResponseDto;
-import com.offnal.shifterz.todo.dto.TodoResponseDto;
 import com.offnal.shifterz.organization.dto.OrganizationResponseDto;
+import com.offnal.shifterz.todo.dto.TodoResponseDto;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -196,9 +196,9 @@ public @interface SuccessApiResponses {
                       "result": {
                         "id": 1,
                         "content": "스터디 준비",
-                        "isSuccess": false,
+                        "completed": false,
                         "targetDate": "2025-09-23",
-                        "organizationId": 10,
+                        "organizationId": 10
                       }
                     }
                     """
@@ -230,9 +230,9 @@ public @interface SuccessApiResponses {
                       "result": {
                         "id": 1,
                         "content": "스터디 준비 - 수정",
-                        "isSuccess": true,
+                        "completed": true,
                         "targetDate": "2025-09-24",
-                        "organizationId": 10,
+                        "organizationId": 10
                       }
                     }
                     """
@@ -264,9 +264,9 @@ public @interface SuccessApiResponses {
                       "result": {
                         "id": 1,
                         "content": "스터디 준비",
-                        "isSuccess": false,
+                        "completed": false,
                         "targetDate": "2025-09-23",
-                        "organizationId": 10,
+                        "organizationId": 10
            
                       }
                     }
@@ -295,16 +295,16 @@ public @interface SuccessApiResponses {
                     {
                       "id": 1,
                       "content": "스터디 준비",
-                      "isSuccess": false,
+                      "completed": false,
                       "targetDate": "2025-09-23",
-                      "organizationId": null,
+                      "organizationId": null
                     },
                     {
                       "id": 2,
                       "content": "야간 근무 교대",
-                      "isSuccess": true,
+                      "completed": true,
                       "targetDate": "2025-09-25",
-                      "organizationId": 10,
+                      "organizationId": 10
                     }
                   ]
                 }

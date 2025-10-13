@@ -34,7 +34,7 @@ public class TodoController {
             description = "새로운 할 일을 생성합니다.\n\n" +
                     "✅ 요청 본문에 포함할 수 있는 값:\n" +
                     "- content: 할 일 내용 (String)\n" +
-                    "- isSuccess: 완료 여부 (Boolean, 기본 false)\n" +
+                    "- completed: 완료 여부 (Boolean, 기본 false)\n" +
                     "- targetDate: 목표 날짜 (LocalDate, 기본 오늘 날짜)\n" +
                     "- organizationId: 소속 조직 ID (Long, 선택, **없으면 null로 보내세요**)"
     )
@@ -49,7 +49,7 @@ public class TodoController {
                                     value = """
                 {
                   "content": "스터디 준비",
-                  "isSuccess": false,
+                  "completed": false,
                   "targetDate": "2025-09-23",
                   "organizationId": 10
                 }
@@ -60,7 +60,7 @@ public class TodoController {
                                     value = """
                 {
                   "content": "스터디 준비",
-                  "isSuccess": false,
+                  "completed": false,
                   "targetDate": "2025-09-23",
                   "organizationId": null
                 }

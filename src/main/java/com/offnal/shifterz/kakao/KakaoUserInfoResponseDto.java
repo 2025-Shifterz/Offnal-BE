@@ -5,10 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
-@ToString
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class KakaoUserInfoResponseDto {
