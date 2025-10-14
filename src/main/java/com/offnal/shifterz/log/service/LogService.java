@@ -2,6 +2,7 @@ package com.offnal.shifterz.log.service;
 
 import com.offnal.shifterz.log.domain.Log;
 import com.offnal.shifterz.log.repository.LogRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
 
@@ -12,6 +13,7 @@ import com.offnal.shifterz.member.domain.Member;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LogService {
 
     private final LogRepository logRepository;
@@ -36,7 +38,7 @@ public class LogService {
 
         } catch (Exception e) {
 
-            System.out.println("로그 저장 실패: " + e.getMessage());
+            log.error("로그 저장 실패: {}", message, e);
         }
     }
 
