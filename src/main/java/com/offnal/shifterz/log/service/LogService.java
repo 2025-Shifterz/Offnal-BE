@@ -2,11 +2,20 @@ package com.offnal.shifterz.log.service;
 
 import com.offnal.shifterz.log.domain.Log;
 import com.offnal.shifterz.log.repository.LogRepository;
-import com.offnal.shifterz.member.domain.Member;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.offnal.shifterz.member.domain.Member;
+
+import java.time.LocalDateTime;
+
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LogService {
 
     private final LogRepository logRepository;
@@ -18,16 +27,24 @@ public class LogService {
      * @param action 수행 동작 (예: 'C' = Controller Enter, 'R' = Return, 'E' = Error)
      * @param message 로그 메시지
      */
-
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveLog(Member member, Character action, String message) {
-        Log log = Log.builder()
-                .member(member)
-                .action(action)
-                .time(System.currentTimeMillis())
-                .message(message)
-                .build();
+        try {
+            Log log = Log.builder()
+                    .member(member)
+                    .action(action)
+                    .time(LocalDateTime.now())
+                    .message(message)
+                    .build();
 
-        logRepository.save(log);
+            logRepository.save(log);
+
+        } catch (Exception e) {
+
+            log.error("로그 저장 실패: {}", message, e);
+        }
     }
+
+
 }
 

@@ -5,6 +5,8 @@ import com.offnal.shifterz.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,7 +27,7 @@ public class Log extends BaseTimeEntity {
      */
     private Character action;
 
-    private Long time;
+    private LocalDateTime time;
 
     @Lob
     private String message;
@@ -35,7 +37,7 @@ public class Log extends BaseTimeEntity {
     private Member member;
 
     @Builder
-    private Log(Member member, Character action, Long time, String message) {
+    private Log(Member member, Character action, LocalDateTime time, String message) {
         this.member = member;
         this.action = action;
         this.time = time;
@@ -47,7 +49,7 @@ public class Log extends BaseTimeEntity {
      */
     public void updateMessage(String newMessage) {
         this.message = newMessage;
-        this.time = System.currentTimeMillis(); // 수정 시각도 갱신
+        this.time = LocalDateTime.now(); // 수정 시각도 갱신
     }
 
     /**
@@ -55,7 +57,7 @@ public class Log extends BaseTimeEntity {
      */
     public void updateAction(Character newAction) {
         this.action = newAction;
-        this.time = System.currentTimeMillis();
+        this.time = LocalDateTime.now();
     }
 }
 
