@@ -37,7 +37,7 @@ public class LogAop {
         String msg = "[Controller] Enter: " + method.getName() + " | Request: " + params;
 
         log.info(msg);
-        logService.saveLog(member, 'C', msg); // C = Controller Enter
+
     }
 
     @AfterReturning(value = "controllerPointcut()", returning = "returnObj")
@@ -48,7 +48,6 @@ public class LogAop {
         String msg = "[Controller] Return: " + method.getName() + " | Response: " + stringify(returnObj);
 
         log.info(msg);
-        logService.saveLog(member, 'R', msg); //R = Return
     }
 
     // ───────────── Service 로그 (저장X + 콘솔) ─────────────

@@ -25,7 +25,6 @@ public class LogService {
      */
     public void saveLog(Member member, Character action, String message) {
         try {
-            System.out.println("로그 저장 시작");
             Log log = Log.builder()
                     .member(member)
                     .action(action)
