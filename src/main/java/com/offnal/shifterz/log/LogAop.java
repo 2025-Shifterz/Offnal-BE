@@ -31,7 +31,7 @@ public class LogAop {
     @Before("controllerPointcut()")
     public void logControllerEnter(JoinPoint joinPoint) {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-        Member member = AuthService.getCurrentMember();
+
 
         String params = extractParams(joinPoint);
         String msg = "[Controller] Enter: " + method.getName() + " | Request: " + params;
@@ -43,7 +43,7 @@ public class LogAop {
     @AfterReturning(value = "controllerPointcut()", returning = "returnObj")
     public void logControllerReturn(JoinPoint joinPoint, Object returnObj) {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-        Member member = AuthService.getCurrentMember();
+
 
         String msg = "[Controller] Return: " + method.getName() + " | Response: " + stringify(returnObj);
 
@@ -56,14 +56,18 @@ public class LogAop {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
         String params = extractParams(joinPoint);
 
-        log.info("[Service] Enter: {} | Request: {}", method.getName(), params);
+        String msg = "[Service] Enter: " + method.getName() + " | Request: " + params;
+
+        log.info(msg);
     }
 
     @AfterReturning(value = "servicePointcut()", returning = "returnObj")
     public void logServiceReturn(JoinPoint joinPoint, Object returnObj) {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
 
-        log.info("[Service] Return: {} | Response: {}", method.getName(), stringify(returnObj));
+        String msg = "[Service] Return: " + method.getName() + " | Response: " + stringify(returnObj);
+
+        log.info(msg);
     }
 
     // ───────────── 공통 Exception 로그 (Controller + Service) ─────────────

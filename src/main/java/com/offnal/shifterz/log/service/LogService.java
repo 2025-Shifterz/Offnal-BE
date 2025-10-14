@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.offnal.shifterz.member.domain.Member;
 
+import java.time.LocalDateTime;
+
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class LogService {
             Log log = Log.builder()
                     .member(member)
                     .action(action)
-                    .time(System.currentTimeMillis())
+                    .time(LocalDateTime.now())
                     .message(message)
                     .build();
 
