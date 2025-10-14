@@ -25,6 +25,7 @@ public class LogService {
      * @param action 수행 동작 (예: 'C' = Controller Enter, 'R' = Return, 'E' = Error)
      * @param message 로그 메시지
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveLog(Member member, Character action, String message) {
         try {
             Log log = Log.builder()
