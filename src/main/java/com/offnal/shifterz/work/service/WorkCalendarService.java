@@ -19,10 +19,12 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.jdbc.Work;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -60,31 +62,43 @@ public class WorkCalendarService {
         }
     }
 
-    public List<WorkDayResponseDto> getWorkDaysByOrganizationAndDateRange(Long organizationId, LocalDate startDate, LocalDate endDate) {
+    // 기간 조회
+    public List<WorkDayResponseDto> getWorkInstancesByRange(Long organizationId, LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            throw new CustomException(WorkCalendarErrorCode.CALENDAR_DATE_REQUIRED);
+        }
+        if (endDate.isBefore(startDate)) {
+            throw new CustomException(WorkCalendarErrorCode.CALENDAR_INVALID_DATE_RANGE);
+        }
         Long memberId = AuthService.getCurrentUserId();
 
         Organization org = organizationRepository.findById(organizationId)
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
 
-
-        List<WorkInstance> instances;
-
-        if (startDate != null && endDate != null) { // startDate, endDate 둘 다 입력: 범위 내에서 조회
-            instances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(
-                    memberId, org, startDate, endDate);
-        } else if (startDate != null) { // startDay만 입력: 해당 날짜 이후 조회
-            instances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarEndDateGreaterThanEqual(
-                    memberId, org, startDate);
-        } else if (endDate != null) { // endDay만 입력: 해당 날짜 이전 조회
-            instances = workInstanceRepository
-                    .findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarStartDateLessThanEqual(
-                            memberId, org, endDate);
-        } else { // 미입력: 해당 조직의 전체 근무 일정 조회
-            instances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarOrganization(
-                    memberId, org);
-        }
+        List<WorkInstance> instances =
+                workInstanceRepository
+                    .findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkDateBetweenOrderByWorkDateAsc(
+                            memberId, org, startDate, endDate);
 
         return WorkCalendarConverter.toDayResponseDtoList(instances);
+    }
+
+    // 근무 일정 월 단위 조회
+    public List<WorkDayResponseDto> getMonthlyWorkInstances(Long organizationId, int year, int month) {
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDate startDate = yearMonth.atDay(1);
+        LocalDate endDate = yearMonth.atEndOfMonth();
+
+        Long memberId = AuthService.getCurrentUserId();
+
+        Organization org = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
+
+        List<WorkInstance> list =
+                workInstanceRepository
+                        .findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkDateBetweenOrderByWorkDateAsc(
+                                memberId, org, startDate, endDate);
+        return WorkCalendarConverter.toDayResponseDtoList(list);
     }
 
     @Transactional
@@ -100,7 +114,7 @@ public class WorkCalendarService {
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
 
         // 캘린더 범위 내 근무 일정 조회
-        List<WorkInstance> existingInstances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkCalendarStartDateLessThanEqualAndWorkCalendarEndDateGreaterThanEqual(
+        List<WorkInstance> existingInstances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkDateBetweenOrderByWorkDateAsc(
                 memberId, org, startDate, endDate);
 
         Map<LocalDate, WorkInstance> existingMap = existingInstances.stream()
@@ -168,7 +182,9 @@ public class WorkCalendarService {
 
         // 근무일 조회 관련
         INVALID_YEAR_FORMAT("CAL012",HttpStatus.BAD_REQUEST, "연도 형식이 올바르지 않습니다."),
-        INVALID_MONTH_FORMAT("CAL013",HttpStatus.BAD_REQUEST, "월 형식이 올바르지 않습니다.");
+        INVALID_MONTH_FORMAT("CAL013",HttpStatus.BAD_REQUEST, "월 형식이 올바르지 않습니다."),
+        CALENDAR_DATE_REQUIRED("CAL014",HttpStatus.BAD_REQUEST, "조회할 기간을 입력해주세요."),
+        CALENDAR_INVALID_DATE_RANGE("CAL015", HttpStatus.BAD_REQUEST, "기간 범위가 올바르지 않습니다.");
 
         private final String code;
         private final HttpStatus status;

@@ -18,7 +18,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -115,20 +117,15 @@ public class WorkCalendarController {
     }
 
     /**
-     * 근무일 조회
+     * 기간별 근무일 조회
      */
 
     @Operation(
-            summary = "근무일 조회",
-            description = "입력한 연도와 월에 해당하는 모든 날짜의 근무유형 정보를 반환합니다.\n\n" +
+            summary = "기간별 근무 조회",
+            description = "startDate ~ endDate 사이의 근무일정을 조회합니다.startDate~endDate 사이의 근무일정을 조회합니다.\n\n" +
                     "✅ 요청 파라미터:\n" +
                     "- organizationId: 소속 조직 ID (필수)\n" +
-                    "- startDate, endDate: 스케줄 기간 (yyyy-MM-dd 형식)\n\n" +
-                    "✅ startDate, endDate 참고사항:\n" +
-                    "- startDate, endDate 미입력: 전체 근무 일정 조회\n" +
-                    "- startDate, endDate 둘 다 입력: 범위 내 근무 일정 조회 (일치 시 그 날의 근무 일정)\n" +
-                    "- startDate만 입력: 해당 날짜 이후 조회\n" +
-                    "- endDate만 입력: 해당 날짜 이전 조회"
+                    "- startDate, endDate: 스케줄 기간 (yyyy-MM-dd 형식)\n\n"
     )
     @SuccessApiResponses.WorkDay
     @ErrorApiResponses.Common
@@ -180,13 +177,86 @@ public class WorkCalendarController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping
-    public SuccessResponse<List<WorkDayResponseDto>> getWorkDaysByOrganizationAndDateRange(
-            @RequestParam Long organizationId,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate
+    public SuccessResponse<List<WorkDayResponseDto>> getWorkInstancesByRange(
+            @RequestParam @NotNull Long organizationId,
+            @RequestParam @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
-        List<WorkDayResponseDto> response = workCalendarService.getWorkDaysByOrganizationAndDateRange(
+        List<WorkDayResponseDto> response = workCalendarService.getWorkInstancesByRange(
                 organizationId, startDate, endDate);
+        return SuccessResponse.success(SuccessCode.DATA_FETCHED, response);
+
+    }
+
+    /**
+     * 월별 근무일 조회
+     */
+
+    @Operation(
+            summary = "월별 근무 조회",
+            description = "startDate ~ endDate 사이의 근무일정을 조회합니다.startDate~endDate 사이의 근무일정을 조회합니다.\n\n" +
+                    "✅ 요청 파라미터:\n" +
+                    "- organizationId: 소속 조직 ID (필수)\n" +
+                    "- year: 조회할 연도\n" +
+                    "- month: 조회할 월"
+    )
+    @SuccessApiResponses.WorkDay
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.WorkDay
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "근무일 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = WorkDayResponseDto.class)),
+                            examples = @ExampleObject(
+                                    name = "근무일 조회 예시",
+                                    value = """
+                                            {
+                                              "code": "DATA_FETCHED",
+                                              "message": "데이터 조회에 성공했습니다.",
+                                              "data": [
+                                                {
+                                                  "date": "2025-09-01",
+                                                  "workTypeName": "오후",
+                                                  "startTime": "16:00",
+                                                  "duration": "PT6H30M"
+                                                },
+                                                {
+                                                  "date": "2025-09-02",
+                                                  "workTypeName": "오후",
+                                                  "startTime": "16:00",
+                                                  "duration": "PT6H30M"
+                                                },
+                                                {
+                                                  "date": "2025-09-03",
+                                                  "workTypeName": "야간",
+                                                  "startTime": "00:00",
+                                                  "duration": "PT6H30M"
+                                                },
+                                                {
+                                                  "date": "2025-09-04",
+                                                  "workTypeName": "휴일",
+                                                  "startTime": null,
+                                                  "duration": null
+                                                }
+                                              ]
+                                            }
+                                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @GetMapping("/monthly")
+    public SuccessResponse<List<WorkDayResponseDto>> getMonthlyWorkInstances(
+            @RequestParam @NotNull Long organizationId,
+            @RequestParam int year,
+            @RequestParam int month
+    ) {
+        List<WorkDayResponseDto> response = workCalendarService.getMonthlyWorkInstances(
+                organizationId, year, month);
         return SuccessResponse.success(SuccessCode.DATA_FETCHED, response);
 
     }
