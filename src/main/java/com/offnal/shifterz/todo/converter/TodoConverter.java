@@ -17,7 +17,7 @@ public class TodoConverter {
 
         return Todo.builder()
                 .content(request.getContent())
-                .isSuccess(request.getIsSuccess())
+                .completed(request.getCompleted())
                 .targetDate(targetDate)
                 .member(member)
                 .organization(organization)
@@ -29,7 +29,7 @@ public class TodoConverter {
         return TodoResponseDto.TodoDto.builder()
                 .id(todo.getId())
                 .content(todo.getContent())
-                .isSuccess(todo.getIsSuccess())
+                .completed(todo.getCompleted())
                 .targetDate(todo.getTargetDate())
                 .organizationId(
                         todo.getOrganization() != null ? todo.getOrganization().getId() : null

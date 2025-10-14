@@ -196,9 +196,9 @@ public @interface SuccessApiResponses {
                       "result": {
                         "id": 1,
                         "content": "스터디 준비",
-                        "isSuccess": false,
+                        "completed": false,
                         "targetDate": "2025-09-23",
-                        "organizationId": 10,
+                        "organizationId": 10
                       }
                     }
                     """
@@ -230,9 +230,9 @@ public @interface SuccessApiResponses {
                       "result": {
                         "id": 1,
                         "content": "스터디 준비 - 수정",
-                        "isSuccess": true,
+                        "completed": true,
                         "targetDate": "2025-09-24",
-                        "organizationId": 10,
+                        "organizationId": 10
                       }
                     }
                     """
@@ -264,9 +264,9 @@ public @interface SuccessApiResponses {
                       "result": {
                         "id": 1,
                         "content": "스터디 준비",
-                        "isSuccess": false,
+                        "completed": false,
                         "targetDate": "2025-09-23",
-                        "organizationId": 10,
+                        "organizationId": 10
            
                       }
                     }
@@ -295,16 +295,16 @@ public @interface SuccessApiResponses {
                     {
                       "id": 1,
                       "content": "스터디 준비",
-                      "isSuccess": false,
+                      "completed": false,
                       "targetDate": "2025-09-23",
-                      "organizationId": null,
+                      "organizationId": null
                     },
                     {
                       "id": 2,
                       "content": "야간 근무 교대",
-                      "isSuccess": true,
+                      "completed": true,
                       "targetDate": "2025-09-25",
-                      "organizationId": 10,
+                      "organizationId": 10
                     }
                   ]
                 }

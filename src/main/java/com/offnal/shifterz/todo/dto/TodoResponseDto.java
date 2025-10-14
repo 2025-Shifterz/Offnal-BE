@@ -12,7 +12,7 @@ public class TodoResponseDto {
     public static class TodoDto {
         private Long id;
         private String content;
-        private Boolean isSuccess;
+        private Boolean completed;
         private LocalDate targetDate;
 //        private Long memberId;
         private Long organizationId;
