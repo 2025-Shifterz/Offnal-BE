@@ -15,7 +15,7 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 public class WorkCalendarConverter {
 
     // WorkCalendarRequestDto -> WorkCalendar
@@ -29,7 +29,7 @@ public class WorkCalendarConverter {
             WorkTimeType timeType = WorkTimeType.fromSymbol(symbol);
             LocalTime startTime = LocalTime.parse(workTimeDto.getStartTime());
 
-            Duration duration = Duration.parse(workTimeDto.getDuration());
+            Duration duration = workTimeDto.getDuration();
             WorkTime workTime = WorkTime.builder()
                     .timeType(timeType)
                     .startTime(startTime)
@@ -59,12 +59,43 @@ public class WorkCalendarConverter {
                 .toList();
 
     }
+
     public static List<WorkDayResponseDto> toDayResponseDtoList(List<WorkInstance> instances) {
         return instances.stream()
-                .map(instance -> WorkDayResponseDto.builder()
-                        .date(instance.getWorkDate())
-                        .workTypeName(instance.getWorkTimeType().getKoreanName())
-                        .build())
-                .collect(Collectors.toList());
+                .map(WorkCalendarConverter::toDayResponseDto)
+                .toList();
+    }
+
+    public static WorkDayResponseDto toDayResponseDto(WorkInstance instance) {
+        WorkTime workTime = resolveWorkTimeFor(instance);
+
+        LocalTime startTime = (workTime != null) ? workTime.getStartTime() : null;
+        Duration duration = (workTime != null) ? workTime.getDuration() : null;
+
+        return WorkDayResponseDto.builder()
+                .date(instance.getWorkDate())
+                .workTypeName(instance.getWorkTimeType().getKoreanName())
+                .startTime(startTime)
+                .duration(duration)
+                .build();
+    }
+
+    private static WorkTime resolveWorkTimeFor(WorkInstance instance) {
+        if (instance == null || instance.getWorkCalendar() == null)
+            return null;
+
+        Map<String, WorkTime> workTimes = instance.getWorkCalendar().getWorkTimes();
+
+        if (workTimes == null || instance.getWorkTimeType() == null)
+            return null;
+
+        WorkTimeType type = instance.getWorkTimeType();
+        WorkTime found = workTimes.get(type.getSymbol());
+
+        if (found == null) {
+            found = workTimes.get(type.name());
+        }
+
+        return found;
     }
 }

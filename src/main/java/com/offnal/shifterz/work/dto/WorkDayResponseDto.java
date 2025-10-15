@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -16,5 +17,5 @@ public class WorkDayResponseDto {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
 
-    private String duration;
+    private Duration duration;
 }

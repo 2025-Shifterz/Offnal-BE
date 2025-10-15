@@ -122,7 +122,7 @@ public class WorkCalendarController {
 
     @Operation(
             summary = "기간별 근무 조회",
-            description = "startDate ~ endDate 사이의 근무일정을 조회합니다.startDate~endDate 사이의 근무일정을 조회합니다.\n\n" +
+            description = "startDate ~ endDate 사이의 근무일정을 조회합니다.\n" +
                     "✅ 요청 파라미터:\n" +
                     "- organizationId: 소속 조직 ID (필수)\n" +
                     "- startDate, endDate: 스케줄 기간 (yyyy-MM-dd 형식)\n\n"

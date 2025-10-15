@@ -16,12 +16,15 @@ import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.repository.WorkCalendarRepository;
 import com.offnal.shifterz.work.repository.WorkInstanceRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.jdbc.Work;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -31,6 +34,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@Validated
 @RequiredArgsConstructor
 public class WorkCalendarService {
     private final WorkCalendarRepository workCalendarRepository;
@@ -38,7 +42,7 @@ public class WorkCalendarService {
     private final OrganizationRepository organizationRepository;
 
     @Transactional
-    public void saveWorkCalendar(WorkCalendarRequestDto workCalendarRequestDto, Long organizationId) {
+    public void saveWorkCalendar(@Valid WorkCalendarRequestDto workCalendarRequestDto, @Positive Long organizationId) {
 
         Long memberId = AuthService.getCurrentUserId();
 
