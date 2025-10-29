@@ -21,13 +21,13 @@ import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.jdbc.Work;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,6 +41,7 @@ public class WorkCalendarService {
     private final WorkInstanceRepository workInstanceRepository;
     private final OrganizationRepository organizationRepository;
 
+    // 근무 일정 등록
     @Transactional
     public void saveWorkCalendar(@Valid WorkCalendarRequestDto workCalendarRequestDto, @Positive Long organizationId) {
 
@@ -66,7 +67,7 @@ public class WorkCalendarService {
         }
     }
 
-    // 기간 조회
+    // 기간으로 근무 일정 조회
     public List<WorkDayResponseDto> getWorkInstancesByRange(Long organizationId, LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
             throw new CustomException(WorkCalendarErrorCode.CALENDAR_DATE_REQUIRED);
@@ -105,48 +106,68 @@ public class WorkCalendarService {
         return WorkCalendarConverter.toDayResponseDtoList(list);
     }
 
+    // 근무 일정 수정. 없으면 생성(upsert)
     @Transactional
-    public void updateWorkCalendar(Long organizationId, LocalDate startDate, LocalDate endDate, WorkCalendarUpdateDto workCalendarUpdateDto) {
+    public void updateWorkCalendar(Long organizationId, WorkCalendarUpdateDto workCalendarUpdateDto) {
         Long memberId = AuthService.getCurrentUserId();
 
         Organization org = organizationRepository.findById(organizationId)
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
 
+        Map<LocalDate, String> shifts = workCalendarUpdateDto.getShifts();
+        if (shifts == null || shifts.isEmpty()) {
+            throw new CustomException(WorkCalendarErrorCode.WORK_INSTANCE_NOT_FOUND);
+        }
+
+        LocalDate minDay = shifts.keySet().stream().min(LocalDate::compareTo).get();
+        LocalDate maxDay = shifts.keySet().stream().max(LocalDate::compareTo).get();
+
         WorkCalendar calendar = workCalendarRepository
                 .findByMemberIdAndOrganizationAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
-                        memberId, org, startDate, endDate)
+                        memberId, org, minDay, maxDay)
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
+
+        for (LocalDate date : shifts.keySet()) {
+            if(!calendar.contains(date)){
+                throw new CustomException(WorkCalendarErrorCode.WORK_INSTANCE_NOT_FOUND);
+            }
+        }
 
         // 캘린더 범위 내 근무 일정 조회
         List<WorkInstance> existingInstances = workInstanceRepository.findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkDateBetweenOrderByWorkDateAsc(
-                memberId, org, startDate, endDate);
+                memberId, org, calendar.getStartDate(), calendar.getEndDate());
 
         Map<LocalDate, WorkInstance> existingMap = existingInstances.stream()
-                .collect(Collectors.toMap(WorkInstance::getWorkDate, wi -> wi));
+                .collect(Collectors.toMap(WorkInstance::getWorkDate, wi -> wi, (a, b) -> a));
 
-        for(Map.Entry<LocalDate, String> entry : workCalendarUpdateDto.getShifts().entrySet()){
+        List<WorkInstance> toCreate = new ArrayList<>();
+        List<WorkInstance> toUpdate = new ArrayList<>();
+
+
+        for(Map.Entry<LocalDate, String> entry : shifts.entrySet()) {
             LocalDate day = entry.getKey();
-            String workType = entry.getValue();
+            WorkTimeType target = WorkTimeType.fromSymbol(entry.getValue());
+            WorkInstance cur = existingMap.get(day);
 
-            WorkInstance existing = existingMap.get(day);
-            WorkTimeType workTimeType = WorkTimeType.fromSymbol(workType);
-
-            if(existing != null){
-                workInstanceRepository.delete(existing);
+            if (cur == null) {
+                toCreate.add(WorkInstance.create(calendar, day, target));
+            } else if (cur.getWorkTimeType() != target) {
+                cur.updateWorkTimeType(target, memberId, org);
+                toUpdate.add(cur);
             }
-                WorkInstance newInstance = WorkInstance.builder()
-                        .workDate(day)
-                        .workTimeType(workTimeType)
-                        .workCalendar(calendar)
-                        .build();
-
-                workInstanceRepository.save(newInstance);
-
         }
+        if (!toUpdate.isEmpty()) workInstanceRepository.saveAll(toUpdate);
+        if (!toCreate.isEmpty()) workInstanceRepository.saveAll(toCreate);
     }
 
     @Transactional
     public void deleteWorkCalendar(Long organizationId, LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            throw new CustomException(WorkCalendarErrorCode.CALENDAR_DATE_REQUIRED);
+        }
+        if (endDate.isBefore(startDate)) {
+            throw new CustomException(WorkCalendarErrorCode.CALENDAR_INVALID_DATE_RANGE);
+        }
         Long memberId = AuthService.getCurrentUserId();
 
         Organization org = organizationRepository.findById(organizationId)
@@ -157,8 +178,15 @@ public class WorkCalendarService {
                         (memberId, org, startDate, endDate)
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
 
-        workInstanceRepository.deleteAllByWorkCalendar(calendar);
-        workCalendarRepository.delete(calendar);
+        List<WorkInstance> instances = workInstanceRepository
+                .findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkDateBetweenOrderByWorkDateAsc(
+                        memberId, org, startDate, endDate);
+
+        if (instances.isEmpty()) {
+            throw new CustomException(WorkCalendarErrorCode.WORK_INSTANCE_NOT_FOUND);
+        }
+
+        workInstanceRepository.deleteAllInBatch(instances);
     }
 
     @Getter
@@ -187,7 +215,7 @@ public class WorkCalendarService {
         // 근무일 조회 관련
         INVALID_YEAR_FORMAT("CAL012",HttpStatus.BAD_REQUEST, "연도 형식이 올바르지 않습니다."),
         INVALID_MONTH_FORMAT("CAL013",HttpStatus.BAD_REQUEST, "월 형식이 올바르지 않습니다."),
-        CALENDAR_DATE_REQUIRED("CAL014",HttpStatus.BAD_REQUEST, "조회할 기간을 입력해주세요."),
+        CALENDAR_DATE_REQUIRED("CAL014",HttpStatus.BAD_REQUEST, "기간을 입력해주세요."),
         CALENDAR_INVALID_DATE_RANGE("CAL015", HttpStatus.BAD_REQUEST, "기간 범위가 올바르지 않습니다.");
 
         private final String code;

@@ -21,12 +21,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
-
+@Validated
 @RestController
 @RequestMapping("/works/calendar")
 @RequiredArgsConstructor
@@ -264,7 +265,7 @@ public class WorkCalendarController {
     /**
      * 근무일 수정
      */
-    @Operation(summary = "근무일 수정", description = "특정 연도와 월의 근무 일정을 수정합니다.")
+    @Operation(summary = "근무일 수정", description = "특정 연도와 월의 근무 일정을 수정합니다. 해당 날짜에 기존의 근무 일정이 없을 경우, 근무 일정을 추가합니다.")
     @SuccessApiResponses.UpdateCalendar
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
@@ -296,8 +297,6 @@ public class WorkCalendarController {
     @PatchMapping
     public SuccessResponse<Void> updateWorkCalendar(
             @RequestParam Long organizationId,
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate,
 
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
@@ -315,7 +314,7 @@ public class WorkCalendarController {
                                     """))
             )
             @RequestBody @Valid WorkCalendarUpdateDto workCalendarUpdateDto){
-        workCalendarService.updateWorkCalendar(organizationId, startDate, endDate, workCalendarUpdateDto);
+        workCalendarService.updateWorkCalendar(organizationId, workCalendarUpdateDto);
         return SuccessResponse.success(SuccessCode.CALENDAR_UPDATED);
     }
 

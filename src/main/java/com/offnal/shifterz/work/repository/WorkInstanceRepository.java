@@ -25,11 +25,10 @@ public interface WorkInstanceRepository extends JpaRepository<WorkInstance, Long
             LocalDate startDate,
             LocalDate endDate);
 
-    // 단일 날짜 조회
-    List<WorkInstance> findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkDateOrderByWorkDateAsc(
+    Optional<WorkInstance> findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkDate(
             Long memberId,
             Organization organization,
             LocalDate workDate);
 
-    void deleteAllByWorkCalendar(WorkCalendar workCalendar);
+
 }
