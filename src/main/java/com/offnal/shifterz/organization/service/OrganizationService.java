@@ -12,6 +12,7 @@ import com.offnal.shifterz.organization.repository.OrganizationRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,16 +25,21 @@ public class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
 
+    // 조직 생성
     @Transactional
     public OrganizationResponseDto.OrganizationDto createOrganization(OrganizationRequestDto.CreateDto request) {
         Member member = AuthService.getCurrentMember();
 
-        if (organizationRepository.existsByOrganizationName(request.getOrganizationName())){
+        String name = request.getOrganizationName().trim();
+        String team = request.getTeam().trim();
+
+
+        if (organizationRepository.existsByOrganizationMemberAndOrganizationNameAndTeam(member, name, team)){
             throw new CustomException(OrganizationErrorCode.ORGANIZATION_DUPLICATE_NAME);
         }
 
-
         Organization org = OrganizationConverter.toEntity(request, member);
+
         return OrganizationConverter.toDto(organizationRepository.save(org));
     }
 
@@ -63,6 +69,28 @@ public class OrganizationService {
                 .map(OrganizationConverter::toDto)
                 .toList();
     }
+
+    // 없으면 조직 생성, 있으면 조직 조회
+    @Transactional
+    public Organization getOrCreateByMemberAndNameAndTeam(String organizationName, String team) {
+        Member member = AuthService.getCurrentMember();
+
+        return organizationRepository.findByOrganizationMemberAndOrganizationNameAndTeam(member, organizationName, team)
+                .orElseGet(() -> {
+                    OrganizationRequestDto.CreateDto request = OrganizationRequestDto.CreateDto.builder()
+                            .organizationName(organizationName)
+                            .team(team)
+                            .build();
+                    Organization newOrg = OrganizationConverter.toEntity(request, member);
+                    try {
+                        return organizationRepository.save(newOrg);
+                    } catch (DataIntegrityViolationException e) {
+                        return organizationRepository.findByOrganizationMemberAndOrganizationNameAndTeam(member, organizationName, team)
+                                .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED));
+                    }
+                });
+    }
+
 
     @Transactional
     public OrganizationResponseDto.OrganizationDto updateOrganization(Long id, OrganizationRequestDto.UpdateDto request) {

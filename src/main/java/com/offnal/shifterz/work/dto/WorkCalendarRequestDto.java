@@ -25,10 +25,6 @@ public class WorkCalendarRequestDto {
     @Schema(description = "근무표 이름")
     private String calendarName;
 
-    @NotNull
-    @Schema(description = "조직 id")
-    private Long organizationId;
-
     @Valid
     @NotEmpty(message = "근무 시간 정보는 필수입니다.")
     @Schema(description = "근무타입별 시간 정보(D/E/N)")

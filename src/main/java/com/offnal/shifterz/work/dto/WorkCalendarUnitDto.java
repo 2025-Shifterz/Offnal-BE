@@ -13,6 +13,13 @@ import java.util.Map;
 @Builder
 public class WorkCalendarUnitDto {
 
+    @NotNull(message = "조직 이름은 필수입니다.")
+    @Schema(description = "조직 이름")
+    private String organizationName;
+
+    @NotNull(message = "조 이름은 필수입니다.")
+    @Schema(description = "조 이름")
+    private String team;
 
     @NotNull(message = "시작일은 필수입니다.")
     @Schema(description = "시작일")

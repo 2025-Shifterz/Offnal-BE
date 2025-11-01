@@ -3,8 +3,10 @@ package com.offnal.shifterz.work.service;
 import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
+import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.organization.repository.OrganizationRepository;
+import com.offnal.shifterz.organization.service.OrganizationService;
 import com.offnal.shifterz.work.converter.WorkCalendarConverter;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
@@ -17,7 +19,6 @@ import com.offnal.shifterz.work.repository.WorkCalendarRepository;
 import com.offnal.shifterz.work.repository.WorkInstanceRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -40,18 +41,23 @@ public class WorkCalendarService {
     private final WorkCalendarRepository workCalendarRepository;
     private final WorkInstanceRepository workInstanceRepository;
     private final OrganizationRepository organizationRepository;
+    private final OrganizationService organizationService;
 
-    // 근무 일정 등록
+    // 조직 생성 또는 조회 + 근무표 및 근무 일정 등록
     @Transactional
-    public void saveWorkCalendar(@Valid WorkCalendarRequestDto workCalendarRequestDto, @Positive Long organizationId) {
+    public void saveWorkCalendar(@Valid WorkCalendarRequestDto workCalendarRequestDto) {
 
         Long memberId = AuthService.getCurrentUserId();
 
-        Organization org = organizationRepository.findById(organizationId)
-                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
-
         for (WorkCalendarUnitDto unitDto : workCalendarRequestDto.getCalendars()) {
-            // 중복 시작일, 종료일의 캘린더 체크 (memberId, startDate, endDate 중복 체크)
+
+            // 조직 + 조 조회 (없으면 생성)
+            Organization org = organizationService.getOrCreateByMemberAndNameAndTeam(
+                    unitDto.getOrganizationName(),
+                    unitDto.getTeam()
+            );
+
+            // 중복 확인 (member + org + startDate + endDate)
             boolean exists = workCalendarRepository.existsByMemberIdAndOrganizationAndStartDateAndEndDate(
                     memberId, org, unitDto.getStartDate(), unitDto.getEndDate());
 
