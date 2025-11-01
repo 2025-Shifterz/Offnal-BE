@@ -78,6 +78,25 @@ public @interface SuccessApiResponses {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "근무 시간 수정 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "근무 시간 수정 성공 예시", value = """
+                                    {
+                                      "code": "WORK_TIME_UPDATED",
+                                      "message": "근무 시간 수정에 성공했습니다.",
+                                      "data": null
+                                    }
+                                    """)}
+                    ))
+    })
+    public @interface UpdateWorkTime {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "근무표 삭제 성공",
                     content = @Content(
                             mediaType = "application/json",

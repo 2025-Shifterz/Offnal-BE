@@ -4,9 +4,7 @@ import com.offnal.shifterz.global.exception.ErrorApiResponses;
 import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
-import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
-import com.offnal.shifterz.work.dto.WorkCalendarUpdateDto;
-import com.offnal.shifterz.work.dto.WorkDayResponseDto;
+import com.offnal.shifterz.work.dto.*;
 import com.offnal.shifterz.work.service.WorkCalendarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -369,5 +367,55 @@ public class WorkCalendarController {
     ){
         workCalendarService.deleteWorkCalendar(organizationName, team, calendarName);
         return SuccessResponse.success(SuccessCode.CALENDAR_DELETED);
+    }
+
+    /**
+     * 근무 시간 수정
+     */
+    @Operation(summary = "근무 시간 수정",
+            description = "calendarName과 team으로 근무표를 찾아 workTimes(D/E/N/- 별 근무 시간)를 수정합니다. ")
+    @SuccessApiResponses.UpdateWorkTime
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.CreateWorkCalendar
+    @ErrorApiResponses.UpdateWorkCalendar
+    @PatchMapping("/{organizationName}/{team}/{calendarName}/work-times")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "근무 시간 수정 예시",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples =
+                    @ExampleObject(
+                            name = "근무 시간 수정 예시",
+                            value = """
+                                    {
+                                    "workTimes": {
+                                        "DAY": {
+                                          "startTime": "08:00",
+                                          "duration": "PT6H"
+                                        },
+                                        "EVENING": {
+                                          "startTime": "16:00",
+                                          "duration": "PT6H"
+                                        },
+                                        "NIGHT": {
+                                          "startTime": "00:00",
+                                          "duration": "PT6H"
+                                        }
+                                      }
+                                    }
+                                    """
+                    )
+            )
+    )
+    public SuccessResponse<Void> updateWorkTimes(
+            @PathVariable String organizationName,
+            @PathVariable String team,
+            @PathVariable String calendarName,
+            @RequestBody @Valid WorkTimeUpdateDto request
+    ){
+        workCalendarService.updateWorkTimes(organizationName, team, calendarName, request);
+        return SuccessResponse.success(SuccessCode.WORK_TIME_UPDATED);
     }
 }

@@ -9,11 +9,9 @@ import com.offnal.shifterz.organization.service.OrganizationService;
 import com.offnal.shifterz.work.converter.WorkCalendarConverter;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
+import com.offnal.shifterz.work.domain.WorkTime;
 import com.offnal.shifterz.work.domain.WorkTimeType;
-import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
-import com.offnal.shifterz.work.dto.WorkCalendarUnitDto;
-import com.offnal.shifterz.work.dto.WorkCalendarUpdateDto;
-import com.offnal.shifterz.work.dto.WorkDayResponseDto;
+import com.offnal.shifterz.work.dto.*;
 import com.offnal.shifterz.work.repository.WorkCalendarRepository;
 import com.offnal.shifterz.work.repository.WorkInstanceRepository;
 import jakarta.transaction.Transactional;
@@ -25,7 +23,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -166,6 +166,68 @@ public class WorkCalendarService {
         }
         if (!toUpdate.isEmpty()) workInstanceRepository.saveAll(toUpdate);
         if (!toCreate.isEmpty()) workInstanceRepository.saveAll(toCreate);
+    }
+
+    // 근무 시간 수정
+    @Transactional
+    public void updateWorkTimes(String organizationName, String team, String calendarName, @Valid WorkTimeUpdateDto request) {
+        Long memberId = AuthService.getCurrentUserId();
+
+        Organization org = organizationRepository
+                .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, organizationName, team)
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
+
+        WorkCalendar calendar = workCalendarRepository
+                .findByMemberIdAndOrganization_OrganizationNameAndOrganization_TeamAndCalendarName(
+                        memberId, organizationName, team, calendarName
+                )
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
+
+        if (request == null || request.getWorkTimes() == null || request.getWorkTimes().isEmpty()) {
+            throw new CustomException(WorkCalendarErrorCode.CALENDAR_WORK_TIME_REQUIRED);
+        }
+
+        Map<String, WorkTime> existingMap = calendar.getWorkTimes();
+        if (existingMap == null || existingMap.isEmpty()) {
+            throw new CustomException(WorkCalendarErrorCode.WORK_TIME_NOT_FOUND);
+        }
+
+        for (Map.Entry<WorkTimeType, WorkTimeDto> entry : request.getWorkTimes().entrySet()) {
+            String symbol  = entry.getKey().getSymbol();
+            WorkTimeDto dto = entry.getValue();
+
+            if (dto == null) {
+                throw new CustomException(WorkCalendarErrorCode.CALENDAR_WORK_TIME_REQUIRED);
+            }
+
+            WorkTime target = existingMap.get(symbol);
+            if (target == null) {
+                throw new CustomException(WorkCalendarErrorCode.WORK_TIME_NOT_FOUND);
+            }
+
+            LocalTime startTime;
+            try {
+                startTime = LocalTime.parse(dto.getStartTime());
+            } catch (Exception e) {
+                throw new CustomException(WorkCalendarErrorCode.CALENDAR_STARTDAY_REQUIRED);
+            }
+
+            Duration duration = dto.getDuration();
+            if (duration == null || duration.toMinutes() <= 0 || duration.toMinutes() > 24 * 60) {
+                throw new CustomException(WorkCalendarErrorCode.CALENDAR_DURATION_REQUIRED);
+            }
+
+            WorkTime updated = WorkTime.builder()
+                    .timeType(WorkTimeType.fromSymbol(symbol))
+                    .startTime(startTime)
+                    .duration(duration)
+                    .build();
+
+            existingMap.put(symbol, updated);
+        }
+
+
+        workCalendarRepository.save(calendar);
     }
 
     // 근무 일정 삭제

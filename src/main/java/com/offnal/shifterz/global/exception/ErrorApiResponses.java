@@ -138,7 +138,25 @@ public @interface ErrorApiResponses {
                                         {
                                           "code": "CALENDAR_DUPLICATION",
                                           "message": "이미 존재하는 연도/월의 캘린더입니다."
+                                        },
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_STARTDAY_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_STARTDAY_REQUIRED",
+                                          "message": "시작일은 필수입니다."
                                         }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_DURATION_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_DURATION_REQUIRED",
+                                          "message": "근무 소요 시간은 필수입니다."
+                                        },
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_ORGANIZATION_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_ORGANIZATION_REQUIRED",
+                                          "message": "조직은 필수입니다."
+                                        },
                                         """)
                             }
                     ))
@@ -216,6 +234,18 @@ public @interface ErrorApiResponses {
                                       "code": "INVALID_MONTH_FORMAT",
                                       "message": "월 형식이 올바르지 않습니다."
                                     }
+                                    """),
+                                    @ExampleObject(name = "CALENDAR_DATE_REQUIRED", value = """
+                                    {
+                                      "code": "CALENDAR_DATE_REQUIRED",
+                                      "message": "기간을 입력해주세요."
+                                    }
+                                    """),
+                                    @ExampleObject(name = "CALENDAR_INVALID_DATE_RANGE", value = """
+                                    {
+                                      "code": "CALENDAR_INVALID_DATE_RANGE",
+                                      "message": "기간 범위가 올바르지 않습니다."
+                                    }
                                     """)
                             }
                     )),
@@ -223,12 +253,20 @@ public @interface ErrorApiResponses {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(name = "WORK_DAY_NOT_FOUND", value = """
-                                {
-                                  "code": "WORK_DAY_NOT_FOUND",
-                                  "message": "해당 연도와 월에 대한 근무일이 존재하지 않습니다."
-                                }
-                                """)
+                            examples = {
+                                    @ExampleObject(name = "WORK_INSTANCE_NOT_FOUND", value = """
+                                    {
+                                    "code": "WORK_INSTANCE_NOT_FOUND",
+                                    "message": "해당 연도와 월에 대한 근무일이 존재하지 않습니다."
+                                    }
+                                    """),
+                                    @ExampleObject(name = "WORK_TIME_NOT_FOUND", value = """
+                                    {
+                                    "code": "WORK_TIME_NOT_FOUND",
+                                    "message": "오늘의 근무 시간 정보가 없습니다."
+                                    }
+                                    """)
+                            }
                     ))
     })
     @interface WorkDay {}

@@ -10,10 +10,12 @@ public enum SuccessCode {
     DATA_FETCHED("COMMON001", HttpStatus.OK, "데이터 조회에 성공했습니다."),
     OK("COMMON002", HttpStatus.OK, "요청이 정상적으로 처리되었습니다."),
     TOKEN_REISSUED("AUTH200", HttpStatus.OK, "토큰이 재발급되었습니다."),
+
     CALENDAR_CREATED("CAL001", HttpStatus.OK, "근무표 등록에 성공했습니다."),
     CALENDAR_UPDATED("CAL002", HttpStatus.OK, "근무표 수정에 성공했습니다."),
     CALENDAR_DELETED("CAL003", HttpStatus.OK, "근무표 삭제에 성공했습니다."),
     WORK_INSTANCES_DELETED("CAL003", HttpStatus.OK, "근무 일정 삭제에 성공했습니다."),
+    WORK_TIME_UPDATED("CAL004",HttpStatus.OK, "근무 시간 수정에 성공했습니다."),
 
     TODO_CREATED("TODO201", HttpStatus.CREATED, "할 일이 생성되었습니다."),
     TODO_UPDATED("TODO200", HttpStatus.OK, "할 일이 수정되었습니다."),

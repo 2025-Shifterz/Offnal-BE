@@ -18,11 +18,9 @@ import java.time.Duration;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Jacksonized
 public class WorkTimeDto {
 
     @NotEmpty(message = "근무 시간 정보는 필수입니다.")
-    @NotNull
     @Schema(description = "근무 시작 시간", example = "08:00")
     @Pattern(regexp = "^\\d{1,2}:\\d{2}$", message = "HH:mm 형식이어야 합니다.")
     private String startTime;
