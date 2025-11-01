@@ -45,16 +45,9 @@ public class OrganizationService {
 
     // 조직 하나 조회
     @Transactional(readOnly = true)
-    public OrganizationResponseDto.OrganizationDto getOrganization(Long id) {
+    public OrganizationResponseDto.OrganizationDto getOrganization(String organizationName, String team) {
         Long memberId = AuthService.getCurrentUserId();
-
-        Organization org = organizationRepository.findById(id)
-                .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND));
-
-        if (!org.getOrganizationMember().getId().equals(memberId)) {
-            throw new CustomException(OrganizationErrorCode.ORGANIZATION_ACCESS_DENIED);
-        }
-
+        Organization org = findOwnedOrganizationOrThrow(memberId, organizationName, team);
         return OrganizationConverter.toDto(org);
     }
 
@@ -93,14 +86,21 @@ public class OrganizationService {
 
 
     @Transactional
-    public OrganizationResponseDto.OrganizationDto updateOrganization(Long id, OrganizationRequestDto.UpdateDto request) {
+    public OrganizationResponseDto.OrganizationDto updateOrganization(String organizationName, String team, OrganizationRequestDto.UpdateDto request) {
         Long memberId = AuthService.getCurrentUserId();
 
-        Organization org = organizationRepository.findById(id)
-                        .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND));
+        Organization org = findOwnedOrganizationOrThrow(memberId, organizationName, team);
 
-        if (!org.getOrganizationMember().getId().equals(memberId)) {
-            throw new CustomException(OrganizationErrorCode.ORGANIZATION_ACCESS_DENIED);
+        String newName = request.getOrganizationName() == null ? org.getOrganizationName() : request.getOrganizationName().trim();
+        String newTeam = request.getTeam() == null ? org.getTeam() : request.getTeam().trim();
+
+        boolean renameOrReteam = !org.getOrganizationName().equals(newName) || !org.getTeam().equals(newTeam);
+        if (renameOrReteam) {
+            boolean exists = organizationRepository
+                    .existsByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, newName, newTeam);
+            if (exists) {
+                throw new CustomException(OrganizationErrorCode.ORGANIZATION_DUPLICATE_NAME);
+            }
         }
 
         org.update(request);
@@ -108,17 +108,30 @@ public class OrganizationService {
     }
 
     @Transactional
-    public void deleteOrganization(Long id) {
+    public void deleteOrganization(String organizationName, String team) {
         Long memberId = AuthService.getCurrentUserId();
 
-        Organization org = organizationRepository.findById(id)
-                .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND));
+        Organization org = findOwnedOrganizationOrThrow(memberId, organizationName, team);
 
         if (!org.getOrganizationMember().getId().equals(memberId)) {
             throw new CustomException(OrganizationErrorCode.ORGANIZATION_ACCESS_DENIED);
         }
 
-        organizationRepository.deleteById(id);
+        organizationRepository.delete(org);
+    }
+
+    private Organization findOwnedOrganizationOrThrow(Long memberId, String organizationName, String team) {
+        String name = organizationName.trim();
+        String t = team.trim();
+
+        Organization org = organizationRepository
+                .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, name, t)
+                .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND));
+
+        if (!org.getOrganizationMember().getId().equals(memberId)) {
+            throw new CustomException(OrganizationErrorCode.ORGANIZATION_ACCESS_DENIED);
+        }
+        return org;
     }
 
 

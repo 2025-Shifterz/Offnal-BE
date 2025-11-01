@@ -88,12 +88,13 @@ public class OrganizationController {
     @SuccessApiResponses.OrganizationUpdate
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @PatchMapping("/{id}")
+    @PatchMapping("/{organizationName}/{team}")
     public SuccessResponse<OrganizationResponseDto.OrganizationDto> updateOrganization(
-            @PathVariable Long id,
+            @PathVariable String organizationName,
+            @PathVariable String team,
             @RequestBody @Valid OrganizationRequestDto.UpdateDto request
     ){
-        return SuccessResponse.success(SuccessCode.ORGANIZATION_UPDATED, organizationService.updateOrganization(id, request));
+        return SuccessResponse.success(SuccessCode.ORGANIZATION_UPDATED, organizationService.updateOrganization(organizationName, team, request));
     }
 
     /**
@@ -103,9 +104,12 @@ public class OrganizationController {
     @SuccessApiResponses.OrganizationGet
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @GetMapping("/{id}")
-    public SuccessResponse<OrganizationResponseDto.OrganizationDto> getOrganization(@PathVariable Long id){
-        return SuccessResponse.success(SuccessCode.ORGANIZATION_FETCHED, organizationService.getOrganization(id));
+    @GetMapping("/{organizationName}/{team}")
+    public SuccessResponse<OrganizationResponseDto.OrganizationDto> getOrganization(
+            @PathVariable String organizationName,
+            @PathVariable String team
+    ){
+        return SuccessResponse.success(SuccessCode.ORGANIZATION_FETCHED, organizationService.getOrganization(organizationName, team));
     }
 
     /**
@@ -128,9 +132,12 @@ public class OrganizationController {
     @SuccessApiResponses.OrganizationDelete
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @DeleteMapping("/{id}")
-    public SuccessResponse<Void> deleteOrganization(@PathVariable Long id){
-        organizationService.deleteOrganization(id);
+    @DeleteMapping("/{organizationName}/{team}")
+    public SuccessResponse<Void> deleteOrganization(
+            @PathVariable String organizationName,
+            @PathVariable String team
+    ){
+        organizationService.deleteOrganization(organizationName, team);
         return SuccessResponse.success(SuccessCode.ORGANIZATION_DELETED, null);
     }
 }
