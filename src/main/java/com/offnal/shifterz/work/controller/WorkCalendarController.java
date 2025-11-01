@@ -137,8 +137,9 @@ public class WorkCalendarController {
             summary = "기간별 근무 조회",
             description = "startDate ~ endDate 사이의 근무일정을 조회합니다.\n" +
                     "✅ 요청 파라미터:\n" +
-                    "- organizationId: 소속 조직 ID (필수)\n" +
-                    "- startDate, endDate: 스케줄 기간 (yyyy-MM-dd 형식)\n\n"
+                    "- organizationName: 조직 이름 (필수)\n" +
+                    "- team: 조 이름 (필수)\n" +
+                    "- startDate, endDate: 스케줄 기간 (YYYY-MM-DD)\n\n"
     )
     @SuccessApiResponses.WorkDay
     @ErrorApiResponses.Common
@@ -191,12 +192,13 @@ public class WorkCalendarController {
     })
     @GetMapping
     public SuccessResponse<List<WorkDayResponseDto>> getWorkInstancesByRange(
-            @RequestParam @NotNull Long organizationId,
+            @RequestParam @NotNull String organizationName,
+            @RequestParam @NotNull String team,
             @RequestParam @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
         List<WorkDayResponseDto> response = workCalendarService.getWorkInstancesByRange(
-                organizationId, startDate, endDate);
+                organizationName, team, startDate, endDate);
         return SuccessResponse.success(SuccessCode.DATA_FETCHED, response);
 
     }
@@ -209,7 +211,8 @@ public class WorkCalendarController {
             summary = "월별 근무 조회",
             description = "startDate ~ endDate 사이의 근무일정을 조회합니다.startDate~endDate 사이의 근무일정을 조회합니다.\n\n" +
                     "✅ 요청 파라미터:\n" +
-                    "- organizationId: 소속 조직 ID (필수)\n" +
+                    "- organizationName: 조직 이름 (필수)\n" +
+                    "- team: 조 이름 (필수)\n" +
                     "- year: 조회할 연도\n" +
                     "- month: 조회할 월"
     )
@@ -264,12 +267,13 @@ public class WorkCalendarController {
     })
     @GetMapping("/monthly")
     public SuccessResponse<List<WorkDayResponseDto>> getMonthlyWorkInstances(
-            @RequestParam @NotNull Long organizationId,
+            @RequestParam @NotNull String organizationName,
+            @RequestParam @NotNull String team,
             @RequestParam int year,
             @RequestParam int month
     ) {
         List<WorkDayResponseDto> response = workCalendarService.getMonthlyWorkInstances(
-                organizationId, year, month);
+                organizationName, team, year, month);
         return SuccessResponse.success(SuccessCode.DATA_FETCHED, response);
 
     }
@@ -308,8 +312,8 @@ public class WorkCalendarController {
     })
     @PatchMapping
     public SuccessResponse<Void> updateWorkCalendar(
-            @RequestParam Long organizationId,
-
+            @RequestParam @NotNull String organizationName,
+            @RequestParam @NotNull String team,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     content = @Content(
                             mediaType = "application/json",
@@ -326,7 +330,7 @@ public class WorkCalendarController {
                                     """))
             )
             @RequestBody @Valid WorkCalendarUpdateDto workCalendarUpdateDto){
-        workCalendarService.updateWorkCalendar(organizationId, workCalendarUpdateDto);
+        workCalendarService.updateWorkCalendar(organizationName, team, workCalendarUpdateDto);
         return SuccessResponse.success(SuccessCode.CALENDAR_UPDATED);
     }
 
@@ -341,11 +345,12 @@ public class WorkCalendarController {
     @ErrorApiResponses.DeleteWorkCalendar
     @DeleteMapping
     public SuccessResponse<Void> deleteWorkCalendar(
-            @RequestParam Long organizationId,
+            @RequestParam @NotNull String organizationName,
+            @RequestParam @NotNull String team,
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate
     ){
-        workCalendarService.deleteWorkCalendar(organizationId, startDate, endDate);
+        workCalendarService.deleteWorkCalendar(organizationName, team, startDate, endDate);
         return SuccessResponse.success(SuccessCode.CALENDAR_DELETED);
     }
 

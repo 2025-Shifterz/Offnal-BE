@@ -28,17 +28,17 @@ public class OrganizationService {
     // 조직 생성
     @Transactional
     public OrganizationResponseDto.OrganizationDto createOrganization(OrganizationRequestDto.CreateDto request) {
-        Member member = AuthService.getCurrentMember();
+        Long memberId = AuthService.getCurrentUserId();
 
         String name = request.getOrganizationName().trim();
         String team = request.getTeam().trim();
 
 
-        if (organizationRepository.existsByOrganizationMemberAndOrganizationNameAndTeam(member, name, team)){
+        if (organizationRepository.existsByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, name, team)){
             throw new CustomException(OrganizationErrorCode.ORGANIZATION_DUPLICATE_NAME);
         }
 
-        Organization org = OrganizationConverter.toEntity(request, member);
+        Organization org = OrganizationConverter.toEntity(request, memberId);
 
         return OrganizationConverter.toDto(organizationRepository.save(org));
     }
@@ -46,12 +46,12 @@ public class OrganizationService {
     // 조직 하나 조회
     @Transactional(readOnly = true)
     public OrganizationResponseDto.OrganizationDto getOrganization(Long id) {
-        Member member = AuthService.getCurrentMember();
+        Long memberId = AuthService.getCurrentUserId();
 
         Organization org = organizationRepository.findById(id)
                 .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND));
 
-        if (!org.getOrganizationMember().getId().equals(member.getId())) {
+        if (!org.getOrganizationMember().getId().equals(memberId)) {
             throw new CustomException(OrganizationErrorCode.ORGANIZATION_ACCESS_DENIED);
         }
 
@@ -61,9 +61,9 @@ public class OrganizationService {
     // 회원의 조직 전체 조회
     @Transactional(readOnly = true)
     public List<OrganizationResponseDto.OrganizationDto> getAllOrganizations() {
-        Member member = AuthService.getCurrentMember();
+        Long memberId = AuthService.getCurrentUserId();
 
-        List<Organization> organizations = organizationRepository.findAllByOrganizationMember(member);
+        List<Organization> organizations = organizationRepository.findAllByOrganizationMember_Id(memberId);
 
         return organizations.stream()
                 .map(OrganizationConverter::toDto)
@@ -73,19 +73,19 @@ public class OrganizationService {
     // 없으면 조직 생성, 있으면 조직 조회
     @Transactional
     public Organization getOrCreateByMemberAndNameAndTeam(String organizationName, String team) {
-        Member member = AuthService.getCurrentMember();
+        Long memberId = AuthService.getCurrentUserId();
 
-        return organizationRepository.findByOrganizationMemberAndOrganizationNameAndTeam(member, organizationName, team)
+        return organizationRepository.findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, organizationName, team)
                 .orElseGet(() -> {
                     OrganizationRequestDto.CreateDto request = OrganizationRequestDto.CreateDto.builder()
                             .organizationName(organizationName)
                             .team(team)
                             .build();
-                    Organization newOrg = OrganizationConverter.toEntity(request, member);
+                    Organization newOrg = OrganizationConverter.toEntity(request, memberId);
                     try {
                         return organizationRepository.save(newOrg);
                     } catch (DataIntegrityViolationException e) {
-                        return organizationRepository.findByOrganizationMemberAndOrganizationNameAndTeam(member, organizationName, team)
+                        return organizationRepository.findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, organizationName, team)
                                 .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED));
                     }
                 });
@@ -94,12 +94,12 @@ public class OrganizationService {
 
     @Transactional
     public OrganizationResponseDto.OrganizationDto updateOrganization(Long id, OrganizationRequestDto.UpdateDto request) {
-        Member member = AuthService.getCurrentMember();
+        Long memberId = AuthService.getCurrentUserId();
 
         Organization org = organizationRepository.findById(id)
                         .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND));
 
-        if (!org.getOrganizationMember().getId().equals(member.getId())) {
+        if (!org.getOrganizationMember().getId().equals(memberId)) {
             throw new CustomException(OrganizationErrorCode.ORGANIZATION_ACCESS_DENIED);
         }
 
@@ -109,12 +109,12 @@ public class OrganizationService {
 
     @Transactional
     public void deleteOrganization(Long id) {
-        Member member = AuthService.getCurrentMember();
+        Long memberId = AuthService.getCurrentUserId();
 
         Organization org = organizationRepository.findById(id)
                 .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND));
 
-        if (!org.getOrganizationMember().getId().equals(member.getId())) {
+        if (!org.getOrganizationMember().getId().equals(memberId)) {
             throw new CustomException(OrganizationErrorCode.ORGANIZATION_ACCESS_DENIED);
         }
 

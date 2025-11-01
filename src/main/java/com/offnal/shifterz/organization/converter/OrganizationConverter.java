@@ -7,10 +7,10 @@ import com.offnal.shifterz.organization.dto.OrganizationResponseDto;
 
 public class OrganizationConverter {
 
-    public static Organization toEntity(OrganizationRequestDto.CreateDto request, Member member){
+    public static Organization toEntity(OrganizationRequestDto.CreateDto request, Long memberId){
         return Organization.builder()
                 .organizationName(request.getOrganizationName())
-                .organizationMember(member)
+                .organizationMember(Member.builder().id(memberId).build())
                 .team(request.getTeam())
                 .build();
     }

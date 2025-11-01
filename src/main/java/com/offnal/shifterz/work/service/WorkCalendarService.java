@@ -74,7 +74,7 @@ public class WorkCalendarService {
     }
 
     // 기간으로 근무 일정 조회
-    public List<WorkDayResponseDto> getWorkInstancesByRange(Long organizationId, LocalDate startDate, LocalDate endDate) {
+    public List<WorkDayResponseDto> getWorkInstancesByRange(String organizationName, String team, LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
             throw new CustomException(WorkCalendarErrorCode.CALENDAR_DATE_REQUIRED);
         }
@@ -83,7 +83,8 @@ public class WorkCalendarService {
         }
         Long memberId = AuthService.getCurrentUserId();
 
-        Organization org = organizationRepository.findById(organizationId)
+        Organization org = organizationRepository
+                .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, organizationName, team)
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
 
         List<WorkInstance> instances =
@@ -95,14 +96,15 @@ public class WorkCalendarService {
     }
 
     // 근무 일정 월 단위 조회
-    public List<WorkDayResponseDto> getMonthlyWorkInstances(Long organizationId, int year, int month) {
+    public List<WorkDayResponseDto> getMonthlyWorkInstances(String organizationName, String team, int year, int month) {
         YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
 
         Long memberId = AuthService.getCurrentUserId();
 
-        Organization org = organizationRepository.findById(organizationId)
+        Organization org = organizationRepository
+                .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, organizationName, team)
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
 
         List<WorkInstance> list =
@@ -114,10 +116,11 @@ public class WorkCalendarService {
 
     // 근무 일정 수정. 없으면 생성(upsert)
     @Transactional
-    public void updateWorkCalendar(Long organizationId, WorkCalendarUpdateDto workCalendarUpdateDto) {
+    public void updateWorkCalendar(String organizationName, String team, WorkCalendarUpdateDto workCalendarUpdateDto) {
         Long memberId = AuthService.getCurrentUserId();
 
-        Organization org = organizationRepository.findById(organizationId)
+        Organization org = organizationRepository
+                .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, organizationName, team)
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
 
         Map<LocalDate, String> shifts = workCalendarUpdateDto.getShifts();
@@ -167,7 +170,7 @@ public class WorkCalendarService {
     }
 
     @Transactional
-    public void deleteWorkCalendar(Long organizationId, LocalDate startDate, LocalDate endDate) {
+    public void deleteWorkCalendar(String organizationName, String team, LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
             throw new CustomException(WorkCalendarErrorCode.CALENDAR_DATE_REQUIRED);
         }
@@ -176,7 +179,8 @@ public class WorkCalendarService {
         }
         Long memberId = AuthService.getCurrentUserId();
 
-        Organization org = organizationRepository.findById(organizationId)
+        Organization org = organizationRepository
+                .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, organizationName, team)
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
 
         WorkCalendar calendar = workCalendarRepository
