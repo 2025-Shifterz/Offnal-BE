@@ -13,6 +13,7 @@ public enum SuccessCode {
     CALENDAR_CREATED("CAL001", HttpStatus.OK, "근무표 등록에 성공했습니다."),
     CALENDAR_UPDATED("CAL002", HttpStatus.OK, "근무표 수정에 성공했습니다."),
     CALENDAR_DELETED("CAL003", HttpStatus.OK, "근무표 삭제에 성공했습니다."),
+    WORK_INSTANCES_DELETED("CAL003", HttpStatus.OK, "근무 일정 삭제에 성공했습니다."),
 
     TODO_CREATED("TODO201", HttpStatus.CREATED, "할 일이 생성되었습니다."),
     TODO_UPDATED("TODO200", HttpStatus.OK, "할 일이 수정되었습니다."),

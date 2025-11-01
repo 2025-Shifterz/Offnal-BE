@@ -3,7 +3,6 @@ package com.offnal.shifterz.work.service;
 import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
-import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.organization.repository.OrganizationRepository;
 import com.offnal.shifterz.organization.service.OrganizationService;
@@ -138,7 +137,7 @@ public class WorkCalendarService {
 
         for (LocalDate date : shifts.keySet()) {
             if(!calendar.contains(date)){
-                throw new CustomException(WorkCalendarErrorCode.WORK_INSTANCE_NOT_FOUND);
+                throw new CustomException(WorkCalendarErrorCode.CALENDAR_INVALID_DATE_RANGE);
             }
         }
 
@@ -169,8 +168,9 @@ public class WorkCalendarService {
         if (!toCreate.isEmpty()) workInstanceRepository.saveAll(toCreate);
     }
 
+    // 근무 일정 삭제
     @Transactional
-    public void deleteWorkCalendar(String organizationName, String team, LocalDate startDate, LocalDate endDate) {
+    public void deleteWorkInstances(String organizationName, String team, LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
             throw new CustomException(WorkCalendarErrorCode.CALENDAR_DATE_REQUIRED);
         }
@@ -198,6 +198,25 @@ public class WorkCalendarService {
 
         workInstanceRepository.deleteAllInBatch(instances);
     }
+
+    // 근무표 삭제
+    @Transactional
+    public void deleteWorkCalendar(String organizationName, String team, String calendarName) {
+        Long memberId = AuthService.getCurrentUserId();
+
+        Organization org = organizationRepository
+                .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, organizationName, team)
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
+
+        WorkCalendar calendar = workCalendarRepository
+                .findByMemberIdAndOrganizationAndCalendarName(memberId, org, calendarName)
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
+
+        workInstanceRepository.deleteByWorkCalendarId(calendar.getId());
+
+        workCalendarRepository.delete(calendar);
+    }
+
 
     @Getter
     @AllArgsConstructor

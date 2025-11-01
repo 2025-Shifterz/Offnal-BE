@@ -3,8 +3,12 @@ package com.offnal.shifterz.organization.domain;
 import com.offnal.shifterz.global.BaseTimeEntity;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.organization.dto.OrganizationRequestDto;
+import com.offnal.shifterz.work.domain.WorkCalendar;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -38,13 +42,15 @@ public class Organization extends BaseTimeEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member organizationMember;
 
+    @OneToMany(mappedBy = "organization",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true)
+    @Builder.Default
+    private List<WorkCalendar> calendars = new ArrayList<>();
+
     public void update(OrganizationRequestDto.UpdateDto request) {
         if(request.getOrganizationName() != null) this.organizationName = request.getOrganizationName();
         if(request.getTeam() != null) this.team = request.getTeam();
-    }
-
-    public void assignOwner(Member member) {
-        this.organizationMember = member;
     }
 }
 

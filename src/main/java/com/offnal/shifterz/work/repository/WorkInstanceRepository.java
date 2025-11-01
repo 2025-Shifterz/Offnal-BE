@@ -4,6 +4,7 @@ import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -25,10 +26,9 @@ public interface WorkInstanceRepository extends JpaRepository<WorkInstance, Long
             LocalDate startDate,
             LocalDate endDate);
 
-    Optional<WorkInstance> findByWorkCalendarMemberIdAndWorkCalendarOrganizationAndWorkDate(
-            Long memberId,
-            Organization organization,
-            LocalDate workDate);
-
+    //근무표 삭제
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from WorkInstance wi where wi.workCalendar.id = :calendarId")
+    void deleteByWorkCalendarId(@Param("calendarId") Long calendarId);
 
 }

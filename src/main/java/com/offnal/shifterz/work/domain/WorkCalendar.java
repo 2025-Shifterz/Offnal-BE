@@ -9,24 +9,39 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
+@Table(
+        name = "work_calendar",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_org_calendar_name",
+                        columnNames = {"organization_id", "calendar_name"}
+                )
+        }
+)
 public class WorkCalendar extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Long memberId;
 
+    @Column(nullable = false)
     private String calendarName;
 
+    @Column(nullable = false)
     private LocalDate startDate;
 
+    @Column(nullable = false)
     private LocalDate endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,8 +50,13 @@ public class WorkCalendar extends BaseTimeEntity {
 
     @Builder.Default
     @ElementCollection
-    @CollectionTable(name = "work_times", joinColumns = @JoinColumn(name = "work_sch_id"))
+    @CollectionTable(name = "work_times", joinColumns = @JoinColumn(name = "work_calendar_id"))
     private Map<String, WorkTime> workTimes = new HashMap<>();
+
+    @OneToMany(mappedBy = "workCalendar",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true)
+    private List<WorkInstance> workInstances = new ArrayList<>();
 
     // 동시성 제어 - 낙관적 락
     @Version

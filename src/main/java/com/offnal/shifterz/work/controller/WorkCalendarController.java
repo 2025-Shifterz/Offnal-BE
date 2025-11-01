@@ -5,7 +5,6 @@ import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
-import com.offnal.shifterz.work.dto.WorkCalendarUnitDto;
 import com.offnal.shifterz.work.dto.WorkCalendarUpdateDto;
 import com.offnal.shifterz.work.dto.WorkDayResponseDto;
 import com.offnal.shifterz.work.service.WorkCalendarService;
@@ -320,11 +319,10 @@ public class WorkCalendarController {
                             examples = @ExampleObject(value = """
                                     {
                                         "shifts": {
-                                            "2025-09-01": "N",
-                                            "2025-09-02": "D",
-                                            "2025-09-03": "-",
-                                            "2025-09-04": "E",
-                                            "2025-09-05": "N"
+                                            "2025-07-01": "N",
+                                            "2025-07-02": "D",
+                                            "2025-07-03": "-",
+                                            "2025-07-04": "E"
                                         }
                                     }
                                     """))
@@ -336,9 +334,29 @@ public class WorkCalendarController {
 
 
     /**
+     * 근무 일정 삭제
+     */
+    @Operation(summary = "근무 일정 삭제", description = "해당 기간의 근무 일정을 삭제합니다.")
+    @SuccessApiResponses.DeleteCalendar
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.DeleteWorkCalendar
+    @DeleteMapping("instances")
+    public SuccessResponse<Void> deleteWorkInstances(
+            @RequestParam @NotNull String organizationName,
+            @RequestParam @NotNull String team,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate
+    ){
+        workCalendarService.deleteWorkInstances(organizationName, team, startDate, endDate);
+        return SuccessResponse.success(SuccessCode.WORK_INSTANCES_DELETED);
+    }
+
+
+    /**
      * 근무표 삭제
      */
-    @Operation(summary = "근무표 삭제", description = "특정 연도와 월의 근무표를 삭제합니다.")
+    @Operation(summary = "근무표 삭제", description = "조직명, 팀, 근무표 이름에 해당하는 근무표와 하위 근무 일정 전체를 삭제합니다.")
     @SuccessApiResponses.DeleteCalendar
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
@@ -347,11 +365,9 @@ public class WorkCalendarController {
     public SuccessResponse<Void> deleteWorkCalendar(
             @RequestParam @NotNull String organizationName,
             @RequestParam @NotNull String team,
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate
+            @RequestParam @NotNull String calendarName
     ){
-        workCalendarService.deleteWorkCalendar(organizationName, team, startDate, endDate);
+        workCalendarService.deleteWorkCalendar(organizationName, team, calendarName);
         return SuccessResponse.success(SuccessCode.CALENDAR_DELETED);
     }
-
 }

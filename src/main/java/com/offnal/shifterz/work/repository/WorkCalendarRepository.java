@@ -11,6 +11,15 @@ import java.util.Optional;
 
 @Repository
 public interface WorkCalendarRepository extends JpaRepository<WorkCalendar, Long> {
-    boolean existsByMemberIdAndOrganizationAndStartDateAndEndDate(Long memberId, Organization organization, LocalDate startDate, LocalDate  endDate);
-    Optional<WorkCalendar> findByMemberIdAndOrganizationAndStartDateLessThanEqualAndEndDateGreaterThanEqual(Long memberId,Organization organization, LocalDate startDate, LocalDate  endDate);
+    boolean existsByMemberIdAndOrganizationAndStartDateAndEndDate(
+            Long memberId, Organization organization, LocalDate startDate, LocalDate  endDate);
+
+    Optional<WorkCalendar> findByMemberIdAndOrganizationAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+            Long memberId,Organization organization, LocalDate startDate, LocalDate  endDate);
+
+    Optional<WorkCalendar> findByMemberIdAndOrganizationAndCalendarName(
+            Long memberId,
+            Organization organization,
+            String calendarName
+    );
 }
