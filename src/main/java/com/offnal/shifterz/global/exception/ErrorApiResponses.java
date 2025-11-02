@@ -138,7 +138,7 @@ public @interface ErrorApiResponses {
                                         {
                                           "code": "CALENDAR_DUPLICATION",
                                           "message": "이미 존재하는 연도/월의 캘린더입니다."
-                                        },
+                                        }
                                         """),
                                     @ExampleObject(name = "CALENDAR_STARTDAY_REQUIRED", value = """
                                         {
@@ -150,13 +150,13 @@ public @interface ErrorApiResponses {
                                         {
                                           "code": "CALENDAR_DURATION_REQUIRED",
                                           "message": "근무 소요 시간은 필수입니다."
-                                        },
+                                        }
                                         """),
                                     @ExampleObject(name = "CALENDAR_ORGANIZATION_REQUIRED", value = """
                                         {
                                           "code": "CALENDAR_ORGANIZATION_REQUIRED",
                                           "message": "조직은 필수입니다."
-                                        },
+                                        }
                                         """)
                             }
                     ))
