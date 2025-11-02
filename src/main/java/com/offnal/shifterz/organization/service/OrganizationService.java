@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,18 +30,19 @@ public class OrganizationService {
     @Transactional
     public OrganizationResponseDto.OrganizationDto createOrganization(OrganizationRequestDto.CreateDto request) {
         Long memberId = AuthService.getCurrentUserId();
+        Member member = AuthService.getCurrentMember();
 
-        String name = request.getOrganizationName().trim();
-        String team = request.getTeam().trim();
+        String name = normalize(request.getOrganizationName());
+        String team = normalize(request.getTeam());
 
+        assertNoDuplicate(memberId, name, team);
 
-        if (organizationRepository.existsByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, name, team)){
-            throw new CustomException(OrganizationErrorCode.ORGANIZATION_DUPLICATE_NAME);
-        }
+        Organization org = OrganizationConverter.toEntity(request, member);
+        org.rename(name, team);
 
-        Organization org = OrganizationConverter.toEntity(request, memberId);
+        Organization saved = organizationRepository.save(org);
 
-        return OrganizationConverter.toDto(organizationRepository.save(org));
+        return OrganizationConverter.toDto(saved);
     }
 
     // 조직 하나 조회
@@ -65,67 +67,58 @@ public class OrganizationService {
 
     // 없으면 조직 생성, 있으면 조직 조회
     @Transactional
-    public Organization getOrCreateByMemberAndNameAndTeam(String organizationName, String team) {
+    public Organization getOrCreateByMemberAndNameAndTeam(String organizationName, String organizationTeam) {
         Long memberId = AuthService.getCurrentUserId();
+        String name = normalize(organizationName);
+        String team = normalize(organizationTeam);
 
-        return organizationRepository.findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, organizationName, team)
-                .orElseGet(() -> {
-                    OrganizationRequestDto.CreateDto request = OrganizationRequestDto.CreateDto.builder()
-                            .organizationName(organizationName)
-                            .team(team)
-                            .build();
-                    Organization newOrg = OrganizationConverter.toEntity(request, memberId);
-                    try {
-                        return organizationRepository.save(newOrg);
-                    } catch (DataIntegrityViolationException e) {
-                        return organizationRepository.findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, organizationName, team)
-                                .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED));
-                    }
-                });
+        return findExisting(memberId, name, team)
+                .orElseGet(() -> createOrFindOnUniqueConflict(memberId, name, team));
     }
 
 
+    // 조직 수정
     @Transactional
     public OrganizationResponseDto.OrganizationDto updateOrganization(String organizationName, String team, OrganizationRequestDto.UpdateDto request) {
         Long memberId = AuthService.getCurrentUserId();
 
         Organization org = findOwnedOrganizationOrThrow(memberId, organizationName, team);
 
-        String newName = request.getOrganizationName() == null ? org.getOrganizationName() : request.getOrganizationName().trim();
-        String newTeam = request.getTeam() == null ? org.getTeam() : request.getTeam().trim();
+        String newName = normalize(defaultIfNull(request.getOrganizationName(), org.getOrganizationName()));
+        String newTeam = normalize(defaultIfNull(request.getTeam(), org.getTeam()));
 
-        boolean renameOrReteam = !org.getOrganizationName().equals(newName) || !org.getTeam().equals(newTeam);
-        if (renameOrReteam) {
-            boolean exists = organizationRepository
-                    .existsByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, newName, newTeam);
-            if (exists) {
-                throw new CustomException(OrganizationErrorCode.ORGANIZATION_DUPLICATE_NAME);
-            }
+        if (noChange(org, newName, newTeam)) {
+            return OrganizationConverter.toDto(org);
         }
 
-        org.update(request);
-        return OrganizationConverter.toDto(org);
+        assertNoDuplicate(memberId, newName, newTeam);
+
+        org.rename(newName, newTeam);
+
+        try {
+            Organization saved = organizationRepository.save(org);
+            return OrganizationConverter.toDto(saved);
+        } catch (DataIntegrityViolationException e) {
+            throw new CustomException(OrganizationErrorCode.ORGANIZATION_DUPLICATE_NAME);
+        }
     }
 
+    // 조직 삭제
     @Transactional
     public void deleteOrganization(String organizationName, String team) {
         Long memberId = AuthService.getCurrentUserId();
 
         Organization org = findOwnedOrganizationOrThrow(memberId, organizationName, team);
 
-        if (!org.getOrganizationMember().getId().equals(memberId)) {
-            throw new CustomException(OrganizationErrorCode.ORGANIZATION_ACCESS_DENIED);
-        }
-
         organizationRepository.delete(org);
     }
 
-    private Organization findOwnedOrganizationOrThrow(Long memberId, String organizationName, String team) {
+    private Organization findOwnedOrganizationOrThrow(Long memberId, String organizationName, String organizationTeam) {
         String name = organizationName.trim();
-        String t = team.trim();
+        String team = organizationTeam.trim();
 
         Organization org = organizationRepository
-                .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, name, t)
+                .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, name, team)
                 .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND));
 
         if (!org.getOrganizationMember().getId().equals(memberId)) {
@@ -134,6 +127,50 @@ public class OrganizationService {
         return org;
     }
 
+    private Optional<Organization> findExisting(Long memberId, String organizationName, String team) {
+        return organizationRepository.findByOrganizationMember_IdAndOrganizationNameAndTeam(
+                memberId, organizationName, team);
+    }
+
+    private Organization createOrFindOnUniqueConflict(Long memberId, String organizationName, String team){
+        OrganizationRequestDto.CreateDto request = buildCreateDto(organizationName, team);
+        Member member = AuthService.getCurrentMember();
+
+        Organization entity = OrganizationConverter.toEntity(request, member);
+
+        try {
+            return organizationRepository.save(entity);
+        } catch (DataIntegrityViolationException e) {
+            return findExisting(memberId, organizationName, team)
+                    .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED));
+        }
+    }
+
+    private OrganizationRequestDto.CreateDto buildCreateDto(String organizationName, String team) {
+        return OrganizationRequestDto.CreateDto.builder()
+                .organizationName(organizationName)
+                .team(team)
+                .build();
+    }
+
+    private boolean noChange(Organization org, String newName, String newTeam) {
+        return org.getOrganizationName().equals(newName) && org.getTeam().equals(newTeam);
+    }
+
+    // 공백 방지
+    private String normalize(String s) {
+        return s == null ? null : s.trim();
+    }
+
+    private String defaultIfNull(String value, String fallback) {
+        return value == null ? fallback : value;
+    }
+
+    private void assertNoDuplicate(Long memberId, String name, String team) {
+        if (organizationRepository.existsByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, name, team)) {
+            throw new CustomException(OrganizationErrorCode.ORGANIZATION_DUPLICATE_NAME);
+        }
+    }
 
     @Getter
     @AllArgsConstructor
@@ -141,7 +178,7 @@ public class OrganizationService {
         ORGANIZATION_NOT_FOUND("ORG001", HttpStatus.NOT_FOUND, "소속 조직을 찾을 수 없습니다."),
         ORGANIZATION_SAVE_FAILED("ORG002", HttpStatus.INTERNAL_SERVER_ERROR, "조직 저장에 실패했습니다."),
         ORGANIZATION_ACCESS_DENIED("ORG003", HttpStatus.FORBIDDEN, "해당 조직에 접근 권한이 없습니다."),
-        ORGANIZATION_DUPLICATE_NAME("ORG004", HttpStatus.INTERNAL_SERVER_ERROR, "이미 존재하는 조직입니다.");
+        ORGANIZATION_DUPLICATE_NAME("ORG004", HttpStatus.CONFLICT, "동일한 이름/팀의 조직이 이미 존재합니다.");
 
         private final String code;
         private final HttpStatus status;

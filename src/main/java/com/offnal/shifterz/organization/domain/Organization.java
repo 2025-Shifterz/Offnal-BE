@@ -48,9 +48,10 @@ public class Organization extends BaseTimeEntity {
     @Builder.Default
     private List<WorkCalendar> calendars = new ArrayList<>();
 
-    public void update(OrganizationRequestDto.UpdateDto request) {
-        if(request.getOrganizationName() != null) this.organizationName = request.getOrganizationName();
-        if(request.getTeam() != null) this.team = request.getTeam();
+    public void rename(String name, String team) {
+        this.organizationName = name;
+        this.team = team;
     }
+
 }
 
