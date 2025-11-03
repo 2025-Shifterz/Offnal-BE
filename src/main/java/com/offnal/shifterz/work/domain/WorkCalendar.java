@@ -5,7 +5,9 @@ import com.offnal.shifterz.organization.domain.Organization;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +37,7 @@ public class WorkCalendar extends BaseTimeEntity {
     @Column(nullable = false)
     private Long memberId;
 
-    @Column(nullable = false)
+    @Column(name = "calendar_name", nullable = false)
     private String calendarName;
 
     @Column(nullable = false)
@@ -49,8 +51,9 @@ public class WorkCalendar extends BaseTimeEntity {
     private Organization organization;
 
     @Builder.Default
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "work_times", joinColumns = @JoinColumn(name = "work_calendar_id"))
+    @MapKeyColumn(name = "time_symbol")
     private Map<String, WorkTime> workTimes = new HashMap<>();
 
     @OneToMany(mappedBy = "workCalendar",
@@ -62,6 +65,14 @@ public class WorkCalendar extends BaseTimeEntity {
     @Version
     private Long version;
 
+    // ===== 메서드 =====
+
+    public Long id() { return this.id; }
+    public LocalDate startDate() { return this.startDate; }
+    public LocalDate endDate() { return this.endDate; }
+    public Map<String, WorkTime> workTimes() { return this.workTimes; }
+
+    // 해당 회원 및 조직 소유 캘린더인지
     public boolean isOwnedBy(Long memberId, Organization org) {
         if (this.memberId == null || memberId == null) return false;
         if (this.organization == null || org == null) return false;
@@ -69,7 +80,10 @@ public class WorkCalendar extends BaseTimeEntity {
                 && Objects.equals(this.organization.getId(), org.getId());
     }
 
+    // 캘린더의 startDate, endDate 범위를 포함하는지
     public boolean contains(LocalDate date) {
         return date != null && !date.isBefore(startDate) && !date.isAfter(endDate);
     }
+
+    public void putWorkTime(String symbol, WorkTime time) { this.workTimes.put(symbol, time); }
 }

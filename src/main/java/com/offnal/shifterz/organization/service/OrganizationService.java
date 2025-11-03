@@ -88,12 +88,12 @@ public class OrganizationService {
 
         Organization org = findOwnedOrganizationOrThrow(memberId, organizationName, team);
 
-        String newName = normalize(defaultIfNull(request.getOrganizationName(), org.getOrganizationName()));
-        String newTeam = normalize(defaultIfNull(request.getTeam(), org.getTeam()));
+        String newName = normalize(defaultIfNull(request.getOrganizationName(), org.name()));
+        String newTeam = normalize(defaultIfNull(request.getTeam(), org.team()));
 
         validateRequiredFields(newName, newTeam);
 
-        if (noChange(org, newName, newTeam)) {
+        if (org.isNamed(newName, newTeam)) {
             return OrganizationConverter.toDto(org);
         }
 

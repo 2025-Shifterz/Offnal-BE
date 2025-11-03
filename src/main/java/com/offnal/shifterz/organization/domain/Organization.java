@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -53,5 +54,16 @@ public class Organization extends BaseTimeEntity {
         this.team = team;
     }
 
+    public String name() { return this.organizationName; }
+    public String team() { return this.team; }
+
+    public boolean isNamed(String name, String team) {
+        return Objects.equals(this.organizationName, name) && Objects.equals(this.team, team);
+    }
+
+    public boolean isOwnedBy(Long memberId) {
+        return this.organizationMember != null
+                && Objects.equals(this.organizationMember.getId(), memberId);
+    }
 }
 
