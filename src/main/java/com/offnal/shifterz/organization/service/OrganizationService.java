@@ -152,7 +152,7 @@ public class OrganizationService {
         try {
             return organizationRepository.save(entity);
         } catch (DataIntegrityViolationException e) {
-            return findExisting(memberId, organizationName, teamName)
+            return findExisting(memberId, name, team)
                     .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED));
         }
     }
