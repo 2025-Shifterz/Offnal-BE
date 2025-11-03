@@ -271,4 +271,77 @@ public @interface ErrorApiResponses {
     })
     @interface WorkDay {}
 
+    // 조직 관련 에러
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청 필드",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "ORGANIZATION_NOT_VALIDATE", value = """
+                                    {
+                                      "code": "ORG005",
+                                      "message": "유효하지 않은 필드입니다."
+                                    }
+                                    """
+                            )
+                    )),
+            @ApiResponse(responseCode = "403", description = "조직 접근 권한 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "ORGANIZATION_ACCESS_DENIED", value = """
+                                    {
+                                      "code": "ORG003",
+                                      "message": "해당 조직에 접근 권한이 없습니다."
+                                    }
+                                    """
+                            )
+                    )),
+            @ApiResponse(responseCode = "404", description = "조직을 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "ORGANIZATION_NOT_FOUND", value = """
+                                    {
+                                      "code": "ORG001",
+                                      "message": "소속 조직을 찾을 수 없습니다."
+                                    }
+                                    """
+                            )
+                    )),
+            @ApiResponse(responseCode = "409", description = "조직 중복(동일 이름/팀)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "ORGANIZATION_DUPLICATE_NAME", value = """
+                                    {
+                                      "code": "ORG004",
+                                      "message": "동일한 이름/팀의 조직이 이미 존재합니다."
+                                    }
+                                    """
+                            )
+                    )),
+            @ApiResponse(responseCode = "500", description = "조직 저장/갱신/삭제 실패(내부 오류)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "ORGANIZATION_SAVE_FAILED", value = """
+                                    {
+                                      "code": "ORG002",
+                                      "message": "조직 저장에 실패했습니다."
+                                    }
+                                    """
+                            )
+                    ))
+    })
+    @interface Organization {}
+
 }
