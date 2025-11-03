@@ -35,6 +35,8 @@ public class OrganizationService {
         String name = normalize(request.getOrganizationName());
         String team = normalize(request.getTeam());
 
+        validateRequiredFields(name, team);
+
         assertNoDuplicate(memberId, name, team);
 
         Organization org = OrganizationConverter.toEntity(request, member);
@@ -72,6 +74,8 @@ public class OrganizationService {
         String name = normalize(organizationName);
         String team = normalize(organizationTeam);
 
+        validateRequiredFields(name, team);
+
         return findExisting(memberId, name, team)
                 .orElseGet(() -> createOrFindOnUniqueConflict(memberId, name, team));
     }
@@ -86,6 +90,8 @@ public class OrganizationService {
 
         String newName = normalize(defaultIfNull(request.getOrganizationName(), org.getOrganizationName()));
         String newTeam = normalize(defaultIfNull(request.getTeam(), org.getTeam()));
+
+        validateRequiredFields(newName, newTeam);
 
         if (noChange(org, newName, newTeam)) {
             return OrganizationConverter.toDto(org);
@@ -117,13 +123,12 @@ public class OrganizationService {
         String name = organizationName.trim();
         String team = organizationTeam.trim();
 
+        validateRequiredFields(name, team);
+
         Organization org = organizationRepository
                 .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, name, team)
                 .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND));
 
-        if (!org.getOrganizationMember().getId().equals(memberId)) {
-            throw new CustomException(OrganizationErrorCode.ORGANIZATION_ACCESS_DENIED);
-        }
         return org;
     }
 
@@ -132,16 +137,22 @@ public class OrganizationService {
                 memberId, organizationName, team);
     }
 
-    private Organization createOrFindOnUniqueConflict(Long memberId, String organizationName, String team){
-        OrganizationRequestDto.CreateDto request = buildCreateDto(organizationName, team);
+    private Organization createOrFindOnUniqueConflict(Long memberId, String organizationName, String teamName){
         Member member = AuthService.getCurrentMember();
+        String name = normalize(organizationName);
+        String team = normalize(teamName);
 
+        validateRequiredFields(name, team);
+
+        OrganizationRequestDto.CreateDto request = buildCreateDto(name, team);
         Organization entity = OrganizationConverter.toEntity(request, member);
+
+        entity.rename(name, team);
 
         try {
             return organizationRepository.save(entity);
         } catch (DataIntegrityViolationException e) {
-            return findExisting(memberId, organizationName, team)
+            return findExisting(memberId, organizationName, teamName)
                     .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED));
         }
     }
@@ -172,13 +183,20 @@ public class OrganizationService {
         }
     }
 
+    private void validateRequiredFields(String organizationName, String team){
+        if (organizationName == null || organizationName.isEmpty() || team == null || team.isEmpty()) {
+            throw new CustomException(OrganizationErrorCode.ORGANIZATION_NOT_VALIDATE);
+        }
+    }
+
     @Getter
     @AllArgsConstructor
     public enum OrganizationErrorCode implements ErrorReason {
         ORGANIZATION_NOT_FOUND("ORG001", HttpStatus.NOT_FOUND, "소속 조직을 찾을 수 없습니다."),
         ORGANIZATION_SAVE_FAILED("ORG002", HttpStatus.INTERNAL_SERVER_ERROR, "조직 저장에 실패했습니다."),
         ORGANIZATION_ACCESS_DENIED("ORG003", HttpStatus.FORBIDDEN, "해당 조직에 접근 권한이 없습니다."),
-        ORGANIZATION_DUPLICATE_NAME("ORG004", HttpStatus.CONFLICT, "동일한 이름/팀의 조직이 이미 존재합니다.");
+        ORGANIZATION_DUPLICATE_NAME("ORG004", HttpStatus.CONFLICT, "동일한 이름/팀의 조직이 이미 존재합니다."),
+        ORGANIZATION_NOT_VALIDATE("ORG005", HttpStatus.BAD_REQUEST, "유효하지 않은 필드입니다.");
 
         private final String code;
         private final HttpStatus status;
