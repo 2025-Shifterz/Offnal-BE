@@ -338,7 +338,7 @@ public class WorkCalendarService {
 
 
         // 캘린더 수정 관련
-        CALENDAR_NOT_FOUND("CAL008",HttpStatus.NOT_FOUND, "해당하는 연도, 월의 캘린더를 찾을 수 없습니다."),
+        CALENDAR_NOT_FOUND("CAL008",HttpStatus.NOT_FOUND, "해당하는 캘린더를 찾을 수 없습니다."),
 
         // 캘린더 삭제 관련
         CALENDAR_DELETE_FAILED("CAL009",HttpStatus.BAD_REQUEST, "근무표 삭제에 실패하였습니다."),

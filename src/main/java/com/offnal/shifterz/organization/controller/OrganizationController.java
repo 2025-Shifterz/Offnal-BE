@@ -54,6 +54,8 @@ public class OrganizationController {
 
     )
     @SuccessApiResponses.OrganizationCreate
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.Organization
     @ErrorApiResponses.Common
     @PostMapping
     public SuccessResponse<OrganizationResponseDto.OrganizationDto> createOrganization(
@@ -86,6 +88,7 @@ public class OrganizationController {
 
     )
     @SuccessApiResponses.OrganizationUpdate
+    @ErrorApiResponses.Organization
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @PatchMapping("/{organizationName}/{team}")
@@ -102,6 +105,7 @@ public class OrganizationController {
      */
     @Operation(summary = "특정 조직 조회", description = "특정 조직의 정보를 조회합니다.")
     @SuccessApiResponses.OrganizationGet
+    @ErrorApiResponses.Organization
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @GetMapping("/{organizationName}/{team}")
@@ -117,6 +121,7 @@ public class OrganizationController {
      */
     @Operation(summary = "회원의 전체 조직 조회", description = "회원의 모든 조직의 정보를 조회합니다.")
     @SuccessApiResponses.AllOrganizationGet
+    @ErrorApiResponses.Organization
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @GetMapping
@@ -130,6 +135,7 @@ public class OrganizationController {
      */
     @Operation(summary = "조직 삭제", description = "조직을 삭제합니다.")
     @SuccessApiResponses.OrganizationDelete
+    @ErrorApiResponses.Organization
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @DeleteMapping("/{organizationName}/{team}")

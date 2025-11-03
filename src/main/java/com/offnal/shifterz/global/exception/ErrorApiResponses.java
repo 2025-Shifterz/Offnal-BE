@@ -174,7 +174,7 @@ public @interface ErrorApiResponses {
                                     @ExampleObject(name = "CALENDAR_NOT_FOUND", value = """
                                         {
                                           "code": "CALENDAR_NOT_FOUND",
-                                          "message": "해당하는 연도, 월의 캘린더를 찾을 수 없습니다."
+                                          "message": "해당하는 캘린더를 찾을 수 없습니다."
                                         }
                                         """)
                             }
@@ -193,7 +193,7 @@ public @interface ErrorApiResponses {
                                     @ExampleObject(name = "CALENDAR_NOT_FOUND", value = """
                                         {
                                           "code": "CALENDAR_NOT_FOUND",
-                                          "message": "해당하는 연도, 월의 캘린더를 찾을 수 없습니다."
+                                          "message": "해당하는 캘린더를 찾을 수 없습니다."
                                         }
                                         """)
                             }
