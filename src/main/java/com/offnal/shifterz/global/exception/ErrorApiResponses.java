@@ -143,7 +143,7 @@ public @interface ErrorApiResponses {
                                     @ExampleObject(name = "CALENDAR_STARTDAY_REQUIRED", value = """
                                         {
                                           "code": "CALENDAR_STARTDAY_REQUIRED",
-                                          "message": "시작일은 필수입니다."
+                                          "message": "시작일이 유효하지 않습니다."
                                         }
                                         """),
                                     @ExampleObject(name = "CALENDAR_DURATION_REQUIRED", value = """

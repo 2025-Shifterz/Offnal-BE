@@ -42,9 +42,12 @@ public class OrganizationService {
         Organization org = OrganizationConverter.toEntity(request, member);
         org.rename(name, team);
 
-        Organization saved = organizationRepository.save(org);
-
-        return OrganizationConverter.toDto(saved);
+        try {
+            Organization saved = organizationRepository.save(org);
+            return OrganizationConverter.toDto(saved);
+        } catch (DataIntegrityViolationException e) {
+            throw new CustomException(OrganizationErrorCode.ORGANIZATION_DUPLICATE_NAME);
+        }
     }
 
     // 조직 하나 조회

@@ -2,6 +2,7 @@ package com.offnal.shifterz.work.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,7 @@ import java.util.Map;
 @Builder
 public class WorkCalendarUnitDto {
 
-    @NotNull(message = "조직 이름은 필수입니다.")
+    @NotBlank(message = "조직 이름은 필수입니다.")
     @Schema(description = "조직 이름")
     private String organizationName;
 

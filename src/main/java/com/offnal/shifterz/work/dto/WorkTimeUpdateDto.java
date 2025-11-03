@@ -14,6 +14,6 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class WorkTimeUpdateDto {
-    @NotEmpty
+    @NotEmpty(message = "근무 시간 정보는 필수입니다.")
     private Map<WorkTimeType, WorkTimeDto> workTimes;
 }

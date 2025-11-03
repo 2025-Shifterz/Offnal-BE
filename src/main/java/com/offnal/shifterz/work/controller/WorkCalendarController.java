@@ -4,7 +4,10 @@ import com.offnal.shifterz.global.exception.ErrorApiResponses;
 import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
-import com.offnal.shifterz.work.dto.*;
+import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
+import com.offnal.shifterz.work.dto.WorkCalendarUpdateDto;
+import com.offnal.shifterz.work.dto.WorkDayResponseDto;
+import com.offnal.shifterz.work.dto.WorkTimeUpdateDto;
 import com.offnal.shifterz.work.service.WorkCalendarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -339,7 +342,7 @@ public class WorkCalendarController {
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @ErrorApiResponses.DeleteWorkCalendar
-    @DeleteMapping("instances")
+    @DeleteMapping("/instances")
     public SuccessResponse<Void> deleteWorkInstances(
             @RequestParam @NotNull String organizationName,
             @RequestParam @NotNull String team,

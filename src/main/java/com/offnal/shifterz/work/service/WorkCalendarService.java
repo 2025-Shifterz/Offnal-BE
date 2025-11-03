@@ -225,8 +225,11 @@ public class WorkCalendarService {
 
     // 사용자, 조직 이름, 조 이름으로 해당 Organization 조회. 없으면 exception.
     private Organization findOrganization(Long memberId, String organizationName, String team) {
+        String name = normalize(organizationName);
+        String teamName = normalize(team);
+
         return organizationRepository
-                .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, organizationName, team)
+                .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, name, teamName)
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
     }
 
@@ -320,6 +323,11 @@ public class WorkCalendarService {
             throw new CustomException(WorkCalendarErrorCode.CALENDAR_DURATION_REQUIRED);
         }
         return duration;
+    }
+
+    // 공백 방지
+    private String normalize(String s) {
+        return s == null ? null : s.trim();
     }
 
     // ===== ErrorCode =====

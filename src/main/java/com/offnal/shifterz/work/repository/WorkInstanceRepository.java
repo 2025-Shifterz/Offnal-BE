@@ -1,7 +1,6 @@
 package com.offnal.shifterz.work.repository;
 
 import com.offnal.shifterz.organization.domain.Organization;
-import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
