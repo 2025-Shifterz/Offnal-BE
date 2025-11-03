@@ -50,4 +50,8 @@ public class WorkInstance extends BaseTimeEntity {
                 .workCalendar(workCalendar)
                 .build();
     }
+
+    public WorkTimeType workType() {
+        return this.workTimeType;
+    }
 }

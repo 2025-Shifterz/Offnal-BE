@@ -120,8 +120,8 @@ public class OrganizationService {
     }
 
     private Organization findOwnedOrganizationOrThrow(Long memberId, String organizationName, String organizationTeam) {
-        String name = organizationName.trim();
-        String team = organizationTeam.trim();
+        String name = normalize(organizationName);
+        String team = normalize(organizationTeam);
 
         validateRequiredFields(name, team);
 

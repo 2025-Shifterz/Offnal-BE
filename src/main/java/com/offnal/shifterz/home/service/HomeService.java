@@ -78,7 +78,7 @@ public class HomeService {
     private WorkTimeType findWorkTypeOrNull(LocalDate date, Long memberId) {
         return workInstanceRepository
                 .findByWorkCalendarMemberIdAndWorkDate(memberId, date)
-                .map(WorkInstance::getWorkTimeType)
+                .map(WorkInstance::workType)
                 .orElse(null);
     }
 
