@@ -135,7 +135,7 @@ public class WorkCalendarService {
 
         Organization org = findOrganization(memberId, organizationName, team);
 
-        WorkCalendar calendar = findCalendarByName(memberId, organizationName, team, calendarName);
+        WorkCalendar calendar = findCalendarByName(memberId, org, calendarName);
 
         if (request == null || request.getWorkTimes() == null || request.getWorkTimes().isEmpty()) {
             throw new CustomException(WorkCalendarErrorCode.CALENDAR_WORK_TIME_REQUIRED);
@@ -203,7 +203,7 @@ public class WorkCalendarService {
         Organization org = findOrganization(memberId, organizationName, team);
 
         WorkCalendar calendar = workCalendarRepository
-                .findByMemberIdAndOrganizationAndCalendarName(memberId, org, calendarName)
+                .findByMemberIdAndOrganizationAndCalendarName(memberId, org,  normalize(calendarName))
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
 
         workInstanceRepository.deleteByWorkCalendarId(calendar.getId());
@@ -230,7 +230,7 @@ public class WorkCalendarService {
 
         return organizationRepository
                 .findByOrganizationMember_IdAndOrganizationNameAndTeam(memberId, name, teamName)
-                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_REQUIRED));
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_ORGANIZATION_NOT_FOUND));
     }
 
     // 사용자, 조직을 기준으로 해당 기간이 포함된 근무표 찾아 반환. 없으면 exception.
@@ -243,10 +243,14 @@ public class WorkCalendarService {
 
     // 근무표 이름으로 조회.
     // 사용자, 조직 이름, 팀 이름, 근무표 이름으로 조회. 없으면 exception
-    private WorkCalendar findCalendarByName(Long memberId, String orgName, String team, String calendarName) {
+    private WorkCalendar findCalendarByName(Long memberId, Organization org, String calendarName) {
+        String calName = normalize(calendarName);
+        if (calName == null || calName.isEmpty()) {
+            throw new CustomException(WorkCalendarErrorCode.CALENDAR_NAME_REQUIRED);
+        }
         return workCalendarRepository
-                .findByMemberIdAndOrganization_OrganizationNameAndOrganization_TeamAndCalendarName(
-                        memberId, orgName, team, calendarName
+                .findByMemberIdAndOrganizationAndCalendarName(
+                        memberId, org, calName
                 )
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
     }
@@ -340,7 +344,7 @@ public class WorkCalendarService {
         CALENDAR_NAME_REQUIRED("CAL002",HttpStatus.BAD_REQUEST, "근무표 이름은 필수입니다."),
         CALENDAR_STARTDAY_REQUIRED("CAL003",HttpStatus.BAD_REQUEST, "시작일이 유효하지 않습니다."),
         CALENDAR_DURATION_REQUIRED("CAL004",HttpStatus.BAD_REQUEST, "근무 소요 시간은 필수입니다."),
-        CALENDAR_ORGANIZATION_REQUIRED("CAL005",HttpStatus.BAD_REQUEST, "조직은 필수입니다."),
+        CALENDAR_ORGANIZATION_NOT_FOUND("CAL005",HttpStatus.NOT_FOUND, "존재하지 않는 조직입니다."),
         CALENDAR_WORK_TIME_REQUIRED("CAL006",HttpStatus.BAD_REQUEST, "근무 시간 정보는 필수입니다."),
         CALENDAR_SHIFT_REQUIRED("CAL007",HttpStatus.BAD_REQUEST, "근무 정보는 필수입니다."),
 

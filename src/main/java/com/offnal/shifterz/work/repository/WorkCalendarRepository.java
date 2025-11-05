@@ -21,11 +21,4 @@ public interface WorkCalendarRepository extends JpaRepository<WorkCalendar, Long
             Organization organization,
             String calendarName
     );
-
-    Optional<WorkCalendar> findByMemberIdAndOrganization_OrganizationNameAndOrganization_TeamAndCalendarName(
-            Long memberId,
-            String organizationName,
-            String team,
-            String calendarName
-    );
 }

@@ -151,15 +151,24 @@ public @interface ErrorApiResponses {
                                           "code": "CALENDAR_DURATION_REQUIRED",
                                           "message": "근무 소요 시간은 필수입니다."
                                         }
-                                        """),
-                                    @ExampleObject(name = "CALENDAR_ORGANIZATION_REQUIRED", value = """
+                                        """)
+                            }
+                    )
+            ),
+            @ApiResponse(responseCode = "404",  description = "근무표 등록 요청 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "CALENDAR_ORGANIZATION_NOT_FOUND", value = """
                                         {
-                                          "code": "CALENDAR_ORGANIZATION_REQUIRED",
-                                          "message": "조직은 필수입니다."
+                                          "code": "CALENDAR_ORGANIZATION_NOT_FOUND",
+                                          "message": "존재하지 않는 조직입니다."
                                         }
                                         """)
                             }
-                    ))
+                    )
+            )
     })
     @interface CreateWorkCalendar {}
 
