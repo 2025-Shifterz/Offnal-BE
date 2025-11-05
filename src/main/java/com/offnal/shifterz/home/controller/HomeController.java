@@ -33,10 +33,9 @@ public class HomeController {
 
     private final HomeService homeService;
 
-    // 1. 근무 일정 조회 API (가벼운 API)
     @Operation(
             summary = "근무 일정 조회",
-            description = "어제, 오늘, 내일의 근무 타입을 반환합니다."
+            description = "오늘의 근무 타입을 반환합니다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -49,9 +48,7 @@ public class HomeController {
                     {
                       "success": true,
                       "data": {
-                        "yesterday": "NIGHT",
-                        "today": "OFF",
-                        "tomorrow": "DAY"
+                        "today": "OFF"
                       }
                     }
                     """)
@@ -60,15 +57,11 @@ public class HomeController {
     })
     @ErrorApiResponses.Common
     @GetMapping("/schedule")
-    public ResponseEntity<SuccessResponse<WorkScheduleResponseDto>> getWorkSchedule(
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-        Long memberId = userDetails.getMember().getId();
-        WorkScheduleResponseDto responseDto = homeService.getWorkSchedule(memberId);
+    public ResponseEntity<SuccessResponse<WorkScheduleResponseDto>> getWorkSchedule() {
+        WorkScheduleResponseDto responseDto = homeService.getWorkSchedule();
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, responseDto));
     }
 
-    // 2. 오늘의 루틴 조회 API
     @Operation(
             summary = "오늘의 루틴 조회",
             description = "오늘의 식사, 수면, 공복 시간 등 건강 루틴 정보를 반환합니다."
@@ -90,21 +83,12 @@ public class HomeController {
                             "time": "13:30",
                             "description": "기상 후 체력 회복",
                             "items": ["김밥", "칼국수"]
-                          },
-                          {
-                            "label": "저녁",
-                            "time": "17:30",
-                            "description": "밤잠 대비 소화 부담 최소화",
-                            "items": ["죽", "나물", "연두부"]
                           }
                         ],
                         "health": {
-                          "fastingComment": "생체 리듬 유지에 집중 야식, 피하고 수면 시간 지키기",
+                          "fastingComment": "생체 리듬 유지에 집중",
                           "fastingSchedule": "저녁 식사 후 공복 유지",
-                          "sleepGuide": [
-                            "(1) 08:00 ~ 13:00 수면",
-                            "(2) 22:00 ~ 05:00 수면"
-                          ],
+                          "sleepGuide": ["08:00 ~ 13:00 수면"],
                           "sleepSchedule": "수면 22:00 ~ 05:00"
                         }
                       }
@@ -115,15 +99,11 @@ public class HomeController {
     })
     @ErrorApiResponses.Common
     @GetMapping("/routine")
-    public ResponseEntity<SuccessResponse<DailyRoutineResDto>> getDailyRoutine(
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-        Long memberId = userDetails.getMember().getId();
-        DailyRoutineResDto responseDto = homeService.getDailyRoutine(memberId);
+    public ResponseEntity<SuccessResponse<DailyRoutineResDto>> getDailyRoutine() {
+        DailyRoutineResDto responseDto = homeService.getDailyRoutine();
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, responseDto));
     }
 
-    // 3. 특정 날짜의 루틴 조회 API (확장성)
     @Operation(
             summary = "특정 날짜 루틴 조회",
             description = "지정한 날짜의 식사, 수면, 공복 시간 등 건강 루틴 정보를 반환합니다."
@@ -141,12 +121,10 @@ public class HomeController {
     @ErrorApiResponses.Common
     @GetMapping("/routine/{date}")
     public ResponseEntity<SuccessResponse<DailyRoutineResDto>> getDailyRoutineByDate(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Parameter(description = "조회할 날짜 (yyyy-MM-dd)", example = "2025-11-05")
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        Long memberId = userDetails.getMember().getId();
-        DailyRoutineResDto responseDto = homeService.getDailyRoutineByDate(memberId, date);
+        DailyRoutineResDto responseDto = homeService.getDailyRoutineByDate(date);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, responseDto));
     }
 }

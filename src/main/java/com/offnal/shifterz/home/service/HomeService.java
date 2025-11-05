@@ -1,11 +1,13 @@
 package com.offnal.shifterz.home.service;
 
+import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.home.converter.HomeDetailConverter;
 import com.offnal.shifterz.home.converter.WorkScheduleConverter;
 import com.offnal.shifterz.home.dto.DailyRoutineResDto;
 import com.offnal.shifterz.home.dto.WorkScheduleContext;
 import com.offnal.shifterz.home.dto.WorkScheduleResponseDto;
+import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.work.domain.WorkTimeType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,22 +26,26 @@ public class HomeService {
     private final WorkScheduleConverter workScheduleConverter;
     private final HomeDetailConverter homeDetailConverter;
 
-    public WorkScheduleResponseDto getWorkSchedule(Long memberId) {
+    public WorkScheduleResponseDto getWorkSchedule() {
+        Long memberId =AuthService.getCurrentUserId();
+
         LocalDate today = LocalDate.now();
         WorkTimeType todayType = workScheduleService.findWorkType(today, memberId);
 
         return workScheduleConverter.toDto(todayType);
     }
 
-    public DailyRoutineResDto getDailyRoutine(Long memberId) {
-        return getDailyRoutineByDate(memberId, LocalDate.now());
+    public DailyRoutineResDto getDailyRoutine() {
+        return getDailyRoutineByDate(LocalDate.now());
     }
 
-    public DailyRoutineResDto getDailyRoutineByDate(Long memberId, LocalDate date) {
+    public DailyRoutineResDto getDailyRoutineByDate(LocalDate date) {
+        Long memberId =AuthService.getCurrentUserId();
+
         WorkScheduleContext context = workScheduleService.getWorkScheduleContext(memberId, date);
         return dailyRoutineService.buildRoutine(context);
     }
-
+    
     @Getter
     @AllArgsConstructor
     public enum HomeErrorCode implements ErrorReason {
