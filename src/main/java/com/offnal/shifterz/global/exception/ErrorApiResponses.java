@@ -140,10 +140,10 @@ public @interface ErrorApiResponses {
                                           "message": "이미 존재하는 연도/월의 캘린더입니다."
                                         }
                                         """),
-                                    @ExampleObject(name = "CALENDAR_STARTDAY_REQUIRED", value = """
+                                    @ExampleObject(name = "CALENDAR_START_TIME_INVALID", value = """
                                         {
-                                          "code": "CALENDAR_STARTDAY_REQUIRED",
-                                          "message": "시작일이 유효하지 않습니다."
+                                          "code": "CALENDAR_START_TIME_INVALID",
+                                          "message": "시작 시간이 유효하지 않습니다."
                                         }
                                         """),
                                     @ExampleObject(name = "CALENDAR_DURATION_REQUIRED", value = """

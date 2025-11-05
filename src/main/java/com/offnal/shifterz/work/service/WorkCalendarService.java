@@ -287,7 +287,7 @@ public class WorkCalendarService {
         try {
             return LocalTime.parse(startTime);
         } catch (Exception e) {
-            throw new CustomException(WorkCalendarErrorCode.CALENDAR_STARTDAY_REQUIRED);
+            throw new CustomException(WorkCalendarErrorCode.CALENDAR_START_TIME_INVALID);
         }
     }
 
@@ -343,7 +343,7 @@ public class WorkCalendarService {
         // 캘린더 저장 관련
         CALENDAR_DUPLICATION("CAL001",HttpStatus.BAD_REQUEST, "이미 존재하는 연도/월의 캘린더입니다."),
         CALENDAR_NAME_REQUIRED("CAL002",HttpStatus.BAD_REQUEST, "근무표 이름은 필수입니다."),
-        CALENDAR_STARTDAY_REQUIRED("CAL003",HttpStatus.BAD_REQUEST, "시작일이 유효하지 않습니다."),
+        CALENDAR_START_TIME_INVALID("CAL003",HttpStatus.BAD_REQUEST, "시작 시간이 유효하지 않습니다."),
         CALENDAR_DURATION_REQUIRED("CAL004",HttpStatus.BAD_REQUEST, "근무 소요 시간은 필수입니다."),
         CALENDAR_ORGANIZATION_NOT_FOUND("CAL005",HttpStatus.NOT_FOUND, "존재하지 않는 조직입니다."),
         CALENDAR_WORK_TIME_REQUIRED("CAL006",HttpStatus.BAD_REQUEST, "근무 시간 정보는 필수입니다."),
