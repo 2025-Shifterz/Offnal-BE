@@ -148,10 +148,12 @@ public class WorkCalendarService {
 
         for (Map.Entry<WorkTimeType, WorkTimeDto> entry : request.getWorkTimes().entrySet()) {
             WorkTimeType type = entry.getKey();
-            WorkTimeDto dto = Objects.requireNonNull(entry.getValue(),
-                    WorkCalendarErrorCode.CALENDAR_WORK_TIME_REQUIRED.getMessage());
+            WorkTimeDto dto = entry.getValue();
 
-            String symbol  = entry.getKey().getSymbol();
+            if (dto == null) {
+                throw new CustomException(WorkCalendarErrorCode.CALENDAR_WORK_TIME_REQUIRED);
+            }
+            String symbol  = type.getSymbol();
             WorkTime target = workTimes.get(symbol);
 
             if (target == null) {
@@ -169,7 +171,6 @@ public class WorkCalendarService {
 
             calendar.putWorkTime(symbol, updated);
         }
-
 
         workCalendarRepository.save(calendar);
     }
