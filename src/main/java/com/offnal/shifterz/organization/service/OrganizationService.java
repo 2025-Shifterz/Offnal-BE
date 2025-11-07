@@ -142,26 +142,47 @@ public class OrganizationService {
                 memberId, organizationName, team);
     }
 
-    private Organization createOrFindOnUniqueConflict(String organizationName, String teamName){
+    private Organization createOrFindOnUniqueConflict(String organizationName, String team){
         Member member = AuthService.getCurrentMember();
-        Long memberId = AuthService.getCurrentUserId();
 
+        NormalizedOrg org = normalizeAndValidate(organizationName, team);
+        Organization entity = buildOrganizationEntity(member, org);
+
+        return saveOrFindExisting(entity, org.organizationName(), org.team());
+    }
+
+    private record NormalizedOrg(String organizationName, String team) {}
+
+    private NormalizedOrg normalizeAndValidate(String organizationName, String team){
         String name = normalize(organizationName);
-        String team = normalize(teamName);
-        validateRequiredFields(name, team);
+        String teamName = normalize(team);
+        validateRequiredFields(name, teamName);
 
-        OrganizationRequestDto.CreateDto request = OrganizationConverter.toCreateDto(name, team);
-        Organization entity = OrganizationConverter.toEntity(request, member);
+        return new NormalizedOrg(name, teamName);
+    }
 
+    private Organization buildOrganizationEntity(Member member, NormalizedOrg org) {
+        OrganizationRequestDto.CreateDto request = OrganizationConverter.toCreateDto(org.organizationName(), org.team());
+        return OrganizationConverter.toEntity(request, member);
+    }
+
+    private Organization saveOrFindExisting(Organization entity, String organizationName, String team) {
         try {
             return organizationRepository.save(entity);
         } catch (DataIntegrityViolationException e) {
-            if (isUniqueViolation(e)) { // 유니크 제약 확인
-                return findExisting(memberId, name, team)
-                        .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED));
-            }
-            throw new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED);
+            return handleUniqueConflict(e, organizationName, team);
         }
+    }
+
+    private Organization handleUniqueConflict(DataIntegrityViolationException e, String organizationName, String team) {
+        Long memberId = AuthService.getCurrentUserId();
+
+        if (isUniqueViolation(e)) {
+            return findExisting(memberId, organizationName, team)
+                    .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED));
+        }
+
+        throw new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED);
     }
 
     private boolean isUniqueViolation(DataIntegrityViolationException e) {
