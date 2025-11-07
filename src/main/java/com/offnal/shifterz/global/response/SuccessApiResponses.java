@@ -148,6 +148,44 @@ public @interface SuccessApiResponses {
             )
     })
     public @interface WorkDay {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "캘린더 메타 정보 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "캘린더 메타 정보 조회 성공 예시", value = """
+                                       {
+                                      "code": "DATA_FETCHED",
+                                      "message": "데이터 조회에 성공했습니다.",
+                                      "data": {
+                                        "calendarName": "2025년 7월 근무표",
+                                        "startDate": "2025-07-01",
+                                        "endDate": "2025-07-07",
+                                        "workTimes": {
+                                          "D": {
+                                            "startTime": "08:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          "E": {
+                                            "startTime": "16:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          "N": {
+                                            "startTime": "00:00",
+                                            "duration": "PT6H30M"
+                                          }
+                                        }
+                                      }
+                                    }
+                                    """)
+                    )
+            )
+    })
+    public @interface WorkCalendarMeta {}
+
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {

@@ -4,10 +4,7 @@ import com.offnal.shifterz.global.exception.ErrorApiResponses;
 import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
-import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
-import com.offnal.shifterz.work.dto.WorkCalendarUpdateDto;
-import com.offnal.shifterz.work.dto.WorkDayResponseDto;
-import com.offnal.shifterz.work.dto.WorkTimeUpdateDto;
+import com.offnal.shifterz.work.dto.*;
 import com.offnal.shifterz.work.service.WorkCalendarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -31,7 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/works/calendar")
 @RequiredArgsConstructor
-@Tag(name = "근무 캘린더", description = "근무표를 저장, 조회, 수정, 삭제합니다.")
+@Tag(name = "WorkCalendar", description = "근무표를 저장, 조회, 수정, 삭제합니다.")
 public class WorkCalendarController {
 
     private final WorkCalendarService workCalendarService;
@@ -277,6 +274,55 @@ public class WorkCalendarController {
         return SuccessResponse.success(SuccessCode.DATA_FETCHED, response);
 
     }
+
+    /**
+     * 캘린더 메타 정보 및 근무시간 조회
+     */
+    @Operation(summary = "캘린더 메타 정보 및 근무시간 조회",
+            description = "조직(OrganizationName, team)과 calendarName으로 근무표의 근무 시간과 workTimes(D/E/N/-)을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "캘린더 메타 정보 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = WorkDayResponseDto.class)),
+                            examples = @ExampleObject(
+                                    name = "캘린더 메타 정보 조회 예시",
+                                    value = """
+                                            {
+                                                  "calendarName": "2025년 7월 근무표",
+                                                  "startDate": "2025-07-01",
+                                                  "endDate": "2025-07-31",
+                                                  "workTimes": {
+                                                    "D": {"startTime": "08:00", "duration": "PT6H30M"},
+                                                    "E": {"startTime": "16:00", "duration": "PT6H30M"},
+                                                    "N": {"startTime": "00:00", "duration": "PT6H30M"},
+                                                    "-": {"startTime": null, "duration": null}
+                                                  }
+                                            }
+                                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @SuccessApiResponses.WorkCalendarMeta
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.Organization
+    @GetMapping("/{organizationName}/{team}/{calendarName}")
+    public SuccessResponse<WorkCalendarMetaDto> getCalendarMeta(
+            @PathVariable String organizationName,
+            @PathVariable String team,
+            @PathVariable String calendarName
+    ){
+        WorkCalendarMetaDto dto =
+                workCalendarService.getWorkCalendarMeta(organizationName, team, calendarName);
+        return SuccessResponse.success(SuccessCode.DATA_FETCHED, dto);
+    }
+
+
+
 
     /**
      * 근무일 수정

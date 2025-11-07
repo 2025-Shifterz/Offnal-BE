@@ -213,6 +213,30 @@ public class WorkCalendarService {
         workCalendarRepository.delete(calendar);
     }
 
+    public WorkCalendarMetaDto getWorkCalendarMeta(String organizationName, String team, String calendarName) {
+        Long memberId = AuthService.getCurrentUserId();
+        Organization org = findOrganization(memberId, organizationName, team);
+        WorkCalendar cal = findCalendarByName(memberId, org, calendarName);
+
+        Map<String, WorkTimeDto> symbolKeyed = cal.workTimes().values().stream()
+                .collect(Collectors.toMap(
+                        wt -> wt.getTimeType().getSymbol(),
+                        wt -> new WorkTimeDto(
+                                wt.getStartTime() == null ? null : wt.getStartTime().toString(), // LocalTime → String
+                                wt.getDuration()
+                        ),
+                        (a, b) -> a
+                ));
+
+        return WorkCalendarMetaDto.builder()
+                .calendarName(cal.getCalendarName())
+                .startDate(cal.startDate())
+                .endDate(cal.endDate())
+                .workTimes(symbolKeyed)
+                .build();
+    }
+
+
     // ===== private =====
 
     // 시작일/종료일 범위 유효성 검증
