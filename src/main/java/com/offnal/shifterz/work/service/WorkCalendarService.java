@@ -154,7 +154,7 @@ public class WorkCalendarService {
                 throw new CustomException(WorkCalendarErrorCode.CALENDAR_WORK_TIME_REQUIRED);
             }
 
-            String workType = type.name();
+            String workType = type.getSymbol();
             WorkTime target = workTimes.get(workType);
 
             if (target == null) {
