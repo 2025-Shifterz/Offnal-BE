@@ -97,6 +97,25 @@ public @interface SuccessApiResponses {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "근무 일정 삭제 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "근무 일정 삭제 성공 예시", value = """
+                                    {
+                                      "code": "WORK_INSTANCES_DELETED",
+                                      "message": "근무 일정 삭제에 성공했습니다.",
+                                      "data": null
+                                    }
+                                    """)}
+                    ))
+    })
+    public @interface DeleteInstance {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "근무표 삭제 성공",
                     content = @Content(
                             mediaType = "application/json",

@@ -194,7 +194,7 @@ public class WorkCalendarController {
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @ErrorApiResponses.Organization
-    @GetMapping("/{organizationName}/{team}/{calendarName}")
+    @GetMapping("/organizations/{organizationName}/teams/{team}/calendars/{calendarName}")
     public SuccessResponse<WorkCalendarMetaDto> getCalendarMeta(
             @PathVariable String organizationName,
             @PathVariable String team,
@@ -214,7 +214,7 @@ public class WorkCalendarController {
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @ErrorApiResponses.Organization
-    @GetMapping("/{organizationName}/{team}/list")
+    @GetMapping("/organizations/{organizationName}/teams/{team}/calendars")
     public SuccessResponse<List<WorkCalendarListItemDto>> listCalendars(
             @PathVariable String organizationName,
             @PathVariable String team) {
@@ -284,7 +284,7 @@ public class WorkCalendarController {
      * 근무 일정 삭제
      */
     @Operation(summary = "근무 일정 삭제", description = "해당 기간의 근무 일정을 삭제합니다.")
-    @SuccessApiResponses.DeleteCalendar
+    @SuccessApiResponses.DeleteInstance
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @ErrorApiResponses.DeleteWorkCalendar

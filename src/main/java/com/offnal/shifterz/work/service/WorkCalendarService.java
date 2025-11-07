@@ -287,7 +287,7 @@ public class WorkCalendarService {
     // 근무일정(shifts) null 또는 비어있을 경우 exception
     private Map<LocalDate, String> nonEmptyShifts(Map<LocalDate, String> shifts) {
         if (shifts == null || shifts.isEmpty()) {
-            throw new CustomException(WorkCalendarErrorCode.WORK_INSTANCE_NOT_FOUND);
+            throw new CustomException(WorkCalendarErrorCode.CALENDAR_SHIFT_REQUIRED);
         }
         return shifts;
     }
