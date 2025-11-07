@@ -25,7 +25,7 @@ spring:
     password: ${DB_PASSWORD}
   data:
     redis:
-      host: redis
+      host: ${REDIS_HOST}
       port: 6379
       repositories:
         enabled: false
