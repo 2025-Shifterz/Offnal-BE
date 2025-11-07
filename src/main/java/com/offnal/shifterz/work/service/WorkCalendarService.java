@@ -153,8 +153,9 @@ public class WorkCalendarService {
             if (dto == null) {
                 throw new CustomException(WorkCalendarErrorCode.CALENDAR_WORK_TIME_REQUIRED);
             }
-            String symbol  = type.getSymbol();
-            WorkTime target = workTimes.get(symbol);
+
+            String workType = type.name();
+            WorkTime target = workTimes.get(workType);
 
             if (target == null) {
                 throw new CustomException(WorkCalendarErrorCode.WORK_TIME_NOT_FOUND);
@@ -164,12 +165,12 @@ public class WorkCalendarService {
             Duration duration = validateDuration(dto.getDuration());
 
             WorkTime updated = WorkTime.builder()
-                    .timeType(WorkTimeType.fromSymbol(symbol))
+                    .timeType(type)
                     .startTime(startTime)
                     .duration(duration)
                     .build();
 
-            calendar.putWorkTime(symbol, updated);
+            calendar.putWorkTime(workType, updated);
         }
 
         workCalendarRepository.save(calendar);

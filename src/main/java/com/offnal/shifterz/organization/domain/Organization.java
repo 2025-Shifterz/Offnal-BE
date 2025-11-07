@@ -60,9 +60,5 @@ public class Organization extends BaseTimeEntity {
         return Objects.equals(this.organizationName, name) && Objects.equals(this.team, team);
     }
 
-    public boolean isOwnedBy(Long memberId) {
-        return this.organizationMember != null
-                && Objects.equals(this.organizationMember.getId(), memberId);
-    }
 }
 

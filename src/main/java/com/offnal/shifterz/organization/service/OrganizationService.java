@@ -25,6 +25,8 @@ import java.util.Optional;
 public class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
+    private static final String ORG_CONSTRAINT_NAME = "uk_org_member_name_team";
+
 
     // 조직 생성
     @Transactional
@@ -80,7 +82,7 @@ public class OrganizationService {
         validateRequiredFields(name, team);
 
         return findExisting(memberId, name, team)
-                .orElseGet(() -> createOrFindOnUniqueConflict(memberId, name, team));
+                .orElseGet(() -> createOrFindOnUniqueConflict(name, team));
     }
 
 
@@ -140,35 +142,33 @@ public class OrganizationService {
                 memberId, organizationName, team);
     }
 
-    private Organization createOrFindOnUniqueConflict(Long memberId, String organizationName, String teamName){
+    private Organization createOrFindOnUniqueConflict(String organizationName, String teamName){
         Member member = AuthService.getCurrentMember();
+        Long memberId = AuthService.getCurrentUserId();
+
         String name = normalize(organizationName);
         String team = normalize(teamName);
-
         validateRequiredFields(name, team);
 
-        OrganizationRequestDto.CreateDto request = buildCreateDto(name, team);
+        OrganizationRequestDto.CreateDto request = OrganizationConverter.toCreateDto(name, team);
         Organization entity = OrganizationConverter.toEntity(request, member);
-
-        entity.rename(name, team);
 
         try {
             return organizationRepository.save(entity);
         } catch (DataIntegrityViolationException e) {
-            return findExisting(memberId, name, team)
-                    .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED));
+            if (isUniqueViolation(e)) { // 유니크 제약 확인
+                return findExisting(memberId, name, team)
+                        .orElseThrow(() -> new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED));
+            }
+            throw new CustomException(OrganizationErrorCode.ORGANIZATION_SAVE_FAILED);
         }
     }
 
-    private OrganizationRequestDto.CreateDto buildCreateDto(String organizationName, String team) {
-        return OrganizationRequestDto.CreateDto.builder()
-                .organizationName(organizationName)
-                .team(team)
-                .build();
-    }
-
-    private boolean noChange(Organization org, String newName, String newTeam) {
-        return org.getOrganizationName().equals(newName) && org.getTeam().equals(newTeam);
+    private boolean isUniqueViolation(DataIntegrityViolationException e) {
+        Throwable cause = e.getCause();
+        return cause != null
+                && cause.getMessage() != null
+                && cause.getMessage().contains(ORG_CONSTRAINT_NAME);
     }
 
     // 공백 방지
