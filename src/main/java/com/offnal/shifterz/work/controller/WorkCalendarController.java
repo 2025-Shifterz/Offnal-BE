@@ -142,51 +142,6 @@ public class WorkCalendarController {
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @ErrorApiResponses.WorkDay
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "근무일 조회 성공",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = WorkDayResponseDto.class)),
-                            examples = @ExampleObject(
-                                    name = "근무일 조회 예시",
-                                    value = """
-                                            {
-                                              "code": "DATA_FETCHED",
-                                              "message": "데이터 조회에 성공했습니다.",
-                                              "data": [
-                                                {
-                                                  "date": "2025-09-01",
-                                                  "workTypeName": "오후",
-                                                  "startTime": "16:00",
-                                                  "duration": "PT6H30M"
-                                                },
-                                                {
-                                                  "date": "2025-09-02",
-                                                  "workTypeName": "오후",
-                                                  "startTime": "16:00",
-                                                  "duration": "PT6H30M"
-                                                },
-                                                {
-                                                  "date": "2025-09-03",
-                                                  "workTypeName": "야간",
-                                                  "startTime": "00:00",
-                                                  "duration": "PT6H30M"
-                                                },
-                                                {
-                                                  "date": "2025-09-04",
-                                                  "workTypeName": "휴일",
-                                                  "startTime": null,
-                                                  "duration": null
-                                                }
-                                              ]
-                                            }
-                                        """
-                            )
-                    )
-            ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-            @ApiResponse(responseCode = "401", description = "인증 실패"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
     @GetMapping
     public SuccessResponse<List<WorkDayResponseDto>> getWorkInstancesByRange(
             @RequestParam @NotNull String organizationName,
@@ -196,7 +151,7 @@ public class WorkCalendarController {
     ) {
         List<WorkDayResponseDto> response = workCalendarService.getWorkInstancesByRange(
                 organizationName, team, startDate, endDate);
-        return SuccessResponse.success(SuccessCode.DATA_FETCHED, response);
+        return SuccessResponse.success(SuccessCode.WORK_DAY_FETCHED, response);
 
     }
 
@@ -217,51 +172,6 @@ public class WorkCalendarController {
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @ErrorApiResponses.WorkDay
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "근무일 조회 성공",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = WorkDayResponseDto.class)),
-                            examples = @ExampleObject(
-                                    name = "근무일 조회 예시",
-                                    value = """
-                                            {
-                                              "code": "DATA_FETCHED",
-                                              "message": "데이터 조회에 성공했습니다.",
-                                              "data": [
-                                                {
-                                                  "date": "2025-09-01",
-                                                  "workTypeName": "오후",
-                                                  "startTime": "16:00",
-                                                  "duration": "PT6H30M"
-                                                },
-                                                {
-                                                  "date": "2025-09-02",
-                                                  "workTypeName": "오후",
-                                                  "startTime": "16:00",
-                                                  "duration": "PT6H30M"
-                                                },
-                                                {
-                                                  "date": "2025-09-03",
-                                                  "workTypeName": "야간",
-                                                  "startTime": "00:00",
-                                                  "duration": "PT6H30M"
-                                                },
-                                                {
-                                                  "date": "2025-09-04",
-                                                  "workTypeName": "휴일",
-                                                  "startTime": null,
-                                                  "duration": null
-                                                }
-                                              ]
-                                            }
-                                        """
-                            )
-                    )
-            ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-            @ApiResponse(responseCode = "401", description = "인증 실패"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
     @GetMapping("/monthly")
     public SuccessResponse<List<WorkDayResponseDto>> getMonthlyWorkInstances(
             @RequestParam @NotNull String organizationName,
@@ -271,41 +181,15 @@ public class WorkCalendarController {
     ) {
         List<WorkDayResponseDto> response = workCalendarService.getMonthlyWorkInstances(
                 organizationName, team, year, month);
-        return SuccessResponse.success(SuccessCode.DATA_FETCHED, response);
+        return SuccessResponse.success(SuccessCode.WORK_DAY_FETCHED, response);
 
     }
 
     /**
-     * 캘린더 메타 정보 및 근무시간 조회
+     * 특정 캘린더 메타 정보 및 근무시간 조회
      */
-    @Operation(summary = "캘린더 메타 정보 및 근무시간 조회",
-            description = "조직(OrganizationName, team)과 calendarName으로 근무표의 근무 시간과 workTimes(D/E/N/-)을 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "캘린더 메타 정보 조회 성공",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = WorkDayResponseDto.class)),
-                            examples = @ExampleObject(
-                                    name = "캘린더 메타 정보 조회 예시",
-                                    value = """
-                                            {
-                                                  "calendarName": "2025년 7월 근무표",
-                                                  "startDate": "2025-07-01",
-                                                  "endDate": "2025-07-31",
-                                                  "workTimes": {
-                                                    "D": {"startTime": "08:00", "duration": "PT6H30M"},
-                                                    "E": {"startTime": "16:00", "duration": "PT6H30M"},
-                                                    "N": {"startTime": "00:00", "duration": "PT6H30M"},
-                                                    "-": {"startTime": null, "duration": null}
-                                                  }
-                                            }
-                                        """
-                            )
-                    )
-            ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-            @ApiResponse(responseCode = "401", description = "인증 실패"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
+    @Operation(summary = "특정 캘린더 메타 정보 및 근무시간 조회",
+            description = "조직(OrganizationName, team)과 calendarName으로 특정 캘린더의 근무표 정보와 workTimes(D/E/N/-)을 조회합니다.")
     @SuccessApiResponses.WorkCalendarMeta
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
@@ -318,10 +202,26 @@ public class WorkCalendarController {
     ){
         WorkCalendarMetaDto dto =
                 workCalendarService.getWorkCalendarMeta(organizationName, team, calendarName);
-        return SuccessResponse.success(SuccessCode.DATA_FETCHED, dto);
+        return SuccessResponse.success(SuccessCode.CALENDAR_DATA_FETCHED, dto);
     }
 
-
+    /**
+     * 조직 내 모든 캘린더 메타 정보 및 근무시간 조회
+     */
+    @Operation(summary = "조직의 모든 캘린더 메타 정보 및 근무시간 조회",
+            description = "조직(OrganizationName, team)에 속한 전체 캘린더의 근무표 정보와 workTimes(D/E/N/-)을 조회합니다.")
+    @SuccessApiResponses.WorkCalendarList
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.Organization
+    @GetMapping("/{organizationName}/{team}/list")
+    public SuccessResponse<List<WorkCalendarListItemDto>> listCalendars(
+            @PathVariable String organizationName,
+            @PathVariable String team) {
+        List<WorkCalendarListItemDto> list =
+                workCalendarService.listWorkCalendars(organizationName, team);
+        return SuccessResponse.success(SuccessCode.CALENDAR_DATA_FETCHED, list);
+    }
 
 
     /**

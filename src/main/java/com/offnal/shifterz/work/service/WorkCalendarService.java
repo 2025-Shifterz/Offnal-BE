@@ -213,31 +213,34 @@ public class WorkCalendarService {
         workCalendarRepository.delete(calendar);
     }
 
+    // 특정 캘린더 메타 정보 및 근무시간 조회
     public WorkCalendarMetaDto getWorkCalendarMeta(String organizationName, String team, String calendarName) {
         Long memberId = AuthService.getCurrentUserId();
         Organization org = findOrganization(memberId, organizationName, team);
         WorkCalendar cal = findCalendarByName(memberId, org, calendarName);
 
-        Map<String, WorkTimeDto> symbolKeyed = cal.workTimes().values().stream()
-                .collect(Collectors.toMap(
-                        wt -> wt.getTimeType().getSymbol(),
-                        wt -> new WorkTimeDto(
-                                wt.getStartTime() == null ? null : wt.getStartTime().toString(), // LocalTime → String
-                                wt.getDuration()
-                        ),
-                        (a, b) -> a
-                ));
+        return WorkCalendarConverter.toMetaDto(cal);
+    }
 
-        return WorkCalendarMetaDto.builder()
-                .calendarName(cal.getCalendarName())
-                .startDate(cal.startDate())
-                .endDate(cal.endDate())
-                .workTimes(symbolKeyed)
-                .build();
+    // 조직 내 모든 캘린더 메타 정보 및 근무시간 조회
+    public List<WorkCalendarListItemDto> listWorkCalendars(String organizationName, String team) {
+        Long memberId = AuthService.getCurrentUserId();
+        Organization org = findOrganization(memberId, organizationName, team);
+
+        List<WorkCalendar> calendars = workCalendarRepository
+                .findByMemberIdAndOrganizationOrderByStartDateDesc(memberId, org);
+
+        return toListItemDtos(calendars);
     }
 
 
     // ===== private =====
+
+    private List<WorkCalendarListItemDto> toListItemDtos(List<WorkCalendar> calendars) {
+        return calendars.stream()
+                .map(WorkCalendarConverter::toListItemDto)
+                .toList();
+    }
 
     // 시작일/종료일 범위 유효성 검증
     private void validateDateRange(LocalDate start, LocalDate end) {

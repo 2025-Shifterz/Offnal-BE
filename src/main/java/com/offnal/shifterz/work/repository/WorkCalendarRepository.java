@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface WorkCalendarRepository extends JpaRepository<WorkCalendar, Long> {
@@ -21,4 +22,6 @@ public interface WorkCalendarRepository extends JpaRepository<WorkCalendar, Long
             Organization organization,
             String calendarName
     );
+
+    List<WorkCalendar> findByMemberIdAndOrganizationOrderByStartDateDesc(Long memberId, Organization organization);
 }

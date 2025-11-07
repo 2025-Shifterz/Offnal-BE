@@ -5,16 +5,14 @@ import com.offnal.shifterz.work.domain.WorkCalendar;
 import com.offnal.shifterz.work.domain.WorkInstance;
 import com.offnal.shifterz.work.domain.WorkTime;
 import com.offnal.shifterz.work.domain.WorkTimeType;
-import com.offnal.shifterz.work.dto.WorkCalendarRequestDto;
-import com.offnal.shifterz.work.dto.WorkCalendarUnitDto;
-import com.offnal.shifterz.work.dto.WorkDayResponseDto;
-import com.offnal.shifterz.work.dto.WorkTimeDto;
+import com.offnal.shifterz.work.dto.*;
 
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class WorkCalendarConverter {
 
@@ -80,6 +78,24 @@ public class WorkCalendarConverter {
                 .build();
     }
 
+    public static WorkCalendarMetaDto toMetaDto(WorkCalendar cal) {
+        return WorkCalendarMetaDto.builder()
+                .calendarName(cal.getCalendarName())
+                .startDate(cal.startDate())
+                .endDate(cal.endDate())
+                .workTimes(toSymbolKeyWorkTimes(cal))
+                .build();
+    }
+
+    public static WorkCalendarListItemDto toListItemDto(WorkCalendar c) {
+        return WorkCalendarListItemDto.builder()
+                .calendarName(c.getCalendarName())
+                .startDate(c.startDate())
+                .endDate(c.endDate())
+                .build();
+    }
+
+
     private static WorkTime resolveWorkTimeFor(WorkInstance instance) {
         if (instance == null || instance.getWorkCalendar() == null)
             return null;
@@ -97,5 +113,21 @@ public class WorkCalendarConverter {
         }
 
         return found;
+    }
+
+    private static Map<String, WorkTimeDto> toSymbolKeyWorkTimes(WorkCalendar cal) {
+        return cal.workTimes().values().stream()
+                .collect(Collectors.toMap(
+                        wt -> wt.getTimeType().getSymbol(),
+                        WorkCalendarConverter::toDto,
+                        (a, b) -> a
+                ));
+    }
+
+    private static WorkTimeDto toDto(WorkTime wt) {
+        return new WorkTimeDto(
+                wt.getStartTime() == null ? null : wt.getStartTime().toString(),
+                wt.getDuration()
+        );
     }
 }
