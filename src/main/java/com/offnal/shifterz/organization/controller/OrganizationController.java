@@ -54,6 +54,8 @@ public class OrganizationController {
 
     )
     @SuccessApiResponses.OrganizationCreate
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.Organization
     @ErrorApiResponses.Common
     @PostMapping
     public SuccessResponse<OrganizationResponseDto.OrganizationDto> createOrganization(
@@ -86,14 +88,16 @@ public class OrganizationController {
 
     )
     @SuccessApiResponses.OrganizationUpdate
+    @ErrorApiResponses.Organization
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @PatchMapping("/{id}")
+    @PatchMapping("/{organizationName}/{team}")
     public SuccessResponse<OrganizationResponseDto.OrganizationDto> updateOrganization(
-            @PathVariable Long id,
+            @PathVariable String organizationName,
+            @PathVariable String team,
             @RequestBody @Valid OrganizationRequestDto.UpdateDto request
     ){
-        return SuccessResponse.success(SuccessCode.ORGANIZATION_UPDATED, organizationService.updateOrganization(id, request));
+        return SuccessResponse.success(SuccessCode.ORGANIZATION_UPDATED, organizationService.updateOrganization(organizationName, team, request));
     }
 
     /**
@@ -101,11 +105,15 @@ public class OrganizationController {
      */
     @Operation(summary = "특정 조직 조회", description = "특정 조직의 정보를 조회합니다.")
     @SuccessApiResponses.OrganizationGet
+    @ErrorApiResponses.Organization
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @GetMapping("/{id}")
-    public SuccessResponse<OrganizationResponseDto.OrganizationDto> getOrganization(@PathVariable Long id){
-        return SuccessResponse.success(SuccessCode.ORGANIZATION_FETCHED, organizationService.getOrganization(id));
+    @GetMapping("/{organizationName}/{team}")
+    public SuccessResponse<OrganizationResponseDto.OrganizationDto> getOrganization(
+            @PathVariable String organizationName,
+            @PathVariable String team
+    ){
+        return SuccessResponse.success(SuccessCode.ORGANIZATION_FETCHED, organizationService.getOrganization(organizationName, team));
     }
 
     /**
@@ -113,6 +121,7 @@ public class OrganizationController {
      */
     @Operation(summary = "회원의 전체 조직 조회", description = "회원의 모든 조직의 정보를 조회합니다.")
     @SuccessApiResponses.AllOrganizationGet
+    @ErrorApiResponses.Organization
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @GetMapping
@@ -126,11 +135,15 @@ public class OrganizationController {
      */
     @Operation(summary = "조직 삭제", description = "조직을 삭제합니다.")
     @SuccessApiResponses.OrganizationDelete
+    @ErrorApiResponses.Organization
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
-    @DeleteMapping("/{id}")
-    public SuccessResponse<Void> deleteOrganization(@PathVariable Long id){
-        organizationService.deleteOrganization(id);
+    @DeleteMapping("/{organizationName}/{team}")
+    public SuccessResponse<Void> deleteOrganization(
+            @PathVariable String organizationName,
+            @PathVariable String team
+    ){
+        organizationService.deleteOrganization(organizationName, team);
         return SuccessResponse.success(SuccessCode.ORGANIZATION_DELETED, null);
     }
 }

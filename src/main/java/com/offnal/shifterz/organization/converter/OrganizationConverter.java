@@ -22,4 +22,11 @@ public class OrganizationConverter {
                 .team(organization.getTeam())
                 .build();
     }
+
+    public static OrganizationRequestDto.CreateDto toCreateDto(String organizationName, String team){
+        return OrganizationRequestDto.CreateDto.builder()
+                .organizationName(organizationName)
+                .team(team)
+                .build();
+    }
 }

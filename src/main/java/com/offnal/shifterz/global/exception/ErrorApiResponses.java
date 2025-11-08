@@ -139,9 +139,36 @@ public @interface ErrorApiResponses {
                                           "code": "CALENDAR_DUPLICATION",
                                           "message": "이미 존재하는 연도/월의 캘린더입니다."
                                         }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_START_TIME_INVALID", value = """
+                                        {
+                                          "code": "CALENDAR_START_TIME_INVALID",
+                                          "message": "시작 시간이 유효하지 않습니다."
+                                        }
+                                        """),
+                                    @ExampleObject(name = "CALENDAR_DURATION_REQUIRED", value = """
+                                        {
+                                          "code": "CALENDAR_DURATION_REQUIRED",
+                                          "message": "근무 소요 시간은 필수입니다."
+                                        }
                                         """)
                             }
-                    ))
+                    )
+            ),
+            @ApiResponse(responseCode = "404",  description = "근무표 등록 요청 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "CALENDAR_ORGANIZATION_NOT_FOUND", value = """
+                                        {
+                                          "code": "CALENDAR_ORGANIZATION_NOT_FOUND",
+                                          "message": "존재하지 않는 조직입니다."
+                                        }
+                                        """)
+                            }
+                    )
+            )
     })
     @interface CreateWorkCalendar {}
 
@@ -156,7 +183,7 @@ public @interface ErrorApiResponses {
                                     @ExampleObject(name = "CALENDAR_NOT_FOUND", value = """
                                         {
                                           "code": "CALENDAR_NOT_FOUND",
-                                          "message": "해당하는 연도, 월의 캘린더를 찾을 수 없습니다."
+                                          "message": "해당하는 캘린더를 찾을 수 없습니다."
                                         }
                                         """)
                             }
@@ -175,7 +202,7 @@ public @interface ErrorApiResponses {
                                     @ExampleObject(name = "CALENDAR_NOT_FOUND", value = """
                                         {
                                           "code": "CALENDAR_NOT_FOUND",
-                                          "message": "해당하는 연도, 월의 캘린더를 찾을 수 없습니다."
+                                          "message": "해당하는 캘린더를 찾을 수 없습니다."
                                         }
                                         """)
                             }
@@ -216,6 +243,18 @@ public @interface ErrorApiResponses {
                                       "code": "INVALID_MONTH_FORMAT",
                                       "message": "월 형식이 올바르지 않습니다."
                                     }
+                                    """),
+                                    @ExampleObject(name = "CALENDAR_DATE_REQUIRED", value = """
+                                    {
+                                      "code": "CALENDAR_DATE_REQUIRED",
+                                      "message": "기간을 입력해주세요."
+                                    }
+                                    """),
+                                    @ExampleObject(name = "CALENDAR_INVALID_DATE_RANGE", value = """
+                                    {
+                                      "code": "CALENDAR_INVALID_DATE_RANGE",
+                                      "message": "기간 범위가 올바르지 않습니다."
+                                    }
                                     """)
                             }
                     )),
@@ -223,14 +262,95 @@ public @interface ErrorApiResponses {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(name = "WORK_DAY_NOT_FOUND", value = """
-                                {
-                                  "code": "WORK_DAY_NOT_FOUND",
-                                  "message": "해당 연도와 월에 대한 근무일이 존재하지 않습니다."
-                                }
-                                """)
+                            examples = {
+                                    @ExampleObject(name = "WORK_INSTANCE_NOT_FOUND", value = """
+                                    {
+                                    "code": "WORK_INSTANCE_NOT_FOUND",
+                                    "message": "해당 연도와 월에 대한 근무일이 존재하지 않습니다."
+                                    }
+                                    """),
+                                    @ExampleObject(name = "WORK_TIME_NOT_FOUND", value = """
+                                    {
+                                    "code": "WORK_TIME_NOT_FOUND",
+                                    "message": "오늘의 근무 시간 정보가 없습니다."
+                                    }
+                                    """)
+                            }
                     ))
     })
     @interface WorkDay {}
+
+    // 조직 관련 에러
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청 필드",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "ORGANIZATION_NOT_VALIDATE", value = """
+                                    {
+                                      "code": "ORG005",
+                                      "message": "유효하지 않은 필드입니다."
+                                    }
+                                    """
+                            )
+                    )),
+            @ApiResponse(responseCode = "403", description = "조직 접근 권한 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "ORGANIZATION_ACCESS_DENIED", value = """
+                                    {
+                                      "code": "ORG003",
+                                      "message": "해당 조직에 접근 권한이 없습니다."
+                                    }
+                                    """
+                            )
+                    )),
+            @ApiResponse(responseCode = "404", description = "조직을 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "ORGANIZATION_NOT_FOUND", value = """
+                                    {
+                                      "code": "ORG001",
+                                      "message": "소속 조직을 찾을 수 없습니다."
+                                    }
+                                    """
+                            )
+                    )),
+            @ApiResponse(responseCode = "409", description = "조직 중복(동일 이름/팀)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "ORGANIZATION_DUPLICATE_NAME", value = """
+                                    {
+                                      "code": "ORG004",
+                                      "message": "동일한 이름/팀의 조직이 이미 존재합니다."
+                                    }
+                                    """
+                            )
+                    )),
+            @ApiResponse(responseCode = "500", description = "조직 저장/갱신/삭제 실패(내부 오류)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "ORGANIZATION_SAVE_FAILED", value = """
+                                    {
+                                      "code": "ORG002",
+                                      "message": "조직 저장에 실패했습니다."
+                                    }
+                                    """
+                            )
+                    ))
+    })
+    @interface Organization {}
 
 }

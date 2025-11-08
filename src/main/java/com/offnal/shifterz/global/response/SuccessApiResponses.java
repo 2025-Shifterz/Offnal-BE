@@ -78,6 +78,44 @@ public @interface SuccessApiResponses {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "근무 시간 수정 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "근무 시간 수정 성공 예시", value = """
+                                    {
+                                      "code": "WORK_TIME_UPDATED",
+                                      "message": "근무 시간 수정에 성공했습니다.",
+                                      "data": null
+                                    }
+                                    """)}
+                    ))
+    })
+    public @interface UpdateWorkTime {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "근무 일정 삭제 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "근무 일정 삭제 성공 예시", value = """
+                                    {
+                                      "code": "WORK_INSTANCES_DELETED",
+                                      "message": "근무 일정 삭제에 성공했습니다.",
+                                      "data": null
+                                    }
+                                    """)}
+                    ))
+    })
+    public @interface DeleteInstance {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "근무표 삭제 성공",
                     content = @Content(
                             mediaType = "application/json",
@@ -103,32 +141,126 @@ public @interface SuccessApiResponses {
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = @ExampleObject(name = "근무일 조회 성공 예시", value = """
                                     {
-                                      "code": "WORK_DAY_FETCHED",
-                                      "message": "근무일 조회에 성공했습니다.",
-                                      "data": [
-                                           {
-                                             "date": "2025-09-01",
-                                             "workTypeName": "오후"
-                                           },
-                                           {
-                                             "date": "2025-09-02",
-                                             "workTypeName": "오후"
-                                           },
-                                           {
-                                             "date": "2025-09-03",
-                                             "workTypeName": "야간"
-                                           },
-                                           {
-                                             "date": "2025-09-04",
-                                             "workTypeName": "휴일"
-                                           }
-                                         ]
-                                    }
+                                        "code": "WORK_DAY_FETCHED",
+                                        "message": "근무일 조회에 성공했습니다.",
+                                        "data": [
+                                          {
+                                            "date": "2025-07-01",
+                                            "workTypeName": "오후",
+                                            "startTime": "16:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          {
+                                            "date": "2025-07-02",
+                                            "workTypeName": "오후",
+                                            "startTime": "16:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          {
+                                            "date": "2025-07-03",
+                                            "workTypeName": "야간",
+                                            "startTime": "00:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          {
+                                            "date": "2025-07-04",
+                                            "workTypeName": "휴일",
+                                            "startTime": null,
+                                            "duration": null
+                                          },
+                                          {
+                                            "date": "2025-07-05",
+                                            "workTypeName": "주간",
+                                            "startTime": "08:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          {
+                                            "date": "2025-07-06",
+                                            "workTypeName": "주간",
+                                            "startTime": "08:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          {
+                                            "date": "2025-07-07",
+                                            "workTypeName": "휴일",
+                                            "startTime": null,
+                                            "duration": null
+                                          }
+                                        ]
+                                      }
                                     """)
                     )
             )
     })
     public @interface WorkDay {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "캘린더 메타 정보 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "캘린더 메타 정보 조회 성공 예시", value = """
+                                       {
+                                      "code": "CALENDAR_DATA_FETCHED",
+                                      "message": "데이터 조회에 성공했습니다.",
+                                      "data": {
+                                        "calendarName": "2025년 7월 근무표",
+                                        "startDate": "2025-07-01",
+                                        "endDate": "2025-07-07",
+                                        "workTimes": {
+                                          "D": {
+                                            "startTime": "08:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          "E": {
+                                            "startTime": "16:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          "N": {
+                                            "startTime": "00:00",
+                                            "duration": "PT6H30M"
+                                          }
+                                        }
+                                      }
+                                    }
+                                    """)
+                    )
+            )
+    })
+    public @interface WorkCalendarMeta {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조직 내 전체 캘린더 메타 정보 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "조직 내 전체 캘린더 메타 정보 조회 예시", value = """
+                                       {
+                                                   "code": "CALENDAR_DATA_FETCHED",
+                                                   "message": "캘린더 정보를 조회했습니다.",
+                                                   "data": [
+                                                     {
+                                                       "calendarName": "2025년 8월 근무표",
+                                                       "startDate": "2025-08-01",
+                                                       "endDate": "2025-08-07"
+                                                     },
+                                                     {
+                                                       "calendarName": "2025년 7월 근무표",
+                                                       "startDate": "2025-07-01",
+                                                       "endDate": "2025-07-07"
+                                                     }
+                                                   ]
+                                                 }
+                                    """)
+                    )
+            )
+    })
+    public @interface WorkCalendarList {}
+
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
