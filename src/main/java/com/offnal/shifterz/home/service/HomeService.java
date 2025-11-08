@@ -42,9 +42,7 @@ public class HomeService {
 
         // 오늘 근무 정보 조회
         WorkInstance todayWork = workInstanceRepository
-                .findByWorkDateAndMemberIdThroughWorkCalendar(
-                        today, memberId, today, today
-                )
+                .findByWorkCalendarMemberIdAndWorkDate(memberId, today)
                 .orElseThrow(() -> new CustomException(HomeErrorCode.WORK_INSTANCE_NOT_FOUND));
 
         WorkTime workTime = null;
@@ -79,10 +77,8 @@ public class HomeService {
     // 특정 날짜의 근무 형태 조회
     private WorkTimeType findWorkTypeOrNull(LocalDate date, Long memberId) {
         return workInstanceRepository
-                .findByWorkDateAndMemberIdThroughWorkCalendar(
-                        date, memberId, date, date
-                )
-                .map(WorkInstance::getWorkTimeType)
+                .findByWorkCalendarMemberIdAndWorkDate(memberId, date)
+                .map(WorkInstance::workType)
                 .orElse(null);
     }
 

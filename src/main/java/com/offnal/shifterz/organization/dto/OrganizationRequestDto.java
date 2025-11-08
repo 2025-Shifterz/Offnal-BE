@@ -16,6 +16,7 @@ public class OrganizationRequestDto {
         @NotBlank(message = "조직 이름은 필수입니다.")
         private String organizationName;
 
+        @NotBlank(message = "조 이름은 필수입니다.")
         private String team;
     }
 

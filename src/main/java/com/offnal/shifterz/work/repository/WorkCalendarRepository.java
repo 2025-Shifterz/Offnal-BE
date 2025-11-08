@@ -7,9 +7,21 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface WorkCalendarRepository extends JpaRepository<WorkCalendar, Long> {
-    boolean existsByMemberIdAndOrganizationAndStartDateAndEndDate(Long memberId, Organization organization, LocalDate startDate, LocalDate  endDate);
-    Optional<WorkCalendar> findByMemberIdAndOrganizationAndStartDateLessThanEqualAndEndDateGreaterThanEqual(Long memberId,Organization organization, LocalDate startDate, LocalDate  endDate);
+    boolean existsByMemberIdAndOrganizationAndStartDateAndEndDate(
+            Long memberId, Organization organization, LocalDate startDate, LocalDate  endDate);
+
+    Optional<WorkCalendar> findByMemberIdAndOrganizationAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+            Long memberId,Organization organization, LocalDate startDate, LocalDate  endDate);
+
+    Optional<WorkCalendar> findByMemberIdAndOrganizationAndCalendarName(
+            Long memberId,
+            Organization organization,
+            String calendarName
+    );
+
+    List<WorkCalendar> findByMemberIdAndOrganizationOrderByStartDateDesc(Long memberId, Organization organization);
 }

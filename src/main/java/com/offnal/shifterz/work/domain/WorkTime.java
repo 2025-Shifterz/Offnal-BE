@@ -1,10 +1,8 @@
 package com.offnal.shifterz.work.domain;
 
 import com.offnal.shifterz.global.BaseTimeEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.offnal.shifterz.work.converter.DurationToStringConverter;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Duration;
@@ -24,8 +22,7 @@ public class WorkTime extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalTime startTime;
 
+    @Convert(converter = DurationToStringConverter.class)
     @Column(nullable = false)
     private Duration duration;
-
-
 }
