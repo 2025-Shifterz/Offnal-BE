@@ -2,27 +2,35 @@ package com.offnal.shifterz.member.domain;
 
 import com.offnal.shifterz.global.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
-@Table(name = "members")
+@Table(
+        name = "member",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_provider_provider_id",
+                        columnNames = {"provider", "provider_id"}
+                )
+        }
+)
 public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Provider provider;
 
+    @Column(name = "provider_id", nullable = false)
     private String providerId;
+
     private String email;
     private String memberName;
     private String phoneNumber;
@@ -34,6 +42,7 @@ public class Member extends BaseTimeEntity {
         this.memberName = memberName;
         this.phoneNumber = phoneNumber;
         this.profileImageUrl = profileImageUrl;
+
     }
 
 

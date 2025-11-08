@@ -4,9 +4,11 @@ import com.offnal.shifterz.work.domain.WorkTimeType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @Builder
+@ToString
 public class HomeDetailResDto {
 
     @Schema(description = "어제의 근무 유형")

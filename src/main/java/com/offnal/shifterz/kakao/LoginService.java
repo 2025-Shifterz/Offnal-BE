@@ -1,13 +1,12 @@
 package com.offnal.shifterz.kakao;
 
 import com.offnal.shifterz.global.exception.CustomException;
-import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.jwt.JwtTokenProvider;
 import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.dto.AuthResponseDto;
+import com.offnal.shifterz.member.dto.MemberResponseDto;
 import com.offnal.shifterz.member.service.MemberService;
-import com.offnal.shifterz.member.service.SocialService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,13 +32,11 @@ public class LoginService {
 
         } else {
             throw new CustomException(LoginErrorCode.UNSUPPORTED_PROVIDER);
-
         }
     }
 
-
     private AuthResponseDto handleKakaoLogin(KakaoUserInfoResponseDto userInfo) {
-        MemberService.MemberResult result = memberService.registerOrUpdateMember(
+        MemberResponseDto.MemberRegisterResponseDto result = memberService.registerOrUpdateMember(
                 Provider.KAKAO,
                 String.valueOf(userInfo.getId()),
                 userInfo.getKakaoAccount().getEmail(),
@@ -51,15 +48,15 @@ public class LoginService {
         return issueTokens(result);
     }
 
-
-
-    private AuthResponseDto issueTokens(MemberService.MemberResult result) {
-        if (result.getMember() == null) {
-            throw new CustomException(ErrorCode.MEMBER_SAVE_FAILED);
+    private AuthResponseDto issueTokens(MemberResponseDto.MemberRegisterResponseDto result) {
+        if (result.getId() == null) {
+            throw new CustomException(MemberService.MemberErrorCode.MEMBER_SAVE_FAILED);
         }
-        String jwtAccessToken = jwtTokenProvider.createToken(result.getMember().getId());
-        String jwtRefreshToken = jwtTokenProvider.createRefreshToken(result.getMember().getEmail());
-        return AuthResponseDto.from(result.getMember(), result.isNewMember(), jwtAccessToken, jwtRefreshToken);
+
+        String jwtAccessToken = jwtTokenProvider.createToken(result.getId());
+        String jwtRefreshToken = jwtTokenProvider.createRefreshToken(result.getId());
+
+        return AuthResponseDto.from(result, jwtAccessToken, jwtRefreshToken);
     }
 
     @Getter

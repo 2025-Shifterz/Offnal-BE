@@ -3,11 +3,13 @@ package com.offnal.shifterz.home.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.List;
 
 @Getter
 @Builder
+@ToString
 public class MealCardDto {
 
     @Schema(description = "식사의 구분 (예: 아침, 점심, 저녁, 간식 등)")

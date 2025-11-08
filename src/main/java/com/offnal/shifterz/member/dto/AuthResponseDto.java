@@ -1,11 +1,10 @@
 package com.offnal.shifterz.member.dto;
 
-import com.offnal.shifterz.member.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 @Builder
 public class AuthResponseDto {
 
@@ -28,14 +27,17 @@ public class AuthResponseDto {
     private String refreshToken;
 
 
-    public static AuthResponseDto from(Member member, boolean isNewMember, String accessToken, String refreshToken) {
+    public static AuthResponseDto from(MemberResponseDto.MemberRegisterResponseDto dto,
+                                       String accessToken,
+                                       String refreshToken) {
         return AuthResponseDto.builder()
-                .memberName(member.getMemberName())
-                .email(member.getEmail())
-                .profileImageUrl(member.getProfileImageUrl())
-                .newMember(isNewMember)
+                .memberName(dto.getMemberName())
+                .email(dto.getEmail())
+                .profileImageUrl(dto.getProfileImageUrl())
+                .newMember(dto.isNewMember())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
     }
+
 }

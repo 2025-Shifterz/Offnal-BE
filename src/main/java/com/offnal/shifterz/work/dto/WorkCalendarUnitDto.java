@@ -2,33 +2,37 @@ package com.offnal.shifterz.work.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Map;
 
-@Getter
+@Data
 @Builder
 public class WorkCalendarUnitDto {
 
-    @NotEmpty(message = "연도는 필수입니다.")
-    @NotNull
-    @Pattern(regexp = "\\d{4}", message = "연도 형식이 올바르지 않습니다.")
-    @Schema(description = "연도")
-    private String year;
+    @NotBlank(message = "조직 이름은 필수입니다.")
+    @Schema(description = "조직 이름")
+    private String organizationName;
 
-    @NotEmpty(message = "월은 필수입니다.")
-    @NotNull
-    @Pattern(regexp = "^(0?[1-9]|1[0-2])$", message = "월 형식이 올바르지 않습니다.")
-    @Schema(description = "월")
-    private String month;
+    @NotBlank(message = "조 이름은 필수입니다.")
+    @Schema(description = "조 이름")
+    private String team;
+
+    @NotNull(message = "시작일은 필수입니다.")
+    @Schema(description = "시작일")
+    private LocalDate startDate;
+
+
+    @NotNull(message = "종료일은 필수입니다.")
+    @Schema(description = "종료일")
+    private LocalDate endDate;
 
     @Valid
-    @NotEmpty(message = "근무일 정보는 필수입니다.")
-    @NotNull
+    @NotNull(message = "근무일 정보는 필수입니다.")
     @Schema(description = "근무표(날짜별 근무타입)")
-    private Map<String, String> shifts;
+    private Map<LocalDate, String> shifts;
 }

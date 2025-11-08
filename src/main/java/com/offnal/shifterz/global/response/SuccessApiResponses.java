@@ -1,5 +1,10 @@
 package com.offnal.shifterz.global.response;
 
+import com.offnal.shifterz.jwt.TokenDto;
+import com.offnal.shifterz.memo.dto.MemoResponseDto;
+import com.offnal.shifterz.organization.dto.OrganizationResponseDto;
+import com.offnal.shifterz.todo.dto.TodoResponseDto;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -73,6 +78,44 @@ public @interface SuccessApiResponses {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "근무 시간 수정 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "근무 시간 수정 성공 예시", value = """
+                                    {
+                                      "code": "WORK_TIME_UPDATED",
+                                      "message": "근무 시간 수정에 성공했습니다.",
+                                      "data": null
+                                    }
+                                    """)}
+                    ))
+    })
+    public @interface UpdateWorkTime {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "근무 일정 삭제 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "근무 일정 삭제 성공 예시", value = """
+                                    {
+                                      "code": "WORK_INSTANCES_DELETED",
+                                      "message": "근무 일정 삭제에 성공했습니다.",
+                                      "data": null
+                                    }
+                                    """)}
+                    ))
+    })
+    public @interface DeleteInstance {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "근무표 삭제 성공",
                     content = @Content(
                             mediaType = "application/json",
@@ -98,18 +141,656 @@ public @interface SuccessApiResponses {
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = @ExampleObject(name = "근무일 조회 성공 예시", value = """
                                     {
-                                      "code": "WORK_DAY_FETCHED",
-                                      "message": "근무일 조회에 성공했습니다.",
-                                      "data": [
-                                        { "day": "1", "workTypeName": "오후" },
-                                        { "day": "2", "workTypeName": "오후" },
-                                        { "day": "3", "workTypeName": "야간" },
-                                        { "day": "4", "workTypeName": "휴무" }
-                                      ]
-                                    }
+                                        "code": "WORK_DAY_FETCHED",
+                                        "message": "근무일 조회에 성공했습니다.",
+                                        "data": [
+                                          {
+                                            "date": "2025-07-01",
+                                            "workTypeName": "오후",
+                                            "startTime": "16:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          {
+                                            "date": "2025-07-02",
+                                            "workTypeName": "오후",
+                                            "startTime": "16:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          {
+                                            "date": "2025-07-03",
+                                            "workTypeName": "야간",
+                                            "startTime": "00:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          {
+                                            "date": "2025-07-04",
+                                            "workTypeName": "휴일",
+                                            "startTime": null,
+                                            "duration": null
+                                          },
+                                          {
+                                            "date": "2025-07-05",
+                                            "workTypeName": "주간",
+                                            "startTime": "08:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          {
+                                            "date": "2025-07-06",
+                                            "workTypeName": "주간",
+                                            "startTime": "08:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          {
+                                            "date": "2025-07-07",
+                                            "workTypeName": "휴일",
+                                            "startTime": null,
+                                            "duration": null
+                                          }
+                                        ]
+                                      }
                                     """)
                     )
             )
     })
     public @interface WorkDay {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "캘린더 메타 정보 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "캘린더 메타 정보 조회 성공 예시", value = """
+                                       {
+                                      "code": "CALENDAR_DATA_FETCHED",
+                                      "message": "데이터 조회에 성공했습니다.",
+                                      "data": {
+                                        "calendarName": "2025년 7월 근무표",
+                                        "startDate": "2025-07-01",
+                                        "endDate": "2025-07-07",
+                                        "workTimes": {
+                                          "D": {
+                                            "startTime": "08:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          "E": {
+                                            "startTime": "16:00",
+                                            "duration": "PT6H30M"
+                                          },
+                                          "N": {
+                                            "startTime": "00:00",
+                                            "duration": "PT6H30M"
+                                          }
+                                        }
+                                      }
+                                    }
+                                    """)
+                    )
+            )
+    })
+    public @interface WorkCalendarMeta {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조직 내 전체 캘린더 메타 정보 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "조직 내 전체 캘린더 메타 정보 조회 예시", value = """
+                                       {
+                                                   "code": "CALENDAR_DATA_FETCHED",
+                                                   "message": "캘린더 정보를 조회했습니다.",
+                                                   "data": [
+                                                     {
+                                                       "calendarName": "2025년 8월 근무표",
+                                                       "startDate": "2025-08-01",
+                                                       "endDate": "2025-08-07"
+                                                     },
+                                                     {
+                                                       "calendarName": "2025년 7월 근무표",
+                                                       "startDate": "2025-07-01",
+                                                       "endDate": "2025-07-07"
+                                                     }
+                                                   ]
+                                                 }
+                                    """)
+                    )
+            )
+    })
+    public @interface WorkCalendarList {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 수정 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "프로필 수정 성공 예시", value = """
+                                {
+                                  "code": "MEMBER_UPDATE_SUCCESS",
+                                  "message": "프로필 수정에 성공했습니다.",
+                                  "data": {
+                                    "memberId": 1,
+                                    "memberName": "홍길동",
+                                    "email": "test@example.com",
+                                    "phoneNumber": "010-1234-5678",
+                                    "profileImageUrl": "https://cdn.com/profile.jpg"
+                                  }
+                                }
+                                """)
+                    )
+            )
+    })
+    public @interface UpdateProfile {}
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "내 정보 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "내 정보 조회 성공 예시", value = """
+                                {
+                                  "code": "MEM002",
+                                  "message": "내 정보 조회에 성공했습니다.",
+                                  "data": {
+                                    "email": "example@kkukmoa.com",
+                                    "name": "홍길동",
+                                    "phoneNumber": "010-1234-5678",
+                                    "profileImageUrl": "https://cdn.example.com/image.jpg"
+                                  }
+                                }
+                                """)
+                    )
+            )
+    })
+    public @interface MyInfo {}
+
+
+
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "할 일 생성 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TodoResponseDto.TodoDto.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "할 일 생성 성공 예시",
+                                            value = """
+                    {
+                      "code": "TODO201",
+                      "message": "할 일이 생성되었습니다.",
+                      "result": {
+                        "id": 1,
+                        "content": "스터디 준비",
+                        "completed": false,
+                        "targetDate": "2025-09-23",
+                        "organizationId": 10
+                      }
+                    }
+                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface TodoCreate {}
+
+
+
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "할 일 수정 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TodoResponseDto.TodoDto.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "할 일 수정 성공 예시",
+                                            value = """
+                    {
+                      "code": "TODO200",
+                      "message": "할 일이 수정되었습니다.",
+                      "result": {
+                        "id": 1,
+                        "content": "스터디 준비 - 수정",
+                        "completed": true,
+                        "targetDate": "2025-09-24",
+                        "organizationId": 10
+                      }
+                    }
+                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface TodoUpdate {}
+
+
+
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "할 일 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TodoResponseDto.TodoDto.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "할 일 조회 성공 예시",
+                                            value = """
+                    {
+                      "code": "TODO200",
+                      "message": "할 일을 조회했습니다.",
+                      "result": {
+                        "id": 1,
+                        "content": "스터디 준비",
+                        "completed": false,
+                        "targetDate": "2025-09-23",
+                        "organizationId": 10
+           
+                      }
+                    }
+                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface TodoGet {}
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "할 일 목록 조회 성공",
+            content = @Content(
+                    schema = @Schema(implementation = TodoResponseDto.TodoDto.class),
+                    examples = @ExampleObject(
+                            name = "할 일 목록 조회 성공 예시",
+                            value = """
+                {
+                  "code": "TODO004",
+                  "message": "할 일 목록을 성공적으로 조회했습니다.",
+                  "result": [
+                    {
+                      "id": 1,
+                      "content": "스터디 준비",
+                      "completed": false,
+                      "targetDate": "2025-09-23",
+                      "organizationId": null
+                    },
+                    {
+                      "id": 2,
+                      "content": "야간 근무 교대",
+                      "completed": true,
+                      "targetDate": "2025-09-25",
+                      "organizationId": 10
+                    }
+                  ]
+                }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface TodoGetAll {}
+
+
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "할 일 삭제 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Void.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "할 일 삭제 성공 예시",
+                                            value = """
+                    {
+                      "code": "TODO204",
+                      "message": "할 일이 삭제되었습니다.",
+                      "result": null
+                    }
+                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface TodoDelete {}
+
+
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "메모 생성 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MemoResponseDto.MemoDto.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "메모 생성 성공 예시",
+                                            value = """
+                    {
+                      "code": "MEMO001",
+                      "message": "메모가 성공적으로 생성되었습니다.",
+                      "result": {
+                        "id": 1,
+                        "content": "야간 근무 교대",
+                        "targetDate": "2025-09-23",
+                        "organizationId": 5
+                      }
+                    }
+                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface MemoCreate {}
+
+
+
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "메모 수정 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MemoResponseDto.MemoDto.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "메모 수정 성공 예시",
+                                            value = """
+                    {
+                      "code": "MEMO002",
+                      "message": "메모가 성공적으로 수정되었습니다.",
+                      "result": {
+                        "id": 1,
+                        "content": "야간 근무 -> 주간 근무",
+                        "targetDate": "2025-09-24",
+                        "organizationId": 5
+                      }
+                    }
+                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface MemoUpdate {}
+
+
+
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "메모 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MemoResponseDto.MemoDto.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "메모 조회 성공 예시",
+                                            value = """
+                    {
+                      "code": "MEMO003",
+                      "message": "메모가 성공적으로 조회되었습니다.",
+                      "result": {
+                        "id": 1,
+                        "content": "야간 근무 교대",
+                        "targetDate": "2025-09-23",
+                        "organizationId": 5
+                      }
+                    }
+                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface MemoGet {}
+
+
+
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "메모 삭제 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Void.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "메모 삭제 성공 예시",
+                                            value = """
+                    {
+                      "code": "MEMO004",
+                      "message": "메모가 성공적으로 삭제되었습니다.",
+                      "result": null
+                    }
+                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface MemoDelete {}
+    @ApiResponse(
+            responseCode = "200",
+            description = "메모 전체 조회 성공",
+            content = @Content(
+                    schema = @Schema(implementation = MemoResponseDto.MemoDto.class),
+                    examples = @ExampleObject(
+                            name = "메모 전체 조회 성공 예시",
+                            value = """
+                {
+                  "code": "MEMO_LIST_FETCHED",
+                  "message": "메모 목록을 성공적으로 조회했습니다.",
+                  "result": [
+                    {
+                      "id": 1,
+                      "content": "스터디 준비",
+                      "targetDate": "2025-09-23",
+                      "organizationId": null,
+                      "createdAt": "2025-09-20T10:15:30",
+                      "updatedAt": "2025-09-21T12:00:00"
+                    },
+                    {
+                      "id": 2,
+                      "content": "야간 근무 교대",
+                      "targetDate": "2025-09-25",
+                      "organizationId": 10,
+                      "createdAt": "2025-09-22T09:00:00",
+                      "updatedAt": "2025-09-23T14:20:00"
+                    }
+                  ]
+                }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface MemoGetAll {}
+
+
+    @ApiResponse(
+            responseCode = "201",
+            description = "조직 생성 성공",
+            content = @Content(
+                    schema = @Schema(implementation = OrganizationResponseDto.OrganizationDto.class),
+                    examples = @ExampleObject(
+                            name = "조직 생성 성공 예시",
+                            value = """
+                                    {
+                                      "code": "ORGANIZATION_CREATED",
+                                      "message": "조직이 성공적으로 생성되었습니다.",
+                                      "result": {
+                                        "id": 1,
+                                        "organizationName": "옾날 병원",
+                                        "team": "1조"
+                                      }
+                                    }
+                                    """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface OrganizationCreate {}
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "조직 수정 성공",
+            content = @Content(
+                    schema = @Schema(implementation = OrganizationResponseDto.OrganizationDto.class),
+                    examples = @ExampleObject(
+                            name = "조직 수정 성공 예시",
+                            value = """
+                                    {
+                                      "code": "ORGANIZATION_UPDATED",
+                                      "message": "조직이 성공적으로 수정되었습니다.",
+                                      "result": {
+                                        "id": 1,
+                                        "organizationName": "오프날 병원",
+                                        "team": "2조"
+                                      }
+                                    }
+                                    """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface OrganizationUpdate {}
+
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "특정 조직 조회 성공",
+            content = @Content(
+                    schema = @Schema(implementation = OrganizationResponseDto.OrganizationDto.class),
+                    examples = @ExampleObject(
+                            name = "특정 조직 조회 성공 예시",
+                            value = """
+                                    {
+                                       "code": "ORGANIZATION_FETCHED",
+                                       "message": "조직이 성공적으로 조회되었습니다.",
+                                       "data": {
+                                         "id": 1,
+                                         "organizationName": "옾날 병원",
+                                         "team": "1조"
+                                       }
+                                     }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface OrganizationGet {}
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "전체 조직 조회 성공",
+            content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = OrganizationResponseDto.OrganizationDto.class)),
+                    examples = @ExampleObject(
+                            name = "전체 조직 조회 성공 예시",
+                            value = """
+                                    {
+                                      "code": "ORGANIZATION_FETCHED",
+                                      "message": "조직이 성공적으로 조회되었습니다.",
+                                      "data": [
+                                        {
+                                          "id": 1,
+                                          "organizationName": "옾날 병원",
+                                          "team": "1조"
+                                        },
+                                        {
+                                          "id": 2,
+                                          "organizationName": "오프날 병원",
+                                          "team": "2조"
+                                        }
+                                      ]
+                                    }
+                                    """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface AllOrganizationGet{}
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "조직 삭제 성공",
+            content = @Content(
+                    schema = @Schema(implementation = Void.class),
+                    examples = @ExampleObject(
+                            name = "조직 삭제 성공 예시",
+                            value = """
+                {
+                  "code": "ORG005",
+                  "message": "조직이 성공적으로 삭제되었습니다.",
+                  "result": null
+                }
+                """
+                    )
+            )
+    )
+    @ApiResponse()
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface OrganizationDelete {}
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "토큰 재발급 성공",
+            content = @Content(
+                    schema = @Schema(implementation = TokenDto.TokenResponse.class),
+                    examples = @ExampleObject(
+                            name = "토큰 재발급 성공 예시",
+                            value = """
+                {
+                  "code": "TOKEN_REISSUED",
+                  "message": "토큰이 재발급되었습니다.",
+                  "data": {
+                    "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+                    "refreshToken": "eyJhbGciOiJIUzI1NiJ9..."
+                  }
+                }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface TokenReissue {}
+
 }

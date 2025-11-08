@@ -18,9 +18,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
-        log.error("[CustomException] {}", e.getMessage(), e);
-        ErrorResponse response = ErrorResponse.from(e.getErrorCode());
-        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(response);
+        log.error("[CustomException] {}", e.getMessage());
+
+        if (e.getErrorReason() != null) {
+            ErrorReason reason = e.getErrorReason();
+            ErrorResponse response = new ErrorResponse(reason.getCode(), reason.getMessage());
+            return ResponseEntity.status(reason.getStatus()).body(response);
+        }
+
+        if (e.getErrorCode() != null) {
+            ErrorCode code = e.getErrorCode();
+            ErrorResponse response = new ErrorResponse(code.name(), code.getMessage());
+            return ResponseEntity.status(code.getHttpStatus()).body(response);
+        }
+
+        // fallback (혹시 둘 다 null이면)
+        ErrorResponse response = ErrorResponse.from(ErrorCode.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     // @Valid 유효성 검사 실패 시 에러코드 처리

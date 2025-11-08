@@ -1,38 +1,83 @@
 package com.offnal.shifterz.work.domain;
 
+import com.offnal.shifterz.global.BaseTimeEntity;
+import com.offnal.shifterz.organization.domain.Organization;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
-@Table(name = "work_calendar")
-public class WorkCalendar {
+@Table(
+        name = "work_calendar",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_org_calendar_name",
+                        columnNames = {"organization_id", "calendar_name"}
+                )
+        }
+)
+public class WorkCalendar extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Long memberId;
 
-    private String calendarName; // 근무표 이름
+    @Column(name = "calendar_name", nullable = false)
+    private String calendarName;
 
-    private String year;
+    @Column(nullable = false)
+    private LocalDate startDate;
 
-    private String month;
+    @Column(nullable = false)
+    private LocalDate endDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization;
 
     @Builder.Default
-    @ElementCollection
-    @CollectionTable(name = "work_times", joinColumns = @JoinColumn(name = "work_sch_id"))
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "work_times", joinColumns = @JoinColumn(name = "work_calendar_id"))
+    @MapKeyColumn(name = "time_symbol")
     private Map<String, WorkTime> workTimes = new HashMap<>();
 
-    private String workGroup; // 유저의 근무 조 (예: A조, B조)
+    @OneToMany(mappedBy = "workCalendar",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true)
+    private List<WorkInstance> workInstances = new ArrayList<>();
+
+    // 동시성 제어 - 낙관적 락
+    @Version
+    private Long version;
+
+    // ===== 메서드 =====
+
+    public Long id() { return this.id; }
+    public LocalDate startDate() { return this.startDate; }
+    public LocalDate endDate() { return this.endDate; }
+    public Map<String, WorkTime> workTimes() { return this.workTimes; }
+
+    // 해당 회원 및 조직 소유 캘린더인지
+    public boolean isOwnedBy(Long memberId, Organization org) {
+        if (this.memberId == null || memberId == null) return false;
+        if (this.organization == null || org == null) return false;
+        return Objects.equals(this.memberId, memberId)
+                && Objects.equals(this.organization.getId(), org.getId());
+    }
+
+    // 캘린더의 startDate, endDate 범위를 포함하는지
+    public boolean contains(LocalDate date) {
+        return date != null && !date.isBefore(startDate) && !date.isAfter(endDate);
+    }
+
+    public void putWorkTime(String symbol, WorkTime time) { this.workTimes.put(symbol, time); }
 }

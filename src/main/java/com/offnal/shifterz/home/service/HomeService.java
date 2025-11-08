@@ -1,7 +1,7 @@
 package com.offnal.shifterz.home.service;
 
 import com.offnal.shifterz.global.exception.CustomException;
-import com.offnal.shifterz.global.exception.ErrorCode;
+import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.home.dto.DailyRoutineResDto;
 import com.offnal.shifterz.home.dto.HealthGuideDto;
 import com.offnal.shifterz.home.dto.HomeDetailResDto;
@@ -10,7 +10,10 @@ import com.offnal.shifterz.work.domain.WorkInstance;
 import com.offnal.shifterz.work.domain.WorkTime;
 import com.offnal.shifterz.work.domain.WorkTimeType;
 import com.offnal.shifterz.work.repository.WorkInstanceRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -38,22 +41,16 @@ public class HomeService {
         WorkTimeType tomorrowType = findWorkTypeOrNull(tomorrow, memberId);
 
         // 오늘 근무 정보 조회
-        String day = String.valueOf(today.getDayOfMonth());
-        String year = String.valueOf(today.getYear());
-        String month = String.valueOf(today.getMonthValue());
-
         WorkInstance todayWork = workInstanceRepository
-                .findByWorkDayAndWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(
-                        day, memberId, year, month
-                )
-                .orElseThrow(() -> new CustomException(ErrorCode.WORK_INSTANCE_NOT_FOUND));
+                .findByWorkCalendarMemberIdAndWorkDate(memberId, today)
+                .orElseThrow(() -> new CustomException(HomeErrorCode.WORK_INSTANCE_NOT_FOUND));
 
         WorkTime workTime = null;
         if (todayType != WorkTimeType.OFF) {
-            String typeKey = convertTypeToKey(todayType);
+            String typeKey = todayType.getSymbol();
             workTime = todayWork.getWorkCalendar().getWorkTimes().get(typeKey);
             if (workTime == null) {
-                throw new CustomException(ErrorCode.WORK_TIME_NOT_FOUND);
+                throw new CustomException(HomeErrorCode.WORK_TIME_NOT_FOUND);
             }
         }
 
@@ -77,27 +74,11 @@ public class HomeService {
         };
     }
 
-    // 근무 타입을 키값으로 변환 (ex: DAY -> D)
-    private String convertTypeToKey(WorkTimeType type) {
-        return switch (type) {
-            case DAY -> "D";
-            case EVENING -> "E";
-            case NIGHT -> "N";
-            case OFF -> "-";
-        };
-    }
-
     // 특정 날짜의 근무 형태 조회
     private WorkTimeType findWorkTypeOrNull(LocalDate date, Long memberId) {
-        String day = String.valueOf(date.getDayOfMonth());
-        String year = String.valueOf(date.getYear());
-        String month = String.valueOf(date.getMonthValue());
-
         return workInstanceRepository
-                .findByWorkDayAndWorkCalendar_MemberIdAndWorkCalendar_YearAndWorkCalendar_Month(
-                        day, memberId, year, month
-                )
-                .map(WorkInstance::getWorkTimeType)
+                .findByWorkCalendarMemberIdAndWorkDate(memberId, date)
+                .map(WorkInstance::workType)
                 .orElse(null);
     }
 
@@ -134,7 +115,7 @@ public class HomeService {
     // DAY 근무 루틴 구성
     private DailyRoutineResDto buildDayRoutine(WorkTime workTime) {
         LocalTime start = workTime.getStartTime();
-        LocalTime end = workTime.getEndTime();
+        LocalTime end = start.plus(workTime.getDuration());
 
         LocalTime sleepStart = end.plusHours(6);
         LocalTime sleepEnd = end.plusHours(13);
@@ -157,7 +138,7 @@ public class HomeService {
     // EVENING 근무 루틴 구성
     private DailyRoutineResDto buildEveningRoutine(WorkTime workTime) {
         LocalTime start = workTime.getStartTime();
-        LocalTime end = workTime.getEndTime();
+        LocalTime end = start.plus(workTime.getDuration());
 
         LocalTime sleepStart = end.plusHours(15);
         LocalTime fastingTime = end.plusHours(1);
@@ -180,7 +161,7 @@ public class HomeService {
     // NIGHT 근무 루틴 구성
     private DailyRoutineResDto buildNightRoutine(WorkTime workTime) {
         LocalTime start = workTime.getStartTime();
-        LocalTime end = workTime.getEndTime();
+        LocalTime end = start.plus(workTime.getDuration());
 
         LocalTime preSleepStart = start.minusHours(11);
         LocalTime preSleepEnd = start.minusHours(6);
@@ -246,5 +227,18 @@ public class HomeService {
     // 분 단위 차이 계산
     private long minutesBetween(LocalTime t1, LocalTime t2) {
         return Math.abs(t1.toSecondOfDay() - t2.toSecondOfDay()) / 60;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum HomeErrorCode implements ErrorReason {
+
+        //근무 관련
+        WORK_INSTANCE_NOT_FOUND("HOME001", HttpStatus.NOT_FOUND, "해당 일자에 저장된 근무 정보가 없습니다."),
+        WORK_TIME_NOT_FOUND("HOME002",HttpStatus.NOT_FOUND, "오늘의 근무 시간 정보가 없습니다.");
+
+        private final String code;
+        private final HttpStatus status;
+        private final String message;
     }
 }
