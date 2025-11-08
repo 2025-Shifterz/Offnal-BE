@@ -2,13 +2,12 @@ package com.offnal.shifterz.log.service;
 
 import com.offnal.shifterz.log.domain.Log;
 import com.offnal.shifterz.log.repository.LogRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Propagation;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.offnal.shifterz.member.domain.Member;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
