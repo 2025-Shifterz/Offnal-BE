@@ -15,7 +15,11 @@ public class MemoRequestDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateDto {
-        @NotNull(message = "메모 내용은 필수입니다.")
+
+        @NotNull(message = "메모 제목은 필수입니다.")
+        private String title;
+
+        @NotNull(message = "메모 내용은 선택입니다.")
         private String content;
 
         @NotNull(message = "메모 날짜는 필수입니다.")

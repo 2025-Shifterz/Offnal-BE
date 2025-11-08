@@ -94,12 +94,12 @@ public class MemoService {
     }
 
     @Transactional(readOnly = true)
-    public List<MemoResponseDto.MemoDto> getMemos(String filter, Long organizationId) {
+    public List<MemoResponseDto.MemoDto> getMemos(String filter, Long organizationId, LocalDate targetDate) {
         Member member = AuthService.getCurrentMember();
 
-        MemoFilterType filterType = resolveFilterType(filter, organizationId);
+        boolean unassigned = "unassigned".equalsIgnoreCase(filter);
 
-        List<Memo> memos = executeFilter(member, filterType, filter, organizationId);
+        List<Memo> memos = memoRepository.findMemosWithFilters(member, organizationId, unassigned, targetDate);
 
         return memos.stream()
                 .map(MemoConverter::toDto)
