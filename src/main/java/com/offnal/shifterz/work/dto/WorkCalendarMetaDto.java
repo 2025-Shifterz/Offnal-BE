@@ -1,6 +1,5 @@
 package com.offnal.shifterz.work.dto;
 
-import com.offnal.shifterz.work.domain.WorkTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

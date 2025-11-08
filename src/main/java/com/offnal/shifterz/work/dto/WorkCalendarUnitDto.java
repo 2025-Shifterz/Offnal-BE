@@ -18,7 +18,7 @@ public class WorkCalendarUnitDto {
     @Schema(description = "조직 이름")
     private String organizationName;
 
-    @NotNull(message = "조 이름은 필수입니다.")
+    @NotBlank(message = "조 이름은 필수입니다.")
     @Schema(description = "조 이름")
     private String team;
 
