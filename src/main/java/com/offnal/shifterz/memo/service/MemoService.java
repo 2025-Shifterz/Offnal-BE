@@ -1,16 +1,23 @@
 package com.offnal.shifterz.memo.service;
 
+import static com.offnal.shifterz.global.util.DateUtil.isDateFilter;
+
 import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.memo.converter.MemoConverter;
 import com.offnal.shifterz.memo.domain.Memo;
+import com.offnal.shifterz.memo.domain.MemoFilterType;
 import com.offnal.shifterz.memo.dto.MemoRequestDto;
 import com.offnal.shifterz.memo.dto.MemoResponseDto;
 import com.offnal.shifterz.memo.repository.MemoRepository;
 import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.organization.repository.OrganizationRepository;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -85,33 +92,75 @@ public class MemoService {
 
         memoRepository.delete(memo);
     }
+
     @Transactional(readOnly = true)
     public List<MemoResponseDto.MemoDto> getMemos(String filter, Long organizationId) {
         Member member = AuthService.getCurrentMember();
-        List<Memo> memos;
 
-        if ("unassigned".equalsIgnoreCase(filter)) {
-            // 소속 없는 메모만
-            memos = memoRepository.findAllByMemberAndOrganizationIsNull(member);
+        MemoFilterType filterType = resolveFilterType(filter, organizationId);
 
-        } else if ("all".equalsIgnoreCase(filter)) {
-            // 모든 메모
-            memos = memoRepository.findAllByMember(member);
-
-        } else if (organizationId != null) {
-            // 특정 조직 메모
-            Organization organization = organizationRepository.findById(organizationId)
-                    .orElseThrow(() -> new CustomException(MemoErrorCode.ORGANIZATION_NOT_FOUND));
-            memos = memoRepository.findAllByMemberAndOrganization(member, organization);
-
-        } else {
-            // 기본값: 모든 메모
-            memos = memoRepository.findAllByMember(member);
-        }
+        List<Memo> memos = executeFilter(member, filterType, filter, organizationId);
 
         return memos.stream()
                 .map(MemoConverter::toDto)
                 .toList();
+    }
+
+    private List<Memo> executeFilter(Member member, MemoFilterType type, String filter, Long organizationId) {
+        Map<MemoFilterType, Supplier<List<Memo>>> filterStrategies = Map.of(
+                MemoFilterType.UNASSIGNED, () -> getUnassignedMemos(member),
+                MemoFilterType.ALL, () -> getAllMemos(member),
+                MemoFilterType.ORGANIZATION, () -> getOrganizationMemos(member, organizationId),
+                MemoFilterType.DATE, () -> getMemosByDate(member, filter)
+        );
+
+        return filterStrategies
+                .getOrDefault(type, () -> getAllMemos(member))
+                .get();
+    }
+
+    private MemoFilterType resolveFilterType(String filter, Long organizationId) {
+        if (filter == null || filter.isBlank()) {
+            return MemoFilterType.ALL;
+        }
+        if (isDateFilter(filter)) {
+            return MemoFilterType.DATE;
+        }
+        if ("unassigned".equalsIgnoreCase(filter)) {
+            return MemoFilterType.UNASSIGNED;
+        }
+        if ("all".equalsIgnoreCase(filter)) {
+            return MemoFilterType.ALL;
+        }
+        if (organizationId != null) {
+            return MemoFilterType.ORGANIZATION;
+        }
+
+        return MemoFilterType.ALL;
+    }
+
+    private List<Memo> getUnassignedMemos(Member member) {
+        return memoRepository.findAllByMemberAndOrganizationIsNull(member);
+    }
+
+    private List<Memo> getAllMemos(Member member) {
+        return memoRepository.findAllByMember(member);
+    }
+
+    private List<Memo> getOrganizationMemos(Member member, Long organizationId) {
+        if (organizationId == null) {
+            throw new CustomException(MemoErrorCode.INVALID_FILTER_COMBINATION);
+        }
+
+        Organization organization = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new CustomException(MemoErrorCode.ORGANIZATION_NOT_FOUND));
+
+        return memoRepository.findAllByMemberAndOrganization(member, organization);
+    }
+
+    private List<Memo> getMemosByDate(Member member, String dateString) {
+        LocalDate targetDate = LocalDate.parse(dateString, DateTimeFormatter.ISO_DATE);
+        return memoRepository.findAllByMemberAndCreatedDate(member, targetDate);
     }
 
 
@@ -121,7 +170,8 @@ public class MemoService {
         MEMO_NOT_FOUND("MEMO001", HttpStatus.NOT_FOUND, "메모를 찾을 수 없습니다."),
         ORGANIZATION_NOT_FOUND("MEMO002", HttpStatus.NOT_FOUND, "소속 조직을 찾을 수 없습니다."),
         MEMO_SAVE_FAILED("MEMO003", HttpStatus.INTERNAL_SERVER_ERROR, "메모 저장에 실패했습니다."),
-        MEMO_ACCESS_DENIED("MEMO004", HttpStatus.FORBIDDEN, "해당 메모에 접근 권한이 없습니다.");
+        MEMO_ACCESS_DENIED("MEMO004", HttpStatus.FORBIDDEN, "해당 메모에 접근 권한이 없습니다."),
+        INVALID_FILTER_COMBINATION("MEMO005",HttpStatus.BAD_REQUEST, "필터 조합이 올바르지 않습니다.");
 
         private final String code;
         private final HttpStatus status;
