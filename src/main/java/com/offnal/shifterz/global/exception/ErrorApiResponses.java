@@ -46,6 +46,17 @@ public @interface ErrorApiResponses {
                                     }
                                     """)
                     )),
+            @ApiResponse(responseCode = "401", description = "로그아웃된 Access Token",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(name = "LOGOUT_TOKEN", value = """
+                                {
+                                  "code": "AUTH004",
+                                  "message": "이미 로그아웃된 토큰입니다."
+                                }
+                                """)
+                    )),
             @ApiResponse(responseCode = "502", description = "카카오 사용자 정보 조회 실패",
                     content = @Content(
                             mediaType = "application/json",
