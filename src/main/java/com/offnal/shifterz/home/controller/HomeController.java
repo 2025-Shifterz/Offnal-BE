@@ -1,6 +1,7 @@
 package com.offnal.shifterz.home.controller;
 
 import com.offnal.shifterz.global.exception.ErrorApiResponses;
+import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.home.dto.DailyRoutineResDto;
@@ -59,6 +60,7 @@ public class HomeController {
                     )
             )
     })
+    @SuccessApiResponses.HomeSchedule
     @ErrorApiResponses.Common
     @GetMapping("/schedule")
     public SuccessResponse<WorkScheduleResponseDto> getWorkSchedule() {
@@ -106,6 +108,7 @@ public class HomeController {
                     )
             )
     })
+    @SuccessApiResponses.HomeRoutine
     @ErrorApiResponses.Common
     @GetMapping("/routine")
     public SuccessResponse<DailyRoutineResDto> getDailyRoutine() {
@@ -153,6 +156,7 @@ public class HomeController {
                     )
             )
     })
+    @SuccessApiResponses.HomeRoutine
     @ErrorApiResponses.Common
     @GetMapping("/routine/{date}")
     public SuccessResponse<DailyRoutineResDto> getDailyRoutineByDate(
