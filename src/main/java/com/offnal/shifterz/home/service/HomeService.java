@@ -2,13 +2,14 @@ package com.offnal.shifterz.home.service;
 
 import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.ErrorReason;
-import com.offnal.shifterz.home.converter.HomeDetailConverter;
-import com.offnal.shifterz.home.converter.WorkScheduleConverter;
+import com.offnal.shifterz.home.converter.WorkScheduleContextConverter;
 import com.offnal.shifterz.home.dto.DailyRoutineResDto;
 import com.offnal.shifterz.home.dto.WorkScheduleContext;
 import com.offnal.shifterz.home.dto.WorkScheduleResponseDto;
-import com.offnal.shifterz.member.domain.Member;
+import com.offnal.shifterz.work.domain.WorkCalendar;
+import com.offnal.shifterz.work.domain.WorkTime;
 import com.offnal.shifterz.work.domain.WorkTimeType;
+import com.offnal.shifterz.work.repository.WorkCalendarRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,17 +25,48 @@ public class HomeService {
 
     private final WorkScheduleService workScheduleService;
     private final DailyRoutineService dailyRoutineService;
-    private final WorkScheduleConverter workScheduleConverter;
-    private final HomeDetailConverter homeDetailConverter;
+    private final WorkCalendarRepository workCalendarRepository;
+    private final WorkScheduleContextConverter contextConverter;
 
+    @Transactional(readOnly = true)
     public WorkScheduleResponseDto getWorkSchedule() {
-        Long memberId =AuthService.getCurrentUserId();
-
+        Long memberId = AuthService.getCurrentUserId();
         LocalDate today = LocalDate.now();
-        WorkTimeType todayType = workScheduleService.findWorkType(today, memberId);
 
-        return workScheduleConverter.toDto(todayType);
+        WorkTimeType yesterdayType = workScheduleService.findWorkType(today.minusDays(1), memberId);
+        WorkTimeType todayType = workScheduleService.findWorkType(today, memberId);
+        WorkTimeType tomorrowType = workScheduleService.findWorkType(today.plusDays(1), memberId);
+
+        WorkCalendar workCalendar = workCalendarRepository
+                .findByMemberIdAndDate(memberId, today)
+                .orElse(null);
+
+        WorkTime workTime = null;
+        if (workCalendar != null && todayType != null) {
+
+            workTime = workCalendar.workTimes().get(todayType.name());
+        }
+
+        WorkScheduleContext context = contextConverter.toContext(
+                memberId,
+                today,
+                yesterdayType,
+                todayType,
+                tomorrowType,
+                workTime
+        );
+
+        dailyRoutineService.buildRoutine(context);
+
+        return WorkScheduleResponseDto.builder()
+                .yesterdayType(yesterdayType != null ? yesterdayType : WorkTimeType.OFF)
+                .todayType(todayType != null ? todayType : WorkTimeType.OFF)
+                .tomorrowType(tomorrowType != null ? tomorrowType : WorkTimeType.OFF)
+                .build();
     }
+
+
+
 
     public DailyRoutineResDto getDailyRoutine() {
         return getDailyRoutineByDate(LocalDate.now());

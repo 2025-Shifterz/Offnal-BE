@@ -19,9 +19,10 @@ public class WorkScheduleService {
 
     public WorkTimeType findWorkType(LocalDate date, Long memberId) {
         return workInstanceRepository
-                .findByWorkDateAndMemberIdThroughWorkCalendar(date, memberId, date, date)
+                .findByWorkDateAndMemberIdThroughWorkCalendar(date, memberId)
                 .map(WorkInstance::getWorkTimeType)
                 .orElse(null);
+
     }
 
     public WorkScheduleContext getWorkScheduleContext(Long memberId, LocalDate date) {
@@ -34,7 +35,7 @@ public class WorkScheduleService {
 
         // 오늘 근무 정보 조회
         WorkInstance todayWork = workInstanceRepository
-                .findByWorkDateAndMemberIdThroughWorkCalendar(date, memberId, date, date)
+                .findByWorkDateAndMemberIdThroughWorkCalendar(date, memberId)
                 .orElseThrow(() -> new CustomException(HomeErrorCode.WORK_INSTANCE_NOT_FOUND));
 
         WorkTime workTime = null;

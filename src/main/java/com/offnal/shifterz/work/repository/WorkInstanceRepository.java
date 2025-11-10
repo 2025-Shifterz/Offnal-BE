@@ -30,4 +30,15 @@ public interface WorkInstanceRepository extends JpaRepository<WorkInstance, Long
     @Query("delete from WorkInstance wi where wi.workCalendar.id = :calendarId")
     void deleteByWorkCalendarId(@Param("calendarId") Long calendarId);
 
+    @Query("""
+        select wi
+        from WorkInstance wi
+        join wi.workCalendar wc
+        where wi.workDate = :workDate
+          and wc.memberId = :memberId
+    """)
+    Optional<WorkInstance> findByWorkDateAndMemberIdThroughWorkCalendar(
+            @Param("workDate") LocalDate workDate,
+            @Param("memberId") Long memberId
+    );
 }

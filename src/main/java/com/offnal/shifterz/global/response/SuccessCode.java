@@ -37,7 +37,10 @@ public enum SuccessCode {
     ORGANIZATION_CREATED("ORG001", HttpStatus.CREATED, "조직이 성공적으로 생성되었습니다."),
     ORGANIZATION_UPDATED("ORG002", HttpStatus.OK,  "조직이 성공적으로 수정되었습니다."),
     ORGANIZATION_FETCHED("ORG003",HttpStatus.OK,  "조직이 성공적으로 조회되었습니다."),
-    ORGANIZATION_DELETED("ORG004", HttpStatus.OK, "조직이 성공적으로 삭제되었습니다.");
+    ORGANIZATION_DELETED("ORG004", HttpStatus.OK, "조직이 성공적으로 삭제되었습니다."),
+
+    WORK_SCHEDULE_FETCHED("HOME001", HttpStatus.OK, "근무 일정을 성공적으로 조회했습니다."),
+    DAILY_ROUTINE_FETCHED("HOME002", HttpStatus.OK, "루틴을 성공적으로 조회했습니다.");
 
     private final String code;
     private final HttpStatus httpStatus;

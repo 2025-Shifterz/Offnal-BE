@@ -20,15 +20,4 @@ public class WorkScheduleResponseDto {
     @Schema(description = "내일의 근무 유형")
     private WorkTimeType tomorrowType;
 
-    @Schema(description = "오늘의 루틴 정보 (식사, 수면, 공복 등)")
-    private DailyRoutineResDto todayRoutine;
-
-    public static WorkScheduleResponseDto from(WorkTimeType yesterdayType, WorkTimeType todayType, WorkTimeType tomorrowType, DailyRoutineResDto routine) {
-        return WorkScheduleResponseDto.builder()
-                .yesterdayType(yesterdayType)
-                .todayType(todayType)
-                .tomorrowType(tomorrowType)
-                .todayRoutine(routine)
-                .build();
-    }
 }

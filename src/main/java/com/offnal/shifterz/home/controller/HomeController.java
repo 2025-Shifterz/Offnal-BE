@@ -6,7 +6,6 @@ import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.home.dto.DailyRoutineResDto;
 import com.offnal.shifterz.home.dto.WorkScheduleResponseDto;
 import com.offnal.shifterz.home.service.HomeService;
-import com.offnal.shifterz.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,8 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +32,7 @@ public class HomeController {
 
     @Operation(
             summary = "근무 일정 조회",
-            description = "오늘의 근무 타입을 반환합니다."
+            description = "어제, 오늘, 내일의 근무 타입을 반환합니다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -44,22 +41,29 @@ public class HomeController {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = WorkScheduleResponseDto.class),
-                            examples = @ExampleObject(value = """
-                    {
-                      "success": true,
-                      "data": {
-                        "today": "OFF"
-                      }
-                    }
-                    """)
+                            examples = @ExampleObject(
+                                    name = "근무 일정 조회 성공 예시",
+                                    value = """
+                        {
+                          "success": true,
+                          "code": "HOME001",
+                          "message": "근무 일정을 성공적으로 조회했습니다.",
+                          "data": {
+                            "yesterdayType": "DAY",
+                            "todayType": "OFF",
+                            "tomorrowType": "DAY"
+                          }
+                        }
+                        """
+                            )
                     )
             )
     })
     @ErrorApiResponses.Common
     @GetMapping("/schedule")
-    public ResponseEntity<SuccessResponse<WorkScheduleResponseDto>> getWorkSchedule() {
+    public SuccessResponse<WorkScheduleResponseDto> getWorkSchedule() {
         WorkScheduleResponseDto responseDto = homeService.getWorkSchedule();
-        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, responseDto));
+        return SuccessResponse.success(SuccessCode.WORK_SCHEDULE_FETCHED, responseDto);
     }
 
     @Operation(
@@ -73,9 +77,13 @@ public class HomeController {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = DailyRoutineResDto.class),
-                            examples = @ExampleObject(value = """
+                            examples = @ExampleObject(
+                                    name = "오늘의 루틴 조회 성공 예시",
+                                    value = """
                     {
                       "success": true,
+                      "code": "HOME002",
+                      "message": "루틴을 성공적으로 조회했습니다.",
                       "data": {
                         "meals": [
                           {
@@ -93,15 +101,16 @@ public class HomeController {
                         }
                       }
                     }
-                    """)
+                    """
+                            )
                     )
             )
     })
     @ErrorApiResponses.Common
     @GetMapping("/routine")
-    public ResponseEntity<SuccessResponse<DailyRoutineResDto>> getDailyRoutine() {
+    public SuccessResponse<DailyRoutineResDto> getDailyRoutine() {
         DailyRoutineResDto responseDto = homeService.getDailyRoutine();
-        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, responseDto));
+        return SuccessResponse.success(SuccessCode.DAILY_ROUTINE_FETCHED, responseDto);
     }
 
     @Operation(
@@ -114,17 +123,43 @@ public class HomeController {
                     description = "루틴 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = DailyRoutineResDto.class)
+                            schema = @Schema(implementation = DailyRoutineResDto.class),
+                            examples = @ExampleObject(
+                                    name = "특정 날짜 루틴 조회 성공 예시",
+                                    value = """
+                    {
+                      "success": true,
+                      "code": "HOME002",
+                      "message": "루틴을 성공적으로 조회했습니다.",
+                      "data": {
+                        "meals": [
+                          {
+                            "label": "아침",
+                            "time": "08:00",
+                            "description": "수면 후 가벼운 식사",
+                            "items": ["샐러드", "토스트"]
+                          }
+                        ],
+                        "health": {
+                          "fastingComment": "공복 유지 권장",
+                          "fastingSchedule": "저녁 이후 금식",
+                          "sleepGuide": ["23:00 ~ 06:00 수면"],
+                          "sleepSchedule": "수면 23:00 ~ 06:00"
+                        }
+                      }
+                    }
+                    """
+                            )
                     )
             )
     })
     @ErrorApiResponses.Common
     @GetMapping("/routine/{date}")
-    public ResponseEntity<SuccessResponse<DailyRoutineResDto>> getDailyRoutineByDate(
+    public SuccessResponse<DailyRoutineResDto> getDailyRoutineByDate(
             @Parameter(description = "조회할 날짜 (yyyy-MM-dd)", example = "2025-11-05")
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         DailyRoutineResDto responseDto = homeService.getDailyRoutineByDate(date);
-        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, responseDto));
+        return SuccessResponse.success(SuccessCode.DAILY_ROUTINE_FETCHED, responseDto);
     }
 }
