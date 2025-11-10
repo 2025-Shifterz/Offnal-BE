@@ -106,64 +106,6 @@ public class MemoService {
                 .toList();
     }
 
-    private List<Memo> executeFilter(Member member, MemoFilterType type, String filter, Long organizationId) {
-        Map<MemoFilterType, Supplier<List<Memo>>> filterStrategies = Map.of(
-                MemoFilterType.UNASSIGNED, () -> getUnassignedMemos(member),
-                MemoFilterType.ALL, () -> getAllMemos(member),
-                MemoFilterType.ORGANIZATION, () -> getOrganizationMemos(member, organizationId),
-                MemoFilterType.DATE, () -> getMemosByDate(member, filter)
-        );
-
-        return filterStrategies
-                .getOrDefault(type, () -> getAllMemos(member))
-                .get();
-    }
-
-    private MemoFilterType resolveFilterType(String filter, Long organizationId) {
-        if (filter == null || filter.isBlank()) {
-            return MemoFilterType.ALL;
-        }
-        if (isDateFilter(filter)) {
-            return MemoFilterType.DATE;
-        }
-        if ("unassigned".equalsIgnoreCase(filter)) {
-            return MemoFilterType.UNASSIGNED;
-        }
-        if ("all".equalsIgnoreCase(filter)) {
-            return MemoFilterType.ALL;
-        }
-        if (organizationId != null) {
-            return MemoFilterType.ORGANIZATION;
-        }
-
-        return MemoFilterType.ALL;
-    }
-
-    private List<Memo> getUnassignedMemos(Member member) {
-        return memoRepository.findAllByMemberAndOrganizationIsNull(member);
-    }
-
-    private List<Memo> getAllMemos(Member member) {
-        return memoRepository.findAllByMember(member);
-    }
-
-    private List<Memo> getOrganizationMemos(Member member, Long organizationId) {
-        if (organizationId == null) {
-            throw new CustomException(MemoErrorCode.INVALID_FILTER_COMBINATION);
-        }
-
-        Organization organization = organizationRepository.findById(organizationId)
-                .orElseThrow(() -> new CustomException(MemoErrorCode.ORGANIZATION_NOT_FOUND));
-
-        return memoRepository.findAllByMemberAndOrganization(member, organization);
-    }
-
-    private List<Memo> getMemosByDate(Member member, String dateString) {
-        LocalDate targetDate = LocalDate.parse(dateString, DateTimeFormatter.ISO_DATE);
-        return memoRepository.findAllByMemberAndCreatedDate(member, targetDate);
-    }
-
-
     @Getter
     @AllArgsConstructor
     public enum MemoErrorCode implements ErrorReason {

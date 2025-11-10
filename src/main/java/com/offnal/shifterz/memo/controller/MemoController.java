@@ -37,7 +37,7 @@ public class MemoController {
             summary = "메모 생성",
             description = "새로운 메모를 생성합니다.\n\n" +
                     "✅ 요청 본문에 포함할 수 있는 값:\n" +
-                    "- title: 메모 재목 (String, 필수)\n" +
+                    "- title: 메모 제목 (String, 필수)\n" +
                     "- content: 메모 내용 (String, 선택)\n" +
                     "- targetDate: 목표 날짜 (LocalDate, 기본 오늘 날짜)\n" +
                     "- organizationId: 소속 조직 ID (Long, 선택, **없으면 null로 보내세요**)"
@@ -143,6 +143,9 @@ public class MemoController {
             @ApiResponse(responseCode = "401", description = "인증 실패 (토큰 없음 또는 만료)", content = @Content),
             @ApiResponse(responseCode = "500", description = "서버 내부 오류", content = @Content)
     })
+    @SuccessApiResponses.MemoGetAll
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
     @GetMapping
     public SuccessResponse<List<MemoResponseDto.MemoDto>> getMemos(
             @Parameter(

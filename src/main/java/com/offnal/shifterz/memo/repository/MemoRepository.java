@@ -25,7 +25,7 @@ public interface MemoRepository extends JpaRepository<Memo, Long> {
     WHERE m.member = :member
       AND (:organizationId IS NULL OR m.organization.id = :organizationId)
       AND (:unassigned = TRUE AND m.organization IS NULL OR :unassigned = FALSE)
-      AND (:targetDate IS NULL OR FUNCTION('DATE', m.targetDate) = :targetDate)
+      AND FUNCTION('DATE', m.targetDate) = :targetDate
 """)
     List<Memo> findMemosWithFilters(
             @Param("member") Member member,
