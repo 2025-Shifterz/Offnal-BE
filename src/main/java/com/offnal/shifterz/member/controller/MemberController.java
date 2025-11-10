@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User", description  = "User 관련 API")
@@ -41,6 +42,15 @@ public class MemberController {
         return SuccessResponse.success(SuccessCode.MY_INFO_FETCHED, memberService.getMyInfo());
     }
 
+    @Operation(summary = "회원 탈퇴", description = "사용자의 계정을 삭제합니다.")
+    @SuccessApiResponses.Withdraw
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.Common
+    @DeleteMapping("/withdraw")
+    public SuccessResponse<Void> withdraw() {
+        memberService.withdrawCurrentMember();
+        return SuccessResponse.success(SuccessCode.MEMBER_DELETED);
+    }
 
 
 }

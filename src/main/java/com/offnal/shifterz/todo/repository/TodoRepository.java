@@ -29,4 +29,5 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
             @Param("targetDate") LocalDate targetDate
     );
 
+    void deleteByMemberId(Long memberId);
 }

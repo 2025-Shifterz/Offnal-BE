@@ -34,4 +34,5 @@ public interface MemoRepository extends JpaRepository<Memo, Long> {
             @Param("targetDate") LocalDate targetDate
     );
 
+    void deleteByMemberId(Long memberId);
 }
