@@ -8,8 +8,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface LogRepository extends JpaRepository<Log, Long> {
 
-    @Modifying(clearAutomatically = true)
-    @Query("UPDATE Log l SET l.member = NULL WHERE l.member.id = :memberId")
-    void anonymizeMemberLogs(@Param("memberId") Long memberId);
+    @Modifying
+    @Query("UPDATE Log l SET l.member = null, l.anonymizedIdentifier = :anonymized WHERE l.member.id = :memberId")
+    void anonymizeMemberLogs(@Param("memberId") Long memberId, @Param("anonymized") String anonymized);
 }
 

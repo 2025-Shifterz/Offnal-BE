@@ -4,6 +4,7 @@ import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.global.util.RedisUtil;
+import com.offnal.shifterz.log.domain.Log;
 import com.offnal.shifterz.log.repository.LogRepository;
 import com.offnal.shifterz.member.converter.MemberConverter;
 import com.offnal.shifterz.member.domain.Member;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Slf4j
@@ -112,13 +114,15 @@ public class MemberService {
     public void withdrawCurrentMember() {
         Long memberId = AuthService.getCurrentUserId();
 
+        String anonymized = "deleted_user_" + System.currentTimeMillis() / 1000;
+
         if (!memberRepository.existsById(memberId)) {
             throw new CustomException(MemberErrorCode.MEMBER_NOT_FOUND);
         }
 
         try {
             // 로그에서 member 비식별화 (null 처리)
-            logRepository.anonymizeMemberLogs(memberId);
+            logRepository.anonymizeMemberLogs(memberId, anonymized);
 
             memoRepository.deleteByMemberId(memberId);
             todoRepository.deleteByMemberId(memberId);
@@ -127,6 +131,15 @@ public class MemberService {
             memberRepository.deleteById(memberId);
 
             redisUtil.delete("RT:" + memberId);
+
+            Log withdrawLog = Log.builder()
+                    .member(null)
+                    .action('C')
+                    .time(LocalDateTime.now())
+                    .message("회원 탈퇴 처리 완료")
+                    .anonymizedIdentifier(anonymized)
+                    .build();
+            logRepository.save(withdrawLog);
 
         } catch (Exception e) {
             throw new CustomException(MemberErrorCode.MEMBER_WITHDRAW_FAILED);
