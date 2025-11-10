@@ -46,7 +46,6 @@ public class HomeController {
                                     name = "근무 일정 조회 성공 예시",
                                     value = """
                         {
-                          "success": true,
                           "code": "HOME001",
                           "message": "근무 일정을 성공적으로 조회했습니다.",
                           "data": {
@@ -83,7 +82,6 @@ public class HomeController {
                                     name = "오늘의 루틴 조회 성공 예시",
                                     value = """
                     {
-                      "success": true,
                       "code": "HOME002",
                       "message": "루틴을 성공적으로 조회했습니다.",
                       "data": {
@@ -131,7 +129,6 @@ public class HomeController {
                                     name = "특정 날짜 루틴 조회 성공 예시",
                                     value = """
                     {
-                      "success": true,
                       "code": "HOME002",
                       "message": "루틴을 성공적으로 조회했습니다.",
                       "data": {
