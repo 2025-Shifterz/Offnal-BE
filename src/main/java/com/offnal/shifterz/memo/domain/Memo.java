@@ -22,6 +22,10 @@ public class Memo extends BaseTimeEntity {
 
     @Lob
     @Column(nullable = false)
+    private String title;
+
+    @Lob
+    @Column()
     private String content;
 
     @Column(nullable = false)
@@ -32,7 +36,7 @@ public class Memo extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organizationI_id")
+    @JoinColumn(name = "organization_id")
     private Organization organization; // nullable
 
     public void update(MemoRequestDto.UpdateMemoDto request) {
