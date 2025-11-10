@@ -116,13 +116,20 @@ public class JwtTokenProvider {
 
     // AccessToken 만료까지 남은 기간 (밀리초 단위)
     public long getExpiration(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
 
-        Date expiration = claims.getExpiration();
-        return expiration.getTime() - System.currentTimeMillis();
+            Date expiration = claims.getExpiration();
+            return expiration.getTime() - System.currentTimeMillis();
+
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            throw new CustomException(TokenService.TokenErrorCode.INVALID_TOKEN); // 만료된 토큰
+        } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
+            throw new CustomException(TokenService.TokenErrorCode.INVALID_TOKEN); // 변조, 파싱 실패 등
+        }
     }
 }

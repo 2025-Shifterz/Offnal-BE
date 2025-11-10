@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TokenController {
 
     private final TokenService tokenService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(summary = "토큰 재발급", description = "만료된 Access Token을 재발급합니다. Refresh Token이 필요합니다.")
     @SuccessApiResponses.TokenReissue
@@ -40,13 +41,11 @@ public class TokenController {
     @ErrorApiResponses.Auth
     @PostMapping("/logout")
     public SuccessResponse<Void> logout(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
+        String accessToken = jwtTokenProvider.resolveToken(request);
 
-        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+        if (accessToken == null) {
             throw new CustomException(TokenService.TokenErrorCode.INVALID_TOKEN);
         }
-
-        String accessToken = bearerToken.substring(7);
 
         tokenService.logout(accessToken);
 

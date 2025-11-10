@@ -1,7 +1,9 @@
 package com.offnal.shifterz.jwt;
 
-import com.offnal.shifterz.global.exception.CustomException;
+import com.offnal.shifterz.global.exception.CustomAuthenticationEntryPoint;
 import com.offnal.shifterz.global.util.RedisUtil;
+import com.offnal.shifterz.jwt.exception.JwtAuthException;
+import com.offnal.shifterz.jwt.exception.JwtErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -22,6 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisUtil redisUtil;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -29,7 +33,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(token != null && jwtTokenProvider.validateToken(token)) {
             // 블랙리스트 체크
             if(redisUtil.isBlackListed(token)) {
-                throw new CustomException(TokenService.TokenErrorCode.LOGOUT_TOKEN);
+                authenticationEntryPoint.commence(
+                        request,
+                        response,
+                        new AuthenticationException("로그아웃된 토큰입니다.") {}
+                );
+                return;
             }
 
             Authentication authentication = jwtTokenProvider.getAuthentication(token);

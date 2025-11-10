@@ -2,9 +2,10 @@ package com.offnal.shifterz.home.builder;
 
 import com.offnal.shifterz.global.util.TimeFormatter;
 import com.offnal.shifterz.home.dto.SleepScheduleDto;
-import java.util.Comparator;
+
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class SleepScheduleBuilder {

@@ -60,7 +60,11 @@ public class TokenService {
         refreshTokenRepository.delete(memberId);
 
         long expiration = jwtTokenProvider.getExpiration(accessToken);
-        redisUtil.setBlackList(accessToken, expiration, TimeUnit.MILLISECONDS);
+        if (expiration > 0) {
+            redisUtil.setBlackList(accessToken, expiration, TimeUnit.MILLISECONDS);
+        } else {
+            throw new CustomException(TokenService.TokenErrorCode.INVALID_TOKEN);
+        }
     }
 
     @Getter

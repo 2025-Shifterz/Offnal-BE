@@ -1,10 +1,11 @@
 package com.offnal.shifterz.home.dto;
 
 import com.offnal.shifterz.work.domain.WorkTime;
-import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.time.LocalTime;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
