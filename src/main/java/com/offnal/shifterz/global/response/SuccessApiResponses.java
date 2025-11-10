@@ -793,4 +793,23 @@ public @interface SuccessApiResponses {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface TokenReissue {}
 
+    @ApiResponse(
+            responseCode = "200",
+            description = "로그아웃 성공",
+            content = @Content(
+                    examples = @ExampleObject(
+                            name = "로그아웃 성공 예시",
+                            value = """
+                                    {
+                                       "code": "LOGOUT_SUCCESS",
+                                       "message": "로그아웃에 성공했습니다.",
+                                       "data": null
+                                     }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Logout {}
 }

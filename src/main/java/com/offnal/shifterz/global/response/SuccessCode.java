@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 public enum SuccessCode {
 
     LOGIN_SUCCESS("AUTH001", HttpStatus.OK, "로그인을 성공했습니다."),
+    LOGOUT_SUCCESS("AUTH002", HttpStatus.OK, "로그아웃에 성공했습니다."),
     DATA_FETCHED("COMMON001", HttpStatus.OK, "데이터 조회에 성공했습니다."),
     OK("COMMON002", HttpStatus.OK, "요청이 정상적으로 처리되었습니다."),
     TOKEN_REISSUED("AUTH200", HttpStatus.OK, "토큰이 재발급되었습니다."),
