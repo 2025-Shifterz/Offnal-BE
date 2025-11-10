@@ -28,7 +28,12 @@ public class MealCardDto {
 
     public static MealCardDto from(String label, String time,
                                    String description, List<String> items) {
-        return new MealCardDto(label, time, description, items);
+        return MealCardDto.builder()
+                .label(label)
+                .time(time)
+                .description(description)
+                .items(items)
+                .build();
     }
 
     public static MealCardDto from(String label, LocalTime time,
