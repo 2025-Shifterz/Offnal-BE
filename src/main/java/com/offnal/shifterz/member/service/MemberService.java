@@ -4,6 +4,7 @@ import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.global.util.RedisUtil;
+import com.offnal.shifterz.jwt.TokenService;
 import com.offnal.shifterz.log.domain.Log;
 import com.offnal.shifterz.log.repository.LogRepository;
 import com.offnal.shifterz.member.converter.MemberConverter;
@@ -17,6 +18,7 @@ import com.offnal.shifterz.organization.repository.OrganizationRepository;
 import com.offnal.shifterz.todo.repository.TodoRepository;
 import com.offnal.shifterz.work.repository.WorkCalendarRepository;
 import com.offnal.shifterz.work.repository.WorkInstanceRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,6 +44,7 @@ public class MemberService {
     private final RedisUtil redisUtil;
     private final WorkInstanceRepository workInstanceRepository;
     private final WorkCalendarRepository workCalendarRepository;
+    private final TokenService tokenService;
 
     /**
      * 소셜 로그인 회원 등록 또는 업데이트
@@ -116,7 +119,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void withdrawCurrentMember() {
+    public void withdrawCurrentMember(HttpServletRequest request) {
         Long memberId = AuthService.getCurrentUserId();
 
         String anonymized = "deleted_user_" + UUID.randomUUID();
@@ -138,6 +141,8 @@ public class MemberService {
             memberRepository.deleteById(memberId);
 
             redisUtil.delete("RT:" + memberId);
+
+            tokenService.blacklistAccessToken(request);
 
             Log withdrawLog = Log.builder()
                     .member(null)

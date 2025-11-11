@@ -6,7 +6,6 @@ import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.repository.MemberRepository;
 import com.offnal.shifterz.member.repository.RefreshTokenRepository;
-import com.offnal.shifterz.member.service.MemberService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -16,7 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -26,9 +24,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Component
 public class JwtTokenProvider {
-    private final MemberService memberService;
     private final MemberRepository memberRepository;
-    private final UserDetailsService userDetailsService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProperties jwtProperties;
 

@@ -5,6 +5,7 @@ import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.global.util.RedisUtil;
 import com.offnal.shifterz.member.repository.RefreshTokenRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +66,17 @@ public class TokenService {
             redisUtil.setBlackList(accessToken, expiration, TimeUnit.MILLISECONDS);
         } else {
             throw new CustomException(TokenService.TokenErrorCode.INVALID_TOKEN);
+        }
+    }
+
+    /**
+     * Access Token을 블랙리스트에 등록 (회원 탈퇴 또는 로그아웃)
+     */
+    public void blacklistAccessToken(HttpServletRequest request) {
+        String accessToken = jwtTokenProvider.resolveToken(request);
+        if (accessToken != null) {
+            long expiration = jwtTokenProvider.getExpiration(accessToken);
+            redisUtil.setBlackList(accessToken, Math.max(expiration, 0L), TimeUnit.MILLISECONDS);
         }
     }
 

@@ -9,6 +9,7 @@ import com.offnal.shifterz.member.dto.MemberResponseDto;
 import com.offnal.shifterz.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -46,8 +47,8 @@ public class MemberController {
     @ErrorApiResponses.Auth
     @ErrorApiResponses.Common
     @DeleteMapping("/withdraw")
-    public SuccessResponse<Void> withdraw() {
-        memberService.withdrawCurrentMember();
+    public SuccessResponse<Void> withdraw(HttpServletRequest request) {
+        memberService.withdrawCurrentMember(request);
         return SuccessResponse.success(SuccessCode.MEMBER_DELETED);
     }
 
