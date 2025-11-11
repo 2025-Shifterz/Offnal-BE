@@ -2,7 +2,8 @@ package com.offnal.shifterz.work.repository;
 
 import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.work.domain.WorkCalendar;
-import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -39,5 +40,6 @@ public interface WorkCalendarRepository extends JpaRepository<WorkCalendar, Long
     );
 
     @Transactional
+    @Modifying
     void deleteByMemberId(Long memberId);
 }
