@@ -1,5 +1,6 @@
 package com.offnal.shifterz.jwt;
 
+import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.global.util.RedisUtil;
@@ -56,7 +57,7 @@ public class TokenService {
      * 로그아웃 - 사용자의 Refresh Token 삭제
      */
     public void logout(String accessToken) {
-        Long memberId = com.offnal.shifterz.global.common.AuthService.getCurrentUserId();
+        Long memberId = AuthService.getCurrentUserId();
         refreshTokenRepository.delete(memberId);
 
         long expiration = jwtTokenProvider.getExpiration(accessToken);

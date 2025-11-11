@@ -1,16 +1,14 @@
 package com.offnal.shifterz.jwt.exception;
 
-import com.offnal.shifterz.global.exception.ErrorReason;
+import com.offnal.shifterz.global.exception.ErrorCode;
 import lombok.Getter;
-
-import javax.naming.AuthenticationException;
 
 @Getter
 public class JwtAuthException extends RuntimeException {
-    private final ErrorReason errorReason;
+    private final ErrorCode errorCode;
 
-    public JwtAuthException(ErrorReason errorReason) {
-        super(errorReason.getMessage());
-        this.errorReason = errorReason;
+    public JwtAuthException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
 }

@@ -2,8 +2,6 @@ package com.offnal.shifterz.jwt;
 
 import com.offnal.shifterz.global.exception.CustomAuthenticationEntryPoint;
 import com.offnal.shifterz.global.util.RedisUtil;
-import com.offnal.shifterz.jwt.exception.JwtAuthException;
-import com.offnal.shifterz.jwt.exception.JwtErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
