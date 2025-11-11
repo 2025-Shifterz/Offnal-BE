@@ -124,12 +124,13 @@ public class JwtTokenProvider {
                     .getBody();
 
             Date expiration = claims.getExpiration();
-            return expiration.getTime() - System.currentTimeMillis();
+            long remaining = expiration.getTime() - System.currentTimeMillis();
+            return Math.max(remaining, 0L);
 
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            throw new CustomException(TokenService.TokenErrorCode.INVALID_TOKEN); // 만료된 토큰
-        } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
-            throw new CustomException(TokenService.TokenErrorCode.INVALID_TOKEN); // 변조, 파싱 실패 등
+            return 0L; // 만료된 토큰
+        } catch (Exception e) {
+            throw new CustomException(TokenService.TokenErrorCode.INVALID_TOKEN);
         }
     }
 }

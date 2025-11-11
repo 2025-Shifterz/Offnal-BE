@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -118,7 +119,7 @@ public class MemberService {
     public void withdrawCurrentMember() {
         Long memberId = AuthService.getCurrentUserId();
 
-        String anonymized = "deleted_user_" + System.currentTimeMillis() / 1000;
+        String anonymized = "deleted_user_" + UUID.randomUUID();
 
         if (!memberRepository.existsById(memberId)) {
             throw new CustomException(MemberErrorCode.MEMBER_NOT_FOUND);
