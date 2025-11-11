@@ -15,6 +15,8 @@ import com.offnal.shifterz.member.repository.MemberRepository;
 import com.offnal.shifterz.memo.repository.MemoRepository;
 import com.offnal.shifterz.organization.repository.OrganizationRepository;
 import com.offnal.shifterz.todo.repository.TodoRepository;
+import com.offnal.shifterz.work.repository.WorkCalendarRepository;
+import com.offnal.shifterz.work.repository.WorkInstanceRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,6 +39,8 @@ public class MemberService {
     private final OrganizationRepository organizationRepository;
     private final LogRepository logRepository;
     private final RedisUtil redisUtil;
+    private final WorkInstanceRepository workInstanceRepository;
+    private final WorkCalendarRepository workCalendarRepository;
 
     /**
      * 소셜 로그인 회원 등록 또는 업데이트
@@ -126,6 +130,8 @@ public class MemberService {
 
             memoRepository.deleteByMemberId(memberId);
             todoRepository.deleteByMemberId(memberId);
+            workInstanceRepository.deleteByMemberId(memberId);
+            workCalendarRepository.deleteByMemberId(memberId);
             organizationRepository.deleteByOrganizationMember_Id(memberId);
 
             memberRepository.deleteById(memberId);
