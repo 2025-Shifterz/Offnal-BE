@@ -2,11 +2,11 @@ package com.offnal.shifterz.home.dto;
 
 import com.offnal.shifterz.global.util.TimeFormatter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter

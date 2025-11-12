@@ -1,6 +1,9 @@
 package com.offnal.shifterz.global.config;
 
+import com.offnal.shifterz.global.exception.CustomAuthenticationEntryPoint;
+import com.offnal.shifterz.global.util.RedisUtil;
 import com.offnal.shifterz.jwt.JwtAuthenticationFilter;
+import com.offnal.shifterz.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +23,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisUtil redisUtil;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -40,7 +45,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .formLogin(formLogin -> formLogin.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisUtil, customAuthenticationEntryPoint),
+                        UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

@@ -1,23 +1,16 @@
 package com.offnal.shifterz.memo.service;
 
-import static com.offnal.shifterz.global.util.DateUtil.isDateFilter;
-
 import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.memo.converter.MemoConverter;
 import com.offnal.shifterz.memo.domain.Memo;
-import com.offnal.shifterz.memo.domain.MemoFilterType;
 import com.offnal.shifterz.memo.dto.MemoRequestDto;
 import com.offnal.shifterz.memo.dto.MemoResponseDto;
 import com.offnal.shifterz.memo.repository.MemoRepository;
 import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.organization.repository.OrganizationRepository;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 

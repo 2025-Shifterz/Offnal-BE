@@ -43,4 +43,26 @@ public class ErrorResponse {
         this.message = message;
         this.errors = null;
     }
+
+    public static ErrorResponse of(ErrorReason reason) {
+        return ErrorResponse.builder()
+                .code(reason.getCode())
+                .message(reason.getMessage())
+                .build();
+    }
+
+    public static ErrorResponse of(String code, String message) {
+        return ErrorResponse.builder()
+                .code(code)
+                .message(message)
+                .build();
+    }
+
+    public static ErrorResponse of(String code, String message, Map<String, String> errors) {
+        return ErrorResponse.builder()
+                .code(code)
+                .message(message)
+                .errors(errors)
+                .build();
+    }
 }

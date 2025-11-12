@@ -11,7 +11,6 @@ import com.offnal.shifterz.todo.domain.Todo;
 import com.offnal.shifterz.todo.dto.TodoRequestDto;
 import com.offnal.shifterz.todo.dto.TodoResponseDto;
 import com.offnal.shifterz.todo.repository.TodoRepository;
-import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 

@@ -1,8 +1,11 @@
 package com.offnal.shifterz.jwt;
 
+import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
+import com.offnal.shifterz.global.util.RedisUtil;
 import com.offnal.shifterz.member.repository.RefreshTokenRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ public class TokenService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisUtil redisUtil;
 
 
     /**
@@ -50,10 +54,39 @@ public class TokenService {
         return new TokenDto.TokenResponse(newAccessToken, newRefreshToken);
     }
 
+    /**
+     * 로그아웃 - 사용자의 Refresh Token 삭제
+     */
+    public void logout(String accessToken) {
+        Long memberId = AuthService.getCurrentUserId();
+        refreshTokenRepository.delete(memberId);
+
+        long expiration = jwtTokenProvider.getExpiration(accessToken);
+        if (expiration > 0) {
+            redisUtil.setBlackList(accessToken, expiration, TimeUnit.MILLISECONDS);
+        } else {
+            throw new CustomException(TokenService.TokenErrorCode.INVALID_TOKEN);
+        }
+    }
+
+    /**
+     * Access Token을 블랙리스트에 등록 (회원 탈퇴 또는 로그아웃)
+     */
+    public void blacklistAccessToken(HttpServletRequest request) {
+        String accessToken = jwtTokenProvider.resolveToken(request);
+        if (accessToken != null) {
+            long expiration = jwtTokenProvider.getExpiration(accessToken);
+            redisUtil.setBlackList(accessToken, Math.max(expiration, 0L), TimeUnit.MILLISECONDS);
+        }
+    }
+
     @Getter
     @AllArgsConstructor
-    private enum TokenErrorCode implements ErrorReason {
-        INVALID_REFRESH_TOKEN("AUTH003", HttpStatus.UNAUTHORIZED, "유효하지 않은 Refresh Token입니다.");
+    public enum TokenErrorCode implements ErrorReason {
+        INVALID_TOKEN("AUTH001", HttpStatus.NOT_FOUND, "해당 회원을 찾을 수 없습니다."),
+        UNAUTHORIZED("AUTH002", HttpStatus.FORBIDDEN, "로그인되지 않았습니다."),
+        INVALID_REFRESH_TOKEN("AUTH003", HttpStatus.UNAUTHORIZED, "유효하지 않은 Refresh Token입니다."),
+        LOGOUT_TOKEN("AUTH004", HttpStatus.UNAUTHORIZED, "이미 로그아웃된 토큰입니다.");
         private final String code;
         private final HttpStatus status;
         private final String message;

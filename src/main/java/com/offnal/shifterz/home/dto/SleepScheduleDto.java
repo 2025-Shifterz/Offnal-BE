@@ -1,9 +1,10 @@
 package com.offnal.shifterz.home.dto;
 
 import com.offnal.shifterz.global.util.TimeFormatter;
-import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.time.LocalTime;
 
 @Getter
 @AllArgsConstructor(staticName = "of")
