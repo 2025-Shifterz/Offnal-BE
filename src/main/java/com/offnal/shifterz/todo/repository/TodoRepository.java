@@ -1,15 +1,13 @@
 package com.offnal.shifterz.todo.repository;
 
 import com.offnal.shifterz.member.domain.Member;
-import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.todo.domain.Todo;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -29,4 +27,5 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
             @Param("targetDate") LocalDate targetDate
     );
 
+    void deleteByMemberId(Long memberId);
 }

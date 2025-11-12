@@ -3,12 +3,12 @@ package com.offnal.shifterz.memo.repository;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.memo.domain.Memo;
 import com.offnal.shifterz.organization.domain.Organization;
-import java.time.LocalDate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -34,4 +34,5 @@ public interface MemoRepository extends JpaRepository<Memo, Long> {
             @Param("targetDate") LocalDate targetDate
     );
 
+    void deleteByMemberId(Long memberId);
 }

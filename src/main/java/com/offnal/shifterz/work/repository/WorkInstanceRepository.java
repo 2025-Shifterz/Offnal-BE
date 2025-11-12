@@ -2,6 +2,7 @@ package com.offnal.shifterz.work.repository;
 
 import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.work.domain.WorkInstance;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -41,4 +42,9 @@ public interface WorkInstanceRepository extends JpaRepository<WorkInstance, Long
             @Param("workDate") LocalDate workDate,
             @Param("memberId") Long memberId
     );
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM WorkInstance wi WHERE wi.workCalendar.memberId = :memberId")
+    void deleteByMemberId(Long memberId);
 }
