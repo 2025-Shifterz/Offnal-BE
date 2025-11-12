@@ -6,7 +6,6 @@ import com.offnal.shifterz.global.exception.ErrorCode;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.repository.MemberRepository;
 import com.offnal.shifterz.member.repository.RefreshTokenRepository;
-import com.offnal.shifterz.member.service.MemberService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -16,7 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -26,9 +24,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Component
 public class JwtTokenProvider {
-    private final MemberService memberService;
     private final MemberRepository memberRepository;
-    private final UserDetailsService userDetailsService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProperties jwtProperties;
 
@@ -114,6 +110,23 @@ public class JwtTokenProvider {
         return request.getHeader("X-AUTH-TOKEN");
     }
 
+    // AccessToken 만료까지 남은 기간 (밀리초 단위)
+    public long getExpiration(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
 
+            Date expiration = claims.getExpiration();
+            long remaining = expiration.getTime() - System.currentTimeMillis();
+            return Math.max(remaining, 0L);
 
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            return 0L; // 만료된 토큰
+        } catch (Exception e) {
+            throw new CustomException(TokenService.TokenErrorCode.INVALID_TOKEN);
+        }
+    }
 }

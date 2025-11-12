@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 public enum SuccessCode {
 
     LOGIN_SUCCESS("AUTH001", HttpStatus.OK, "로그인을 성공했습니다."),
+    LOGOUT_SUCCESS("AUTH002", HttpStatus.OK, "로그아웃에 성공했습니다."),
+    MEMBER_DELETED("AUTH003", HttpStatus.OK, "회원 탈퇴에 성공했습니다."),
     DATA_FETCHED("COMMON001", HttpStatus.OK, "데이터 조회에 성공했습니다."),
     OK("COMMON002", HttpStatus.OK, "요청이 정상적으로 처리되었습니다."),
     TOKEN_REISSUED("AUTH200", HttpStatus.OK, "토큰이 재발급되었습니다."),
@@ -37,7 +39,10 @@ public enum SuccessCode {
     ORGANIZATION_CREATED("ORG001", HttpStatus.CREATED, "조직이 성공적으로 생성되었습니다."),
     ORGANIZATION_UPDATED("ORG002", HttpStatus.OK,  "조직이 성공적으로 수정되었습니다."),
     ORGANIZATION_FETCHED("ORG003",HttpStatus.OK,  "조직이 성공적으로 조회되었습니다."),
-    ORGANIZATION_DELETED("ORG004", HttpStatus.OK, "조직이 성공적으로 삭제되었습니다.");
+    ORGANIZATION_DELETED("ORG004", HttpStatus.OK, "조직이 성공적으로 삭제되었습니다."),
+
+    WORK_SCHEDULE_FETCHED("HOME001", HttpStatus.OK, "근무 일정을 성공적으로 조회했습니다."),
+    DAILY_ROUTINE_FETCHED("HOME002", HttpStatus.OK, "루틴을 성공적으로 조회했습니다.");
 
     private final String code;
     private final HttpStatus httpStatus;

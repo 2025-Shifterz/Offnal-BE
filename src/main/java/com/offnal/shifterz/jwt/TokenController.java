@@ -1,11 +1,13 @@
 package com.offnal.shifterz.jwt;
 
+import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorApiResponses;
 import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TokenController {
 
     private final TokenService tokenService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(summary = "토큰 재발급", description = "만료된 Access Token을 재발급합니다. Refresh Token이 필요합니다.")
     @SuccessApiResponses.TokenReissue
@@ -30,6 +33,23 @@ public class TokenController {
     public SuccessResponse<TokenDto.TokenResponse> reissue(@RequestBody TokenDto.TokenReissueRequest request) {
         TokenDto.TokenResponse response = tokenService.reissue(request);
         return SuccessResponse.success(SuccessCode.TOKEN_REISSUED, response);
+    }
+
+    @Operation(summary = "로그아웃", description = "Access Token을 블랙리스트에 등록하고 Refresh Token을 삭제합니다.")
+    @SuccessApiResponses.Logout
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @PostMapping("/logout")
+    public SuccessResponse<Void> logout(HttpServletRequest request) {
+        String accessToken = jwtTokenProvider.resolveToken(request);
+
+        if (accessToken == null) {
+            throw new CustomException(TokenService.TokenErrorCode.INVALID_TOKEN);
+        }
+
+        tokenService.logout(accessToken);
+
+        return SuccessResponse.success(SuccessCode.LOGOUT_SUCCESS);
     }
 
 }

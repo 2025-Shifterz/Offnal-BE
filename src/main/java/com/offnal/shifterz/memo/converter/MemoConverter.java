@@ -16,6 +16,7 @@ public class MemoConverter {
                 .orElse(LocalDate.now());
 
         return Memo.builder()
+                .title(request.getTitle())
                 .content(request.getContent())
                 .targetDate(targetDate)
                 .member(member)
@@ -26,6 +27,7 @@ public class MemoConverter {
     public static MemoResponseDto.MemoDto toDto(Memo memo) {
         return MemoResponseDto.MemoDto.builder()
                 .id(memo.getId())
+                .title(memo.getTitle())
                 .content(memo.getContent())
                 .targetDate(memo.getTargetDate())
                 .organizationId(

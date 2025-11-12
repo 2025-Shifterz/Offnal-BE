@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -85,35 +86,19 @@ public class MemoService {
 
         memoRepository.delete(memo);
     }
+
     @Transactional(readOnly = true)
-    public List<MemoResponseDto.MemoDto> getMemos(String filter, Long organizationId) {
+    public List<MemoResponseDto.MemoDto> getMemos(String filter, Long organizationId, LocalDate targetDate) {
         Member member = AuthService.getCurrentMember();
-        List<Memo> memos;
 
-        if ("unassigned".equalsIgnoreCase(filter)) {
-            // 소속 없는 메모만
-            memos = memoRepository.findAllByMemberAndOrganizationIsNull(member);
+        boolean unassigned = "unassigned".equalsIgnoreCase(filter);
 
-        } else if ("all".equalsIgnoreCase(filter)) {
-            // 모든 메모
-            memos = memoRepository.findAllByMember(member);
-
-        } else if (organizationId != null) {
-            // 특정 조직 메모
-            Organization organization = organizationRepository.findById(organizationId)
-                    .orElseThrow(() -> new CustomException(MemoErrorCode.ORGANIZATION_NOT_FOUND));
-            memos = memoRepository.findAllByMemberAndOrganization(member, organization);
-
-        } else {
-            // 기본값: 모든 메모
-            memos = memoRepository.findAllByMember(member);
-        }
+        List<Memo> memos = memoRepository.findMemosWithFilters(member, organizationId, unassigned, targetDate);
 
         return memos.stream()
                 .map(MemoConverter::toDto)
                 .toList();
     }
-
 
     @Getter
     @AllArgsConstructor
@@ -121,7 +106,8 @@ public class MemoService {
         MEMO_NOT_FOUND("MEMO001", HttpStatus.NOT_FOUND, "메모를 찾을 수 없습니다."),
         ORGANIZATION_NOT_FOUND("MEMO002", HttpStatus.NOT_FOUND, "소속 조직을 찾을 수 없습니다."),
         MEMO_SAVE_FAILED("MEMO003", HttpStatus.INTERNAL_SERVER_ERROR, "메모 저장에 실패했습니다."),
-        MEMO_ACCESS_DENIED("MEMO004", HttpStatus.FORBIDDEN, "해당 메모에 접근 권한이 없습니다.");
+        MEMO_ACCESS_DENIED("MEMO004", HttpStatus.FORBIDDEN, "해당 메모에 접근 권한이 없습니다."),
+        INVALID_FILTER_COMBINATION("MEMO005",HttpStatus.BAD_REQUEST, "필터 조합이 올바르지 않습니다.");
 
         private final String code;
         private final HttpStatus status;

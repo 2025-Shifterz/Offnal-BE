@@ -1,10 +1,12 @@
 package com.offnal.shifterz.home.dto;
 
+import com.offnal.shifterz.global.util.TimeFormatter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -24,12 +26,18 @@ public class MealCardDto {
     @Schema(description = "권장 식사 메뉴 리스트")
     private List<String> items;
 
-    public static MealCardDto from(String label, String time, String description, List<String> items) {
+    public static MealCardDto from(String label, String time,
+                                   String description, List<String> items) {
         return MealCardDto.builder()
                 .label(label)
                 .time(time)
                 .description(description)
                 .items(items)
                 .build();
+    }
+
+    public static MealCardDto from(String label, LocalTime time,
+                                   String description, List<String> items) {
+        return from(label, TimeFormatter.format(time), description, items);
     }
 }

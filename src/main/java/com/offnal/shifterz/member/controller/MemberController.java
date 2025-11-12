@@ -9,6 +9,7 @@ import com.offnal.shifterz.member.dto.MemberResponseDto;
 import com.offnal.shifterz.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -43,4 +44,16 @@ public class MemberController {
     public SuccessResponse<MemberResponseDto.MemberUpdateResponseDto> getMyInfo() {
         return SuccessResponse.success(SuccessCode.MY_INFO_FETCHED, memberService.getMyInfo());
     }
+
+    @Operation(summary = "회원 탈퇴", description = "사용자의 계정을 삭제합니다.")
+    @SuccessApiResponses.Withdraw
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.Common
+    @DeleteMapping("/withdraw")
+    public SuccessResponse<Void> withdraw(HttpServletRequest request) {
+        memberService.withdrawCurrentMember(request);
+        return SuccessResponse.success(SuccessCode.MEMBER_DELETED);
+    }
+
+
 }

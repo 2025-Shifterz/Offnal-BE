@@ -793,4 +793,116 @@ public @interface SuccessApiResponses {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface TokenReissue {}
 
+    @ApiResponse(
+            responseCode = "200",
+            description = "로그아웃 성공",
+            content = @Content(
+                    examples = @ExampleObject(
+                            name = "로그아웃 성공 예시",
+                            value = """
+                                    {
+                                       "code": "LOGOUT_SUCCESS",
+                                       "message": "로그아웃에 성공했습니다.",
+                                       "data": null
+                                     }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Logout {}
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "회원 탈퇴 성공",
+            content = @Content(
+                    examples = @ExampleObject(
+                            name = "회원 탈퇴 성공 예시",
+                            value = """
+                                    {
+                                       "code": "MEMBER_DELETED",
+                                       "message": "회원 탈퇴에 성공했습니다.",
+                                       "data": null
+                                     }
+                                    """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Withdraw {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "근무 일정 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "근무 일정 조회 성공 예시",
+                                            value = """
+                                            {
+                                              "code": "HOME001",
+                                              "message": "근무 일정을 성공적으로 조회했습니다.",
+                                              "data": {
+                                                "yesterdayType": "DAY",
+                                                "todayType": "OFF",
+                                                "tomorrowType": "DAY"
+                                              }
+                                            }
+                                            """
+                                    )
+                            }
+                    )
+            )
+    })
+    public @interface HomeSchedule {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "오늘의 루틴 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "오늘의 루틴 조회 성공 예시",
+                                            value = """
+                                            {
+                                              "code": "HOME002",
+                                              "message": "루틴을 성공적으로 조회했습니다.",
+                                              "data": {
+                                                "meals": [
+                                                  {
+                                                    "label": "점심",
+                                                    "time": "13:30",
+                                                    "description": "기상 후 체력 회복",
+                                                    "items": ["김밥", "칼국수"]
+                                                  }
+                                                ],
+                                                "health": {
+                                                  "fastingComment": "생체 리듬 유지에 집중",
+                                                  "fastingSchedule": "저녁 식사 후 공복 유지",
+                                                  "sleepGuide": ["08:00 ~ 13:00 수면"],
+                                                  "sleepSchedule": "수면 22:00 ~ 05:00"
+                                                }
+                                              }
+                                            }
+                                            """
+                                    )
+                            }
+                    )
+            )
+    })
+    public @interface HomeRoutine {}
+
+
 }
