@@ -97,19 +97,21 @@ public class MemberService {
                 .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
         MemberResponseDto.MemberUpdateResponseDto response = MemberConverter.toResponse(member);
 
-        if (response.getProfileImageUrl() != null && !response.getProfileImageUrl().isEmpty()) {
-            String viewUrl = s3Service.generateViewPresignedUrl(response.getProfileImageUrl());
-            response = MemberResponseDto.MemberUpdateResponseDto.builder()
-                    .id(response.getId())
-                    .email(response.getEmail())
-                    .memberName(response.getMemberName())
-                    .phoneNumber(response.getPhoneNumber())
-                    .profileImageKey(response.getProfileImageUrl())
-                    .profileImageUrl(viewUrl)
-                    .build();
+        String key = member.getProfileImageKey();
+        String presignedUrl = null;
+
+        if (key != null && !key.isEmpty()) {
+            presignedUrl = s3Service.generateViewPresignedUrl(key);
         }
 
-        return response;
+        return MemberResponseDto.MemberUpdateResponseDto.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .memberName(member.getMemberName())
+                .phoneNumber(member.getPhoneNumber())
+                .profileImageKey(key)
+                .profileImageUrl(presignedUrl)
+                .build();
     }
 
     /**

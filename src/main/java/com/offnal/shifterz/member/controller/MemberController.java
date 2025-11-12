@@ -24,6 +24,8 @@ public class MemberController {
     private final MemberService memberService;
     private final S3Service s3Service;
 
+    @SuccessApiResponses.S3_URL
+    @ErrorApiResponses.S3
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @Operation(summary = "S3 업로드용 Presigned URL 발급",
@@ -59,7 +61,7 @@ public class MemberController {
                     "- 회원 DB의 profileImageKey를 null로 초기화합니다."
     )
     @DeleteMapping("/profile/image")
-    @SuccessApiResponses.UpdateProfile
+    @ErrorApiResponses.S3
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     public SuccessResponse<Void> deleteProfileImage() {
@@ -82,6 +84,7 @@ public class MemberController {
 
     @Operation(summary = "회원 탈퇴", description = "사용자의 계정을 삭제합니다.")
     @SuccessApiResponses.Withdraw
+    @ErrorApiResponses.S3
     @ErrorApiResponses.Auth
     @ErrorApiResponses.Common
     @DeleteMapping("/withdraw")

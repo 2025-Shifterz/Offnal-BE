@@ -107,6 +107,17 @@ public @interface ErrorApiResponses {
                                       "message": "존재하지 않는 회원입니다."
                                     }
                                     """)
+                    )),
+            @ApiResponse(responseCode = "500", description = "회원 저장 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(name = "MEMBER_SAVE_FAILED", value = """
+                                    {
+                                      "code": "MEMBER_SAVE_FAILED",
+                                      "message": "회원 저장에 실패했습니다."
+                                    }
+                                    """)
                     ))
     })
     @interface Member {}
@@ -374,5 +385,50 @@ public @interface ErrorApiResponses {
                     ))
     })
     @interface Organization {}
+
+    // S3 관련 에러
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 중복 Key",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "S3_KEY_ALREADY_EXISTS", value = """
+                                            {
+                                              "code": "S3_KEY_ALREADY_EXISTS",
+                                              "message": "이미 프로필 이미지가 존재합니다."
+                                            }
+                                            """),
+                                    @ExampleObject(name = "S3_KEY_NOT_FOUND", value = """
+                                            {
+                                              "code": "S3_KEY_NOT_FOUND",
+                                              "message": "해당 S3 객체 키를 찾을 수 없습니다."
+                                            }
+                                            """)
+                            }
+                    )),
+            @ApiResponse(responseCode = "500", description = "S3 업로드/삭제 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "S3_UPLOAD_FAILED", value = """
+                                            {
+                                              "code": "S3_UPLOAD_FAILED",
+                                              "message": "S3 파일 업로드에 실패했습니다."
+                                            }
+                                            """),
+                                    @ExampleObject(name = "S3_DELETE_FAILED", value = """
+                                            {
+                                              "code": "S3_DELETE_FAILED",
+                                              "message": "S3 파일 삭제에 실패했습니다."
+                                            }
+                                            """)
+                            }
+                    ))
+    })
+    @interface S3 {}
 
 }
