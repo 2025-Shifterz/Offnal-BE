@@ -15,7 +15,7 @@ public class MemberResponseDto {
         private String email;
         private String memberName;
         private String phoneNumber;
-        private String profileImageUrl;
+        private String profileImageKey;
         private boolean isNewMember;
     }
 
@@ -36,7 +36,12 @@ public class MemberResponseDto {
         @Schema(example = "010-1111-1111", description = "전화번호")
         private String phoneNumber;
 
-        @Schema(hidden = true)
+        @Schema(example = "profile/abcde12345-test.jpg",
+                description = "S3에 저장된 프로필 이미지 key")
+        private String profileImageKey;
+
+        @Schema(example = "https://bucket.s3.ap-northeast-2.amazonaws.com/profile/...",
+                description = "S3 presigned 조회 URL (10분 유효)")
         private String profileImageUrl;
     }
 

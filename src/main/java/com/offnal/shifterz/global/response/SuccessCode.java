@@ -29,6 +29,8 @@ public enum SuccessCode {
 
     PROFILE_UPDATED("MEM001", HttpStatus.OK, "프로필 수정에 성공했습니다."),
     MY_INFO_FETCHED("MEM002", HttpStatus.OK, "내 정보 조회에 성공했습니다."),
+    PROFILE_UPLOAD_URL_CREATED("MEM003", HttpStatus.OK, "S3용 프로필 사진 업로드 url 생성을 성공했습니다."),
+    PROFILE_IMAGE_DELETED("MEM004", HttpStatus.OK, "프로필 이미지가 삭제되었습니다."),
 
     MEMO_CREATED("MEMO001", HttpStatus.CREATED, "메모가 성공적으로 생성되었습니다."),
     MEMO_UPDATED("MEMO002", HttpStatus.OK,  "메모가 성공적으로 수정되었습니다."),

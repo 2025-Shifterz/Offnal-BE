@@ -11,7 +11,7 @@ public class MemberConverter {
                 .email(member.getEmail())
                 .memberName(member.getMemberName())
                 .phoneNumber(member.getPhoneNumber())
-                .profileImageUrl(member.getProfileImageUrl())
+                .profileImageKey(member.getProfileImageKey())
                 .isNewMember(isNewMember)
                 .build();
     }
@@ -21,7 +21,7 @@ public class MemberConverter {
                 .email(member.getEmail())
                 .memberName(member.getMemberName())
                 .phoneNumber(member.getPhoneNumber())
-                .profileImageUrl(member.getProfileImageUrl())
+                .profileImageUrl(member.getProfileImageKey())
                 .build();
     }
 }

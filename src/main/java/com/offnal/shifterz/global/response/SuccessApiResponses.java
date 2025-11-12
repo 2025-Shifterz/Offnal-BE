@@ -277,7 +277,7 @@ public @interface SuccessApiResponses {
                                     "memberName": "홍길동",
                                     "email": "test@example.com",
                                     "phoneNumber": "010-1234-5678",
-                                    "profileImageUrl": "https://cdn.com/profile.jpg"
+                                    "profileImageKey": "https://cdn.com/profile.jpg"
                                   }
                                 }
                                 """)
@@ -300,7 +300,7 @@ public @interface SuccessApiResponses {
                                     "email": "example@kkukmoa.com",
                                     "name": "홍길동",
                                     "phoneNumber": "010-1234-5678",
-                                    "profileImageUrl": "https://cdn.example.com/image.jpg"
+                                    "profileImageKey": "profile/member-1-test"
                                   }
                                 }
                                 """)

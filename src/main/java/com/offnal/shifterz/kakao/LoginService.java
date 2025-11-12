@@ -36,13 +36,12 @@ public class LoginService {
     }
 
     private AuthResponseDto handleKakaoLogin(KakaoUserInfoResponseDto userInfo) {
-        MemberResponseDto.MemberRegisterResponseDto result = memberService.registerOrUpdateMember(
+        MemberResponseDto.MemberRegisterResponseDto result = memberService.registerMemberIfAbsent(
                 Provider.KAKAO,
                 String.valueOf(userInfo.getId()),
                 userInfo.getKakaoAccount().getEmail(),
                 userInfo.getKakaoAccount().getProfile().getNickName(),
-                null,
-                userInfo.getKakaoAccount().getProfile().getProfileImageUrl()
+                null
         );
 
         return issueTokens(result);

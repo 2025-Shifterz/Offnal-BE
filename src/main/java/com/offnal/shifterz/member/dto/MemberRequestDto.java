@@ -22,6 +22,6 @@ public class MemberRequestDto {
         private String name;
 
         @Schema(hidden = true)
-        private String profileImageUrl;
+        private String profileImageKey;
     }
 }

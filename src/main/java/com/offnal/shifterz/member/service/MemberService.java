@@ -4,10 +4,10 @@ import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.global.util.RedisUtil;
+import com.offnal.shifterz.global.util.S3Service;
 import com.offnal.shifterz.jwt.TokenService;
 import com.offnal.shifterz.log.domain.Log;
 import com.offnal.shifterz.log.repository.LogRepository;
-import com.offnal.shifterz.global.util.S3Service;
 import com.offnal.shifterz.member.converter.MemberConverter;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.domain.Provider;
@@ -27,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -56,26 +55,21 @@ public class MemberService {
      * @param email 이메일
      * @param memberName 이름
      * @param phoneNumber 전화번호
-     * @param profileImageUrl 프로필 이미지
      * @return 등록/업데이트된 Member와 신규 가입 여부
      */
     @Transactional
-    public MemberResponseDto.MemberRegisterResponseDto registerOrUpdateMember(
+    public MemberResponseDto.MemberRegisterResponseDto registerMemberIfAbsent(
             Provider provider,
             String providerId,
             String email,
             String memberName,
-            String phoneNumber,
-            String profileImageUrl
+            String phoneNumber
     ) {
         Optional<Member> existingMember = memberRepository.findByProviderAndProviderId(provider, providerId);
 
         if (existingMember.isPresent()) {
-            // 기존 회원 정보 업데이트
-            Member member = existingMember.get();
-            member.updateMemberInfo(email, memberName, phoneNumber, profileImageUrl);
-
-            return MemberConverter.toRegisterResponse(member, false);
+            // 기존 회원 정보 유지
+            return MemberConverter.toRegisterResponse(existingMember.get(), false);
         } else {
             // 신규 회원 등록
             Member newMember = Member.builder()
@@ -84,65 +78,58 @@ public class MemberService {
                     .email(email)
                     .memberName(memberName)
                     .phoneNumber(phoneNumber)
-                    .profileImageUrl(profileImageUrl)
+                    .profileImageKey(null)
                     .build();
 
             Member savedMember = memberRepository.save(newMember);
-
-
 
             return MemberConverter.toRegisterResponse(savedMember, true);
         }
     }
 
-
-    @Transactional
-    public MemberResponseDto.MemberUpdateResponseDto updateProfile(
-            MemberRequestDto.MemberUpdateRequestDto request,
-            MultipartFile newProfileImage) {
-        Long memberId = AuthService.getCurrentUserId();
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
-
-        String imageUrl = member.getProfileImageUrl();
-
-        if (newProfileImage != null && !newProfileImage.isEmpty()) {
-            if (imageUrl != null && imageUrl.contains("amazonaws.com")) {
-                s3Service.deleteFile(imageUrl);
-            }
-
-            imageUrl = s3Service.uploadFile(newProfileImage, "profile");
-        }
-
-        member.updateMemberInfo(
-                request.getEmail(),
-                request.getName(),
-                request.getPhoneNumber(),
-                imageUrl
-        );
-
-        return MemberConverter.toResponse(member);
-    }
-
+    /**
+     * 내 프로필 조회
+     */
     @Transactional
     public MemberResponseDto.MemberUpdateResponseDto getMyInfo() {
         Long memberId = AuthService.getCurrentUserId();
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
-        return MemberConverter.toResponse(member);
+        MemberResponseDto.MemberUpdateResponseDto response = MemberConverter.toResponse(member);
+
+        if (response.getProfileImageUrl() != null && !response.getProfileImageUrl().isEmpty()) {
+            String viewUrl = s3Service.generateViewPresignedUrl(response.getProfileImageUrl());
+            response = MemberResponseDto.MemberUpdateResponseDto.builder()
+                    .id(response.getId())
+                    .email(response.getEmail())
+                    .memberName(response.getMemberName())
+                    .phoneNumber(response.getPhoneNumber())
+                    .profileImageKey(response.getProfileImageUrl())
+                    .profileImageUrl(viewUrl)
+                    .build();
+        }
+
+        return response;
     }
 
+    /**
+     * 회원 탈퇴
+     */
     @Transactional
     public void withdrawCurrentMember(HttpServletRequest request) {
         Long memberId = AuthService.getCurrentUserId();
 
         String anonymized = "deleted_user_" + UUID.randomUUID();
 
-        if (!memberRepository.existsById(memberId)) {
-            throw new CustomException(MemberErrorCode.MEMBER_NOT_FOUND);
-        }
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         try {
+            String profileImageKey = member.getProfileImageKey();
+            if (profileImageKey != null && !profileImageKey.isEmpty()) {
+                s3Service.deleteFile(profileImageKey);
+            }
+
             // 로그에서 member 비식별화 (null 처리)
             logRepository.anonymizeMemberLogs(memberId, anonymized);
 
@@ -167,9 +154,76 @@ public class MemberService {
                     .build();
             logRepository.save(withdrawLog);
 
+        } catch (CustomException e) {
+            throw e;
         } catch (Exception e) {
             throw new CustomException(MemberErrorCode.MEMBER_WITHDRAW_FAILED);
         }
+    }
+
+    /**
+     * 일반 정보 수정
+     */
+    @Transactional
+    public MemberResponseDto.MemberUpdateResponseDto updateMemberInfo(MemberRequestDto.MemberUpdateRequestDto request) {
+        Long memberId = AuthService.getCurrentUserId();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        member.updateMemberInfo(
+                request.getEmail(),
+                request.getName(),
+                request.getPhoneNumber(),
+                member.getProfileImageKey()
+        );
+
+        return MemberConverter.toResponse(member);
+
+    }
+
+    /**
+     * 사진 정보 추가 또는 수정
+     */
+    @Transactional
+    public void updateProfileImage(String newImageKey) {
+        Long memberId = AuthService.getCurrentUserId();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        String currentKey = member.getProfileImageKey();
+
+        if (currentKey != null && !currentKey.isEmpty()) {
+            s3Service.deleteFile(currentKey);
+        }
+
+        member.updateMemberInfo(
+                member.getEmail(),
+                member.getMemberName(),
+                member.getPhoneNumber(),
+                newImageKey
+        );
+    }
+
+    @Transactional
+    public void deleteProfileImage() {
+        Long memberId = AuthService.getCurrentUserId();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        String currentKey = member.getProfileImageKey();
+
+        if (currentKey == null || currentKey.isEmpty()) {
+            throw new CustomException(S3Service.S3ErrorCode.S3_KEY_NOT_FOUND);
+        }
+
+        s3Service.deleteFile(currentKey);
+
+        member.updateMemberInfo(
+                member.getEmail(),
+                member.getMemberName(),
+                member.getPhoneNumber(),
+                null
+        );
     }
 
     @Getter
