@@ -11,7 +11,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "User", description  = "User 관련 API")
 @RestController
@@ -20,15 +22,16 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
 
-    @PatchMapping("/profile")
+    @PatchMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "프로필 수정", description = "내 프로필 정보를 수정합니다.")
     @SuccessApiResponses.UpdateProfile
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     public SuccessResponse<MemberResponseDto.MemberUpdateResponseDto> updateProfile(
-            @RequestBody @Valid MemberRequestDto.MemberUpdateRequestDto request
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+            @RequestPart("request") @Valid MemberRequestDto.MemberUpdateRequestDto request
     ) {
-        MemberResponseDto.MemberUpdateResponseDto response = memberService.updateProfile(request);
+        MemberResponseDto.MemberUpdateResponseDto response = memberService.updateProfile(request, profileImage);
         return SuccessResponse.success(SuccessCode.PROFILE_UPDATED, response);
     }
 
@@ -40,7 +43,4 @@ public class MemberController {
     public SuccessResponse<MemberResponseDto.MemberUpdateResponseDto> getMyInfo() {
         return SuccessResponse.success(SuccessCode.MY_INFO_FETCHED, memberService.getMyInfo());
     }
-
-
-
 }

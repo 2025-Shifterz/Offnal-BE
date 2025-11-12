@@ -3,6 +3,7 @@ package com.offnal.shifterz.member.service;
 import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
+import com.offnal.shifterz.global.util.S3Service;
 import com.offnal.shifterz.member.converter.MemberConverter;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.domain.Provider;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final S3Service s3Service;
 
     /**
      * 소셜 로그인 회원 등록 또는 업데이트
@@ -74,17 +77,28 @@ public class MemberService {
 
 
     @Transactional
-    public MemberResponseDto.MemberUpdateResponseDto updateProfile(MemberRequestDto.MemberUpdateRequestDto request) {
+    public MemberResponseDto.MemberUpdateResponseDto updateProfile(
+            MemberRequestDto.MemberUpdateRequestDto request,
+            MultipartFile newProfileImage) {
         Long memberId = AuthService.getCurrentUserId();
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        String imageUrl = member.getProfileImageUrl();
+
+        if (newProfileImage != null && !newProfileImage.isEmpty()) {
+            if (imageUrl != null && imageUrl.contains("amazonaws.com")) {
+                s3Service.deleteFile(imageUrl);
+            }
+
+            imageUrl = s3Service.uploadFile(newProfileImage, "profile");
+        }
 
         member.updateMemberInfo(
                 request.getEmail(),
                 request.getName(),
                 request.getPhoneNumber(),
-                request.getProfileImageUrl()
-
+                imageUrl
         );
 
         return MemberConverter.toResponse(member);
