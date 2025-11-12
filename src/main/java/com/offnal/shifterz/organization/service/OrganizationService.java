@@ -4,11 +4,13 @@ import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.member.domain.Member;
+import com.offnal.shifterz.memo.repository.MemoRepository;
 import com.offnal.shifterz.organization.converter.OrganizationConverter;
 import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.organization.dto.OrganizationRequestDto;
 import com.offnal.shifterz.organization.dto.OrganizationResponseDto;
 import com.offnal.shifterz.organization.repository.OrganizationRepository;
+import com.offnal.shifterz.todo.repository.TodoRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,8 @@ import java.util.Optional;
 public class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
+    private final MemoRepository memoRepository;
+    private final TodoRepository todoRepository;
     private static final String ORG_CONSTRAINT_NAME = "uk_org_member_name_team";
 
 
@@ -120,6 +124,9 @@ public class OrganizationService {
         Long memberId = AuthService.getCurrentUserId();
 
         Organization org = findOwnedOrganizationOrThrow(memberId, organizationName, team);
+
+        memoRepository.deleteAllByOrganization(org);
+        todoRepository.deleteAllByOrganization(org);
 
         organizationRepository.delete(org);
     }

@@ -28,5 +28,6 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
             @Param("unassigned") boolean unassigned,
             @Param("targetDate") LocalDate targetDate
     );
+    void deleteAllByOrganization(Organization organization);
 
 }
