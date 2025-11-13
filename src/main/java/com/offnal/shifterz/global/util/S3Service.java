@@ -110,7 +110,7 @@ public class S3Service {
 
             return key;
         } catch (Exception e) {
-            throw new CustomException(S3ErrorCode.S3_UPLOAD_FAILED);
+            throw new CustomException(S3ErrorCode.UPLOAD_TO_S3_FAILED);
         }
     }
 
@@ -119,7 +119,7 @@ public class S3Service {
         try (var in = new java.net.URL(imageUrl).openStream()) {
             return in.readAllBytes();
         } catch (Exception e) {
-            throw new CustomException(S3ErrorCode.S3_UPLOAD_FAILED);
+            throw new CustomException(S3ErrorCode.UPLOAD_TO_S3_FAILED);
         }
     }
 
@@ -127,7 +127,7 @@ public class S3Service {
     @Getter
     @AllArgsConstructor
     public enum S3ErrorCode implements ErrorReason {
-        S3_UPLOAD_FAILED("S3001", HttpStatus.NOT_FOUND, "프로필 사진을 S3 업로드 실패하였습니다."),
+        S3_UPLOAD_FAILED("S3001", HttpStatus.INTERNAL_SERVER_ERROR, "프로필 사진을 S3 업로드 실패하였습니다."),
         S3_DELETE_FAILED("S3002", HttpStatus.INTERNAL_SERVER_ERROR, "S3에 업로드된 프로필 사진을 삭제하는 데에 실패하였습니다."),
         S3_KEY_ALREADY_EXISTS("S3003", HttpStatus.BAD_REQUEST, "이미 프로필 이미지 Key가 존재하는 회원입니다."),
         S3_KEY_NOT_FOUND("S3004", HttpStatus.BAD_REQUEST, "존재하지 않는 S3 Key입니다."),
