@@ -206,7 +206,7 @@ public @interface SuccessApiResponses {
                                       "code": "CALENDAR_DATA_FETCHED",
                                       "message": "데이터 조회에 성공했습니다.",
                                       "data": {
-                                        "calendarName": "2025년 7월 근무표",
+                                        "calendarId": 1,
                                         "startDate": "2025-07-01",
                                         "endDate": "2025-07-07",
                                         "workTimes": {
@@ -244,12 +244,12 @@ public @interface SuccessApiResponses {
                                                    "message": "캘린더 정보를 조회했습니다.",
                                                    "data": [
                                                      {
-                                                       "calendarName": "2025년 8월 근무표",
+                                                       "calendarId": 1,
                                                        "startDate": "2025-08-01",
                                                        "endDate": "2025-08-07"
                                                      },
                                                      {
-                                                       "calendarName": "2025년 7월 근무표",
+                                                       "calendarId": 2,
                                                        "startDate": "2025-07-01",
                                                        "endDate": "2025-07-07"
                                                      }

@@ -133,12 +133,12 @@ public class WorkCalendarService {
 
     // 근무 시간 수정
     @Transactional
-    public void updateWorkTimes(String organizationName, String team, String calendarName, @Valid WorkTimeUpdateDto request) {
+    public void updateWorkTimes(String organizationName, String team, Long calendarId, @Valid WorkTimeUpdateDto request) {
         Long memberId = AuthService.getCurrentUserId();
 
         Organization org = findOrganization(memberId, organizationName, team);
 
-        WorkCalendar calendar = findCalendarByName(memberId, org, calendarName);
+        WorkCalendar calendar = findCalendarById(memberId, org, calendarId);
 
         if (request == null || request.getWorkTimes() == null || request.getWorkTimes().isEmpty()) {
             throw new CustomException(WorkCalendarErrorCode.CALENDAR_WORK_TIME_REQUIRED);
@@ -202,14 +202,12 @@ public class WorkCalendarService {
 
     // 근무표 삭제
     @Transactional
-    public void deleteWorkCalendar(String organizationName, String team, String calendarName) {
+    public void deleteWorkCalendar(String organizationName, String team, Long calendarId) {
         Long memberId = AuthService.getCurrentUserId();
 
         Organization org = findOrganization(memberId, organizationName, team);
 
-        WorkCalendar calendar = workCalendarRepository
-                .findByMemberIdAndOrganizationAndCalendarName(memberId, org,  normalize(calendarName))
-                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
+        WorkCalendar calendar = findCalendarById(memberId, org, calendarId);
 
         workInstanceRepository.deleteByWorkCalendarId(calendar.getId());
 
@@ -217,10 +215,10 @@ public class WorkCalendarService {
     }
 
     // 특정 캘린더 메타 정보 및 근무시간 조회
-    public WorkCalendarMetaDto getWorkCalendarMeta(String organizationName, String team, String calendarName) {
+    public WorkCalendarMetaDto getWorkCalendarMeta(String organizationName, String team, Long calendarId) {
         Long memberId = AuthService.getCurrentUserId();
         Organization org = findOrganization(memberId, organizationName, team);
-        WorkCalendar cal = findCalendarByName(memberId, org, calendarName);
+        WorkCalendar cal = findCalendarById(memberId, org, calendarId);
 
         return WorkCalendarConverter.toMetaDto(cal);
     }
@@ -275,14 +273,10 @@ public class WorkCalendarService {
 
     // 근무표 이름으로 조회.
     // 사용자, 조직 이름, 팀 이름, 근무표 이름으로 조회. 없으면 exception
-    private WorkCalendar findCalendarByName(Long memberId, Organization org, String calendarName) {
-        String calName = normalize(calendarName);
-        if (calName == null || calName.isEmpty()) {
-            throw new CustomException(WorkCalendarErrorCode.CALENDAR_NAME_REQUIRED);
-        }
+    private WorkCalendar findCalendarById(Long memberId, Organization org, Long calendarId) {
         return workCalendarRepository
-                .findByMemberIdAndOrganizationAndCalendarName(
-                        memberId, org, calName
+                .findByIdAndMemberIdAndOrganization(
+                        calendarId, memberId, org
                 )
                 .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
     }
@@ -344,8 +338,13 @@ public class WorkCalendarService {
             }
         }
 
-        if (!toUpdate.isEmpty()) workInstanceRepository.saveAll(toUpdate);
-        if (!toCreate.isEmpty()) workInstanceRepository.saveAll(toCreate);
+        List<WorkInstance> total = new ArrayList<>();
+        total.addAll(toCreate);
+        total.addAll(toUpdate);
+
+        if (!total.isEmpty()) {
+            workInstanceRepository.saveAll(total);
+        }
     }
 
     // 근무 시간(Duration) 유효성 검증

@@ -20,10 +20,6 @@ import java.util.Map;
 @Jacksonized
 public class WorkCalendarRequestDto {
 
-    @NotBlank(message = "근무표 이름은 필수입니다.")
-    @Schema(description = "근무표 이름")
-    private String calendarName;
-
     @Valid
     @NotEmpty(message = "근무 시간 정보는 필수입니다.")
     @Schema(description = "근무타입별 시간 정보(D/E/N)")

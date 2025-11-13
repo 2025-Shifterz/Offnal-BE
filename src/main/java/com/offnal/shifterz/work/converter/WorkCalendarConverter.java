@@ -37,7 +37,6 @@ public class WorkCalendarConverter {
         }
 
         return WorkCalendar.builder()
-                .calendarName(workCalendarRequestDto.getCalendarName())
                 .startDate(unitDto.getStartDate())
                 .endDate(unitDto.getEndDate())
                 .memberId(memberId)
@@ -80,7 +79,7 @@ public class WorkCalendarConverter {
 
     public static WorkCalendarMetaDto toMetaDto(WorkCalendar cal) {
         return WorkCalendarMetaDto.builder()
-                .calendarName(cal.getCalendarName())
+                .calendarId(cal.getId())
                 .startDate(cal.startDate())
                 .endDate(cal.endDate())
                 .workTimes(toSymbolKeyWorkTimes(cal))
@@ -89,7 +88,7 @@ public class WorkCalendarConverter {
 
     public static WorkCalendarListItemDto toListItemDto(WorkCalendar c) {
         return WorkCalendarListItemDto.builder()
-                .calendarName(c.getCalendarName())
+                .calendarId(c.getId())
                 .startDate(c.startDate())
                 .endDate(c.endDate())
                 .build();

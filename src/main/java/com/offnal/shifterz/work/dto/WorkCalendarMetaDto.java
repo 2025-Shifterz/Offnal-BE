@@ -13,7 +13,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WorkCalendarMetaDto {
-    private String calendarName;
+    private Long calendarId;
     private LocalDate startDate;
     private LocalDate endDate;
     private Map<String, WorkTimeDto> workTimes;

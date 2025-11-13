@@ -21,11 +21,6 @@ public interface WorkCalendarRepository extends JpaRepository<WorkCalendar, Long
     Optional<WorkCalendar> findByMemberIdAndOrganizationAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
             Long memberId,Organization organization, LocalDate startDate, LocalDate  endDate);
 
-    Optional<WorkCalendar> findByMemberIdAndOrganizationAndCalendarName(
-            Long memberId,
-            Organization organization,
-            String calendarName
-    );
 
     List<WorkCalendar> findByMemberIdAndOrganizationOrderByStartDateDesc(Long memberId, Organization organization);
     @Query("""
@@ -38,6 +33,9 @@ public interface WorkCalendarRepository extends JpaRepository<WorkCalendar, Long
             @Param("memberId") Long memberId,
             @Param("date") LocalDate date
     );
+
+    Optional<WorkCalendar> findByIdAndMemberIdAndOrganization(Long calendarId, Long memberId, Organization organization);
+
 
     @Transactional
     @Modifying
