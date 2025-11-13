@@ -65,11 +65,26 @@ public class WorkCalendarService {
                 throw new CustomException(WorkCalendarErrorCode.CALENDAR_DUPLICATION);
             }
 
+            validateShiftDateRange(unitDto);
+
             WorkCalendar calendar = WorkCalendarConverter.toEntity(memberId, org, workCalendarRequestDto, unitDto);
             WorkCalendar savedCalendar = workCalendarRepository.save(calendar);
 
             List<WorkInstance> instances = WorkCalendarConverter.toWorkInstances(unitDto, savedCalendar);
             workInstanceRepository.saveAll(instances);
+        }
+    }
+
+    // shift 날짜가 캘린더 범위안에 있는지 검증
+    private void validateShiftDateRange(WorkCalendarUnitDto unitDto) {
+        LocalDate start = unitDto.getStartDate();
+        LocalDate end = unitDto.getEndDate();
+
+        for (LocalDate date : unitDto.getShifts().keySet()) {
+
+            if (date.isBefore(start) || date.isAfter(end)) {
+                throw new CustomException(WorkCalendarErrorCode.INVALID_SHIFT_DATE);
+            }
         }
     }
 
@@ -395,7 +410,9 @@ public class WorkCalendarService {
         INVALID_MONTH_FORMAT("CAL013",HttpStatus.BAD_REQUEST, "월 형식이 올바르지 않습니다."),
         CALENDAR_DATE_REQUIRED("CAL014",HttpStatus.BAD_REQUEST, "기간을 입력해주세요."),
         CALENDAR_INVALID_DATE_RANGE("CAL015", HttpStatus.BAD_REQUEST, "기간 범위가 올바르지 않습니다."),
-        SHIFTS_NOT_FOUND("CAL016", HttpStatus.NOT_FOUND, "존재하는 근무 일정이 없습니다.");
+        SHIFTS_NOT_FOUND("CAL016", HttpStatus.NOT_FOUND, "존재하는 근무 일정이 없습니다."),
+
+        INVALID_SHIFT_DATE("CAL017", HttpStatus.BAD_REQUEST, "근무 일정이 캘린더의 범위를 벗어났습니다.");
         private final String code;
         private final HttpStatus status;
         private final String message;
