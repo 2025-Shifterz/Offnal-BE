@@ -42,9 +42,9 @@ public class KakaoUserInfoResponseDto {
             @JsonProperty("nickname")
             public String nickName;
 
-//            //프로필 사진 URL
-//            @JsonProperty("profile_image_url")
-//            public String profileImageUrl;
+            //프로필 사진 URL
+            @JsonProperty("profile_image_url")
+            public String profileImageUrl;
         }
     }
 }

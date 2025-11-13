@@ -41,7 +41,8 @@ public class LoginService {
                 String.valueOf(userInfo.getId()),
                 userInfo.getKakaoAccount().getEmail(),
                 userInfo.getKakaoAccount().getProfile().getNickName(),
-                null
+                null,
+                userInfo.getKakaoAccount().getProfile().getProfileImageUrl()
         );
 
         return issueTokens(result);

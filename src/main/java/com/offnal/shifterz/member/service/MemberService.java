@@ -63,7 +63,8 @@ public class MemberService {
             String providerId,
             String email,
             String memberName,
-            String phoneNumber
+            String phoneNumber,
+            String socialProfileImageUrl
     ) {
         Optional<Member> existingMember = memberRepository.findByProviderAndProviderId(provider, providerId);
 
@@ -83,7 +84,30 @@ public class MemberService {
 
             Member savedMember = memberRepository.save(newMember);
 
+            if (socialProfileImageUrl != null && !socialProfileImageUrl.isBlank()) {
+                uploadSocialProfileImage(savedMember, socialProfileImageUrl);
+            }
+
             return MemberConverter.toRegisterResponse(savedMember, true);
+        }
+    }
+
+    private void uploadSocialProfileImage(Member member, String socialProfileImageUrl) {
+        try{
+            byte[] bytes = s3Service.downloadImageFromUrl(socialProfileImageUrl);
+
+            String key = "profile/member-" + member.getId() + "-profile";
+
+            s3Service.uploadImageBytes(bytes, key);
+
+            member.updateMemberInfo(
+                    member.getEmail(),
+                    member.getMemberName(),
+                    member.getPhoneNumber(),
+                    key
+            );
+        } catch (Exception e) {
+            throw new CustomException(S3Service.S3ErrorCode.UPLOAD_TO_S3_FAILED);
         }
     }
 

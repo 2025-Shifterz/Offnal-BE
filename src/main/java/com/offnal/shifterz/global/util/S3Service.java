@@ -24,6 +24,8 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 
 import java.time.Duration;
 
+import static software.amazon.awssdk.core.sync.RequestBody.fromBytes;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -95,13 +97,41 @@ public class S3Service {
         }
     }
 
+    // 프로필 이미지 S3에 직접 업로드
+    public String uploadImageBytes(byte[] bytes, String key) {
+        try {
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(key)
+                    .contentType("image/jpeg")
+                    .build();
+
+            s3Client.putObject(putObjectRequest, fromBytes(bytes));
+
+            return key;
+        } catch (Exception e) {
+            throw new CustomException(S3ErrorCode.S3_UPLOAD_FAILED);
+        }
+    }
+
+    // imageUrl 다운로드
+    public byte[] downloadImageFromUrl(String imageUrl) {
+        try (var in = new java.net.URL(imageUrl).openStream()) {
+            return in.readAllBytes();
+        } catch (Exception e) {
+            throw new CustomException(S3ErrorCode.S3_UPLOAD_FAILED);
+        }
+    }
+
+
     @Getter
     @AllArgsConstructor
     public enum S3ErrorCode implements ErrorReason {
         S3_UPLOAD_FAILED("S3001", HttpStatus.NOT_FOUND, "프로필 사진을 S3 업로드 실패하였습니다."),
         S3_DELETE_FAILED("S3002", HttpStatus.INTERNAL_SERVER_ERROR, "S3에 업로드된 프로필 사진을 삭제하는 데에 실패하였습니다."),
         S3_KEY_ALREADY_EXISTS("S3003", HttpStatus.BAD_REQUEST, "이미 프로필 이미지 Key가 존재하는 회원입니다."),
-        S3_KEY_NOT_FOUND("S3004", HttpStatus.BAD_REQUEST, "존재하지 않는 S3 Key입니다.");
+        S3_KEY_NOT_FOUND("S3004", HttpStatus.BAD_REQUEST, "존재하지 않는 S3 Key입니다."),
+        UPLOAD_TO_S3_FAILED("S3005", HttpStatus.INTERNAL_SERVER_ERROR, "S3에 사진 업로드를 실패하였습니다.");
 
         private final String code;
         private final HttpStatus status;
