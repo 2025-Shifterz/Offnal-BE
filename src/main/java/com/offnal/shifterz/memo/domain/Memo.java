@@ -40,8 +40,11 @@ public class Memo extends BaseTimeEntity {
     private Organization organization; // nullable
 
     public void update(MemoRequestDto.UpdateMemoDto request) {
+
+        if (request.getTitle() != null) this.title = request.getTitle();
         if (request.getContent() != null) this.content = request.getContent();
         if (request.getTargetDate() != null) this.targetDate = request.getTargetDate();
     }
+
 }
 
