@@ -33,15 +33,19 @@ public class Log extends BaseTimeEntity {
     private String message;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberId", nullable = false)
+    @JoinColumn(name = "memberId", nullable = true)
     private Member member;
 
+    @Column(nullable = true)
+    private String anonymizedIdentifier;
+
     @Builder
-    private Log(Member member, Character action, LocalDateTime time, String message) {
+    private Log(Member member, Character action, LocalDateTime time, String message, String anonymizedIdentifier) {
         this.member = member;
         this.action = action;
         this.time = time;
         this.message = message;
+        this.anonymizedIdentifier = anonymizedIdentifier;
     }
 
     /**

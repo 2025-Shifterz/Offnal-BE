@@ -15,13 +15,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,7 +47,6 @@ public class HomeController {
                                     name = "근무 일정 조회 성공 예시",
                                     value = """
                         {
-                          "success": true,
                           "code": "HOME001",
                           "message": "근무 일정을 성공적으로 조회했습니다.",
                           "data": {
@@ -83,7 +83,6 @@ public class HomeController {
                                     name = "오늘의 루틴 조회 성공 예시",
                                     value = """
                     {
-                      "success": true,
                       "code": "HOME002",
                       "message": "루틴을 성공적으로 조회했습니다.",
                       "data": {
@@ -131,7 +130,6 @@ public class HomeController {
                                     name = "특정 날짜 루틴 조회 성공 예시",
                                     value = """
                     {
-                      "success": true,
                       "code": "HOME002",
                       "message": "루틴을 성공적으로 조회했습니다.",
                       "data": {
