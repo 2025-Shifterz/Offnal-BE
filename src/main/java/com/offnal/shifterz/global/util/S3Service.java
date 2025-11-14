@@ -23,6 +23,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
 import java.time.Duration;
+import java.util.UUID;
 
 import static software.amazon.awssdk.core.sync.RequestBody.fromBytes;
 
@@ -52,7 +53,8 @@ public class S3Service {
             throw new CustomException(S3ErrorCode.S3_KEY_ALREADY_EXISTS);
         }
 
-        String key = FOLDER + "/member-" + memberId + "-profile";
+        String key = FOLDER + "/member-" + memberId + "-profile-" + UUID.randomUUID();
+
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucket)

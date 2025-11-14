@@ -96,7 +96,8 @@ public class MemberService {
         try{
             byte[] bytes = s3Service.downloadImageFromUrl(socialProfileImageUrl);
 
-            String key = "profile/member-" + member.getId() + "-profile";
+            String key = "profile/member-" + member.getId() + "-profile-" + UUID.randomUUID();
+
 
             s3Service.uploadImageBytes(bytes, key);
 
