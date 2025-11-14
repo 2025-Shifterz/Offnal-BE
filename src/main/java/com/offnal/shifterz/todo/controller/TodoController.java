@@ -121,7 +121,7 @@ public class TodoController {
                     
                     **조회 기준**
                     - `filter` : 조회할 Todo 유형
-                        - `all` → 내가 작성한 모든 Todo (기본값)
+                        - `all` → 내가 작성한 해당 날짜의 모든 Todo (기본값)
                         - `unassigned` → 소속 조직이 없는 Todo만
                     - `organizationId` : 특정 조직의 Todo만 조회
                     - `date` : 특정 날짜(`yyyy-MM-dd`)의 Todo만 조회
@@ -129,8 +129,8 @@ public class TodoController {
                     **조합 가능한 예시**
                     | 조합 | 설명 |
                     |------|------|
-                    | `filter=all` | 전체 Todo |
-                    | `filter=unassigned` | 소속 없는 Todo |
+                    | `filter=all&date=2025-11-09` | 해당 날짜의 전체 Todo |
+                    | `filter=unassigned&date=2025-11-09`` | 해당 날짜의 소속 없는 Todo |
                     | `organizationId=3` | 조직 ID=3의 Todo |
                     | `date=2025-11-09` | 2025년 11월 9일 작성된 Todo |
                     | `filter=unassigned&date=2025-11-09` | 소속 없는 2025-11-09 Todo |

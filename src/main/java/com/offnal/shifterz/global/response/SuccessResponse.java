@@ -1,5 +1,6 @@
 package com.offnal.shifterz.global.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SuccessResponse<T> {
 
     @Schema(description = "응답 코드", example = "LOGIN_SUCCESS")

@@ -1,7 +1,7 @@
 package com.offnal.shifterz.memo.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +20,7 @@ public class MemoRequestDto {
         @NotNull(message = "메모 제목은 필수입니다.")
         private String title;
 
-        @Null(message = "메모 내용은 선택입니다.")
+        @Schema(description = "메모 내용은 선택입니다.")
         private String content;
 
         @NotNull(message = "메모 날짜는 필수입니다.")
@@ -37,6 +37,8 @@ public class MemoRequestDto {
 
         @NotNull(message = "메모 ID는 필수입니다.")
         private Long id;
+
+        private String title;
         private String content;
         private LocalDate targetDate;
     }
