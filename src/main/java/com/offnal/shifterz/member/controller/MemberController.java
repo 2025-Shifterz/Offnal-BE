@@ -5,6 +5,7 @@ import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
 import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.global.util.S3Service;
+import com.offnal.shifterz.global.util.dto.PresignedUrlRequestDto;
 import com.offnal.shifterz.global.util.dto.PresignedUrlResponse;
 import com.offnal.shifterz.member.dto.MemberRequestDto;
 import com.offnal.shifterz.member.dto.MemberResponseDto;
@@ -30,13 +31,16 @@ public class MemberController {
     @ErrorApiResponses.Auth
     @Operation(summary = "S3 업로드용 Presigned URL 발급",
             description = "프로필 이미지를 S3에 업로드하기 위한 URL을 발급합니다.\n\n" +
-                        "발급된 key는 회원의 프로필 이미지로 자동 반영됩니다.\n\n" +
+                    "요청 시 클라이언트는 업로드할 이미지의 **확장자(extension)** 를 전달해야 합니다.\n\n" +
+                        "발급된 key는 회원 정보에 자동 반영됩니다.\n\n" +
                         "✅ 반환값:\n" +
                         "- **uploadUrl**: 이미지를 직접 업로드할 S3 주소\n" +
                         "- **key**: 업로드된 파일의 S3 경로\n\n")
-    @GetMapping("/profile/upload-url")
-    public SuccessResponse<PresignedUrlResponse> generateUploadUrl() {
-        PresignedUrlResponse response = s3Service.generateUploadPresignedUrl();
+    @PostMapping("/profile/upload-url")
+    public SuccessResponse<PresignedUrlResponse> generateUploadUrl(
+            @RequestBody PresignedUrlRequestDto request
+    ) {
+        PresignedUrlResponse response = s3Service.generateUploadPresignedUrl(request.getExtension());
         memberService.updateProfileImage(response.getKey());
         return SuccessResponse.success(SuccessCode.PROFILE_UPLOAD_URL_CREATED, response);
     }

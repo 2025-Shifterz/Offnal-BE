@@ -94,10 +94,11 @@ public class MemberService {
 
     private void uploadSocialProfileImage(Member member, String socialProfileImageUrl) {
         try{
+            String extension = extractExtensionFromUrl(socialProfileImageUrl);
+
+            String key = "profile/member-" + member.getId() + "-profile-" + UUID.randomUUID() + "." + extension;
+
             byte[] bytes = s3Service.downloadImageFromUrl(socialProfileImageUrl);
-
-            String key = "profile/member-" + member.getId() + "-profile-" + UUID.randomUUID();
-
 
             s3Service.uploadImageBytes(bytes, key);
 
@@ -109,6 +110,20 @@ public class MemberService {
             );
         } catch (Exception e) {
             throw new CustomException(S3Service.S3ErrorCode.UPLOAD_TO_S3_FAILED);
+        }
+    }
+
+    private String extractExtensionFromUrl(String url) {
+        try {
+            String lower = url.toLowerCase();
+
+            if (lower.contains(".png")) return "png";
+            if (lower.contains(".jpeg")) return "jpeg";
+            if (lower.contains(".jpg")) return "jpg";
+
+            throw new CustomException(S3Service.S3ErrorCode.UNSUPPORTED_CONTENT_TYPE);
+        } catch (Exception e) {
+            throw new CustomException(S3Service.S3ErrorCode.UNSUPPORTED_CONTENT_TYPE);
         }
     }
 

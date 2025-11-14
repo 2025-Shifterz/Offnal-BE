@@ -409,6 +409,19 @@ public @interface ErrorApiResponses {
                                             """)
                             }
                     )),
+            @ApiResponse(responseCode = "404", description = "지원하지 않는 확장자",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "UNSUPPORTED_CONTENT_TYPE", value = """
+                                            {
+                                              "code": "UNSUPPORTED_CONTENT_TYPE",
+                                              "message": "지원하지 않는 이미지 파일 확장자입니다."
+                                            }
+                                            """)
+                            }
+                    )),
             @ApiResponse(responseCode = "500", description = "S3 업로드/삭제 실패",
                     content = @Content(
                             mediaType = "application/json",
@@ -424,6 +437,12 @@ public @interface ErrorApiResponses {
                                             {
                                               "code": "S3_DELETE_FAILED",
                                               "message": "S3 파일 삭제에 실패했습니다."
+                                            }
+                                            """),
+                                    @ExampleObject(name = "UPLOAD_TO_S3_FAILED", value = """
+                                            {
+                                              "code": "UPLOAD_TO_S3_FAILED",
+                                              "message": "S3에 사진 업로드를 실패하였습니다."
                                             }
                                             """)
                             }

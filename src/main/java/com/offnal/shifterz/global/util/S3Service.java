@@ -43,7 +43,7 @@ public class S3Service {
 
 
     // S3에 이미지 업로드할 presigned url 발급
-    public PresignedUrlResponse generateUploadPresignedUrl(){
+    public PresignedUrlResponse generateUploadPresignedUrl(String extension){
         Long memberId = AuthService.getCurrentUserId();
 
         Member member = memberRepository.findById(memberId)
@@ -53,13 +53,16 @@ public class S3Service {
             throw new CustomException(S3ErrorCode.S3_KEY_ALREADY_EXISTS);
         }
 
-        String key = FOLDER + "/member-" + memberId + "-profile-" + UUID.randomUUID();
+        extension = normalizeExtension(extension);
 
+        String key = FOLDER + "/member-" + memberId + "-profile-" + UUID.randomUUID() + "." + extension;
+
+        String contentType = getContentTypeFromExtension(extension);
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
-                .contentType("image/jpeg")
+                .contentType(contentType)
                 .build();
 
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(
@@ -71,6 +74,22 @@ public class S3Service {
                 .uploadUrl(presignedRequest.url().toString())
                 .key(key)
                 .build();
+    }
+
+    private String normalizeExtension(String extension) {
+        if (extension == null || extension.isEmpty()) {
+            throw new CustomException(S3ErrorCode.UNSUPPORTED_CONTENT_TYPE);
+        }
+        return extension.replace(".","").toLowerCase();
+    }
+
+    // 확장자 get
+    private String getContentTypeFromExtension(String extension) {
+        return switch (extension.toLowerCase()){
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "png" -> "image/png";
+            default -> throw new CustomException(S3ErrorCode.UNSUPPORTED_CONTENT_TYPE);
+        };
     }
 
     // S3의 이미지 조회용 presigned url 발급
@@ -102,10 +121,12 @@ public class S3Service {
     // 프로필 이미지 S3에 직접 업로드
     public String uploadImageBytes(byte[] bytes, String key) {
         try {
+            String contentType = getContentTypeFromKey(key);
+
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucket)
                     .key(key)
-                    .contentType("image/jpeg")
+                    .contentType(contentType)
                     .build();
 
             s3Client.putObject(putObjectRequest, fromBytes(bytes));
@@ -114,6 +135,14 @@ public class S3Service {
         } catch (Exception e) {
             throw new CustomException(S3ErrorCode.UPLOAD_TO_S3_FAILED);
         }
+    }
+
+    private String getContentTypeFromKey(String key) {
+        if (key.endsWith(".png")) return "image/png";
+        if (key.endsWith(".jpg")) return "image/jpeg";
+        if (key.endsWith(".jpeg")) return "image/jpeg";
+
+        throw new CustomException(S3ErrorCode.UNSUPPORTED_CONTENT_TYPE);
     }
 
     // imageUrl 다운로드
@@ -133,7 +162,8 @@ public class S3Service {
         S3_DELETE_FAILED("S3002", HttpStatus.INTERNAL_SERVER_ERROR, "S3에 업로드된 프로필 사진을 삭제하는 데에 실패하였습니다."),
         S3_KEY_ALREADY_EXISTS("S3003", HttpStatus.BAD_REQUEST, "이미 프로필 이미지 Key가 존재하는 회원입니다."),
         S3_KEY_NOT_FOUND("S3004", HttpStatus.BAD_REQUEST, "존재하지 않는 S3 Key입니다."),
-        UPLOAD_TO_S3_FAILED("S3005", HttpStatus.INTERNAL_SERVER_ERROR, "S3에 사진 업로드를 실패하였습니다.");
+        UPLOAD_TO_S3_FAILED("S3005", HttpStatus.INTERNAL_SERVER_ERROR, "S3에 사진 업로드를 실패하였습니다."),
+        UNSUPPORTED_CONTENT_TYPE("S3006", HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 파일 확장자입니다.");
 
         private final String code;
         private final HttpStatus status;
