@@ -125,8 +125,8 @@ public class MemoController {
                     **조합 가능한 예시**
                     | 조합 | 설명 |
                     |------|------|
-                    | `filter=all` | 내가 작성한 전체 메모 |
-                    | `filter=unassigned` | 소속 없는 메모 |
+                    | `filter=all&date=2025-11-09` | 해당 날짜의 전체 메모 |
+                    | `filter=unassigned&date=2025-11-09` | 해당 날짜의 소속 없는 메모 |
                     | `organizationId=3` | 조직 ID=3의 메모 |
                     | `date=2025-11-09` | 2025년 11월 9일 작성된 메모 |
                     | `filter=unassigned&date=2025-11-09` | 소속 없는 2025-11-09 메모 |
