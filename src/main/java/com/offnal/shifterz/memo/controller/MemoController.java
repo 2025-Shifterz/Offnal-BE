@@ -125,8 +125,8 @@ public class MemoController {
                     **조합 가능한 예시**
                     | 조합 | 설명 |
                     |------|------|
-                    | `filter=all` | 내가 작성한 전체 메모 |
-                    | `filter=unassigned` | 소속 없는 메모 |
+                    | `filter=all&date=2025-11-09` | 해당 날짜의 전체 메모 |
+                    | `filter=unassigned&date=2025-11-09` | 해당 날짜의 소속 없는 메모 |
                     | `organizationId=3` | 조직 ID=3의 메모 |
                     | `date=2025-11-09` | 2025년 11월 9일 작성된 메모 |
                     | `filter=unassigned&date=2025-11-09` | 소속 없는 2025-11-09 메모 |
@@ -135,7 +135,7 @@ public class MemoController {
                     **주의사항**
                     - `filter`, `organizationId`, `date`는 모두 **선택 파라미터**입니다.
                     - 조합에 따라 동적으로 결과가 결정됩니다.
-                    - 파라미터를 생략하면 `filter=all` 기본값으로 전체 메모를 조회합니다.
+                    - 파라미터를 생략하면 `filter=all` 기본값으로 전체 메모를 조회하며, 날짜와 함꼐 요청해야 합니다.
                     """
     )
     @ApiResponses(value = {
