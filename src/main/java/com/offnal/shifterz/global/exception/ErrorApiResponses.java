@@ -184,6 +184,12 @@ public @interface ErrorApiResponses {
                                           "code": "CALENDAR_DURATION_REQUIRED",
                                           "message": "근무 소요 시간은 필수입니다."
                                         }
+                                        """),
+                                    @ExampleObject(name = "INVALID_SHIFT_DATE", value = """
+                                        {
+                                          "code": "INVALID_SHIFT_DATE",
+                                          "message": "근무 일정이 캘린더의 범위를 벗어났습니다."
+                                        }
                                         """)
                             }
                     )

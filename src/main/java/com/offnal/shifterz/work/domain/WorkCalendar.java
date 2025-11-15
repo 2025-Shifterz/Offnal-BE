@@ -17,8 +17,8 @@ import java.util.*;
         name = "work_calendar",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "uk_org_calendar_name",
-                        columnNames = {"organization_id", "calendar_name"}
+                        name = "uk_org_calendar_unique",
+                        columnNames = {"organization_id"}
                 )
         }
 )
@@ -30,9 +30,6 @@ public class WorkCalendar extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Long memberId;
-
-    @Column(name = "calendar_name", nullable = false)
-    private String calendarName;
 
     @Column(nullable = false)
     private LocalDate startDate;
