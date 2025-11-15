@@ -400,7 +400,14 @@ public @interface ErrorApiResponses {
                                               "code": "S3_KEY_ALREADY_EXISTS",
                                               "message": "이미 프로필 이미지가 존재합니다."
                                             }
-                                            """),
+                                            """)
+                            }
+                    )),
+            @ApiResponse(responseCode = "404", description = "잘못된 요청 또는 중복 Key",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
                                     @ExampleObject(name = "S3_KEY_NOT_FOUND", value = """
                                             {
                                               "code": "S3_KEY_NOT_FOUND",
@@ -409,7 +416,7 @@ public @interface ErrorApiResponses {
                                             """)
                             }
                     )),
-            @ApiResponse(responseCode = "404", description = "지원하지 않는 확장자",
+            @ApiResponse(responseCode = "400", description = "지원하지 않는 확장자",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),

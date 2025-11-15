@@ -161,7 +161,7 @@ public class S3Service {
         S3_UPLOAD_FAILED("S3001", HttpStatus.INTERNAL_SERVER_ERROR, "프로필 사진을 S3 업로드 실패하였습니다."),
         S3_DELETE_FAILED("S3002", HttpStatus.INTERNAL_SERVER_ERROR, "S3에 업로드된 프로필 사진을 삭제하는 데에 실패하였습니다."),
         S3_KEY_ALREADY_EXISTS("S3003", HttpStatus.BAD_REQUEST, "이미 프로필 이미지 Key가 존재하는 회원입니다."),
-        S3_KEY_NOT_FOUND("S3004", HttpStatus.BAD_REQUEST, "존재하지 않는 S3 Key입니다."),
+        S3_KEY_NOT_FOUND("S3004", HttpStatus.NOT_FOUND, "존재하지 않는 S3 Key입니다."),
         UPLOAD_TO_S3_FAILED("S3005", HttpStatus.INTERNAL_SERVER_ERROR, "S3에 사진 업로드를 실패하였습니다."),
         UNSUPPORTED_CONTENT_TYPE("S3006", HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 파일 확장자입니다.");
 
