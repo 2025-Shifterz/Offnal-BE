@@ -14,8 +14,8 @@ public class AuthResponseDto {
     @Schema(description = "회원 이메일", example = "test@example.com")
     private String email;
 
-    @Schema(description = "회원 프로필 이미지 URL")
-    private String profileImageUrl;
+    @Schema(description = "회원 프로필 이미지 Key")
+    private String profileImageKey;
 
     @Schema(description = "신규 가입 여부, 기존 - false / 신규 - true", example = "true")
     private boolean newMember;
@@ -33,7 +33,7 @@ public class AuthResponseDto {
         return AuthResponseDto.builder()
                 .memberName(dto.getMemberName())
                 .email(dto.getEmail())
-                .profileImageUrl(dto.getProfileImageUrl())
+                .profileImageKey(dto.getProfileImageKey())
                 .newMember(dto.isNewMember())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

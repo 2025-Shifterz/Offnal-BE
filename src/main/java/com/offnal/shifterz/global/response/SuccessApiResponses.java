@@ -206,7 +206,7 @@ public @interface SuccessApiResponses {
                                       "code": "CALENDAR_DATA_FETCHED",
                                       "message": "데이터 조회에 성공했습니다.",
                                       "data": {
-                                        "calendarName": "2025년 7월 근무표",
+                                        "calendarId": 1,
                                         "startDate": "2025-07-01",
                                         "endDate": "2025-07-07",
                                         "workTimes": {
@@ -244,12 +244,12 @@ public @interface SuccessApiResponses {
                                                    "message": "캘린더 정보를 조회했습니다.",
                                                    "data": [
                                                      {
-                                                       "calendarName": "2025년 8월 근무표",
+                                                       "calendarId": 1,
                                                        "startDate": "2025-08-01",
                                                        "endDate": "2025-08-07"
                                                      },
                                                      {
-                                                       "calendarName": "2025년 7월 근무표",
+                                                       "calendarId": 2,
                                                        "startDate": "2025-07-01",
                                                        "endDate": "2025-07-07"
                                                      }
@@ -269,22 +269,24 @@ public @interface SuccessApiResponses {
                             mediaType = "application/json",
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = @ExampleObject(name = "프로필 수정 성공 예시", value = """
-                                {
-                                  "code": "MEMBER_UPDATE_SUCCESS",
-                                  "message": "프로필 수정에 성공했습니다.",
-                                  "data": {
-                                    "memberId": 1,
-                                    "memberName": "홍길동",
-                                    "email": "test@example.com",
-                                    "phoneNumber": "010-1234-5678",
-                                    "profileImageUrl": "https://cdn.com/profile.jpg"
-                                  }
-                                }
+                                    {
+                                       "code": "PROFILE_UPDATED",
+                                       "message": "프로필 수정에 성공했습니다.",
+                                       "data": {
+                                         "id": 3,
+                                         "email": "test@offnal.com",
+                                         "memberName": "테스트",
+                                         "phoneNumber": "010-1111-1111",
+                                         "profileImageKey": "profile/member-3-profile",
+                                         "profileImageUrl": "https://bucket.s3.ap-northeast-2.amazonaws.com/profile/member-1-profile"
+                                       }
+                                     }
                                 """)
                     )
             )
     })
     public @interface UpdateProfile {}
+
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
@@ -293,23 +295,45 @@ public @interface SuccessApiResponses {
                             mediaType = "application/json",
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = @ExampleObject(name = "내 정보 조회 성공 예시", value = """
-                                {
-                                  "code": "MEM002",
-                                  "message": "내 정보 조회에 성공했습니다.",
-                                  "data": {
-                                    "email": "example@kkukmoa.com",
-                                    "name": "홍길동",
-                                    "phoneNumber": "010-1234-5678",
-                                    "profileImageUrl": "https://cdn.example.com/image.jpg"
-                                  }
-                                }
+                                    {
+                                       "code": "MY_INFO_FETCHED",
+                                       "message": "내 정보 조회에 성공했습니다.",
+                                       "data": {
+                                         "id": 1,
+                                         "email": "example@offnal.com",
+                                         "memberName": "홍길동",
+                                         "phoneNumber": null,
+                                         "profileImageKey": "profile/member-1-profile",
+                                         "profileImageUrl": "https://bucket.s3.ap-northeast-2.amazonaws.com/profile/member-1-profile"
+                                       }
+                                     }
                                 """)
                     )
             )
     })
     public @interface MyInfo {}
 
-
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "S3 업로드 url 생성 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "S3 업로드 url 생성 성공 예시", value = """
+                                    {
+                                          "code": "PROFILE_UPLOAD_URL_CREATED",
+                                          "message": "S3용 프로필 사진 업로드 url 생성을 성공했습니다.",
+                                          "data": {
+                                            "uploadUrl": "https://offnal-s3-bucket.s3.ap-northeast-2.amazonaws.com/profile/member-3-profile?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20251112T190907Z&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Expires=300&X-Amz-Credential=AKIARGOKMTMG4PU4K2HM%2F20251112%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Signature=61ef9208f6d3e492e22dedee14aeed989ec52bfa76e30787746b0e3bcd62f58e",
+                                            "key": "profile/member-3-profile"
+                                          }
+                                        }
+                                """)
+                    )
+            )
+    })
+    public @interface S3_URL {}
 
     @ApiResponses(value = {
             @ApiResponse(

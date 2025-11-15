@@ -21,7 +21,7 @@ public class ErrorResponse {
     private final String message;
 
 
-    @Schema(description = "필드별 에러 정보", example = "{\"calendarName\": \"근무표 이름은 필수입니다.\"}")
+    @Schema(description = "필드별 에러 정보", example = "{\"organizationName\": \"조직 이름은 필수입니다.\"}")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private final Map<String, String> errors;
 
