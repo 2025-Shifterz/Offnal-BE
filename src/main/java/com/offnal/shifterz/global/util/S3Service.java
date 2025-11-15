@@ -35,7 +35,6 @@ public class S3Service {
     private final S3Presigner s3Presigner;
     private final S3Client s3Client;
     private final MemberRepository memberRepository;
-    private final MemberService memberService;
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
@@ -63,7 +62,6 @@ public class S3Service {
             key = member.getProfileImageKey();
         } else{
             key = FOLDER + "/member-" + memberId + "-profile-" + UUID.randomUUID() + "." + extension;
-            memberService.updateProfileImage(key);
         }
 
 
