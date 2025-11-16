@@ -233,7 +233,7 @@ public class MemberService {
 
         if (currentKey == null || currentKey.isEmpty()) {
             member.updateMemberInfo(
-                    member.getEmail(),
+                    member.getMemberName(),
                     newImageKey
             );
         }
