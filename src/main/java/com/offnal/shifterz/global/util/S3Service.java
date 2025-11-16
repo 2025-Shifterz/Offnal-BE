@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -44,7 +45,7 @@ public class S3Service {
         extension = normalizeExtension(extension);
         String contentType = getContentTypeFromExtension(extension);
 
-        String key = (existingKey != null && !existingKey.isEmpty())
+        String key = StringUtils.hasText(existingKey)
                 ? existingKey
                 : FOLDER + "/" + UUID.randomUUID() + "." + extension;
 
