@@ -277,7 +277,7 @@ public @interface SuccessApiResponses {
                                          "email": "test@offnal.com",
                                          "memberName": "테스트",
                                          "phoneNumber": "010-1111-1111",
-                                         "profileImageKey": "profile/member-3-profile",
+                                         "profileImageKey": "profile/a360f82d-88e6-4e18-947b-804598d5570a.jpg",
                                          "profileImageUrl": "https://bucket.s3.ap-northeast-2.amazonaws.com/profile/member-1-profile"
                                        }
                                      }
@@ -303,7 +303,7 @@ public @interface SuccessApiResponses {
                                          "email": "example@offnal.com",
                                          "memberName": "홍길동",
                                          "phoneNumber": null,
-                                         "profileImageKey": "profile/member-1-profile",
+                                         "profileImageKey": "profile/a360f82d-88e6-4e18-947b-804598d5570a.jpg",
                                          "profileImageUrl": "https://bucket.s3.ap-northeast-2.amazonaws.com/profile/member-1-profile"
                                        }
                                      }
@@ -326,7 +326,7 @@ public @interface SuccessApiResponses {
                                           "message": "S3용 프로필 사진 업로드 url 생성을 성공했습니다.",
                                           "data": {
                                             "uploadUrl": "https://offnal-s3-bucket.s3.ap-northeast-2.amazonaws.com/profile/member-3-profile?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20251112T190907Z&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Expires=300&X-Amz-Credential=AKIARGOKMTMG4PU4K2HM%2F20251112%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Signature=61ef9208f6d3e492e22dedee14aeed989ec52bfa76e30787746b0e3bcd62f58e",
-                                            "key": "profile/member-3-profile"
+                                            "key": "profile/a360f82d-88e6-4e18-947b-804598d5570a.jpg"
                                           }
                                         }
                                 """)

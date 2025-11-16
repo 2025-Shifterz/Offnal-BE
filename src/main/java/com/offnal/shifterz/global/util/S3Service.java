@@ -1,12 +1,9 @@
 package com.offnal.shifterz.global.util;
 
-import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.global.util.dto.PresignedUrlResponse;
-import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.repository.MemberRepository;
-import com.offnal.shifterz.member.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -43,26 +40,13 @@ public class S3Service {
 
 
     // S3에 이미지 업로드할 presigned url 발급
-    public PresignedUrlResponse generateUploadPresignedUrl(String extension){
-        Long memberId = AuthService.getCurrentUserId();
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(MemberService.MemberErrorCode.MEMBER_NOT_FOUND));
-
-        if (member.getProfileImageKey() != null && !member.getProfileImageKey().isEmpty()) {
-            throw new CustomException(S3ErrorCode.S3_KEY_ALREADY_EXISTS);
-        }
-
+    public PresignedUrlResponse createPresignedUrl(String extension, String existingKey){
         extension = normalizeExtension(extension);
-
         String contentType = getContentTypeFromExtension(extension);
 
-        String key;
-        if (member.getProfileImageKey() != null && !member.getProfileImageKey().isEmpty()) {
-            key = member.getProfileImageKey();
-        } else{
-            key = FOLDER + "/member-" + memberId + "-profile-" + UUID.randomUUID() + "." + extension;
-        }
+        String key = (existingKey != null && !existingKey.isEmpty())
+                ? existingKey
+                : FOLDER + "/" + UUID.randomUUID() + "." + extension;
 
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
@@ -76,10 +60,7 @@ public class S3Service {
                         .signatureDuration(Duration.ofMinutes(5))
         );
 
-        return PresignedUrlResponse.builder()
-                .uploadUrl(presignedRequest.url().toString())
-                .key(key)
-                .build();
+        return new PresignedUrlResponse(presignedRequest.url().toString(), key);
     }
 
     private String normalizeExtension(String extension) {
