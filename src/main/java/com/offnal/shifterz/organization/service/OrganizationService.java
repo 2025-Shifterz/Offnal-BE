@@ -69,7 +69,7 @@ public class OrganizationService {
     public List<OrganizationResponseDto.OrganizationDto> getAllOrganizations() {
         Long memberId = AuthService.getCurrentUserId();
 
-        List<Organization> organizations = organizationRepository.findAllByOrganizationMember_Id(memberId);
+        List<Organization> organizations = organizationRepository.findAllByOrganizationMember_IdOrderByIdAsc(memberId);
 
         return organizations.stream()
                 .map(OrganizationConverter::toDto)
