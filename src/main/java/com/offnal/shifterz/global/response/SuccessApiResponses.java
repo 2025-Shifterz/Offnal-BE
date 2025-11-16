@@ -741,6 +741,38 @@ public @interface SuccessApiResponses {
 
     @ApiResponse(
             responseCode = "200",
+            description = "같은 이름의 조직 조회 성공",
+            content = @Content(
+                    schema = @Schema(implementation = OrganizationResponseDto.OrganizationDto.class),
+                    examples = @ExampleObject(
+                            name = "같은 이름의 조직 조회 성공 예시",
+                            value = """
+                                    {
+                                           "code": "ORGANIZATION_FETCHED",
+                                           "message": "조직이 성공적으로 조회되었습니다.",
+                                           "data": [
+                                                {
+                                                    "id": 1,
+                                                    "organizationName": "병원 1",
+                                                    "team": "1조"
+                                                },
+                                                {
+                                                     "id": 2,
+                                                     "organizationName": "병원 1",
+                                                     "team": "2조"
+                                                }
+                                           ]
+                                     }
+                """
+                    )
+            )
+    )
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface OrganizationTeamGet {}
+
+    @ApiResponse(
+            responseCode = "200",
             description = "전체 조직 조회 성공",
             content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = OrganizationResponseDto.OrganizationDto.class)),

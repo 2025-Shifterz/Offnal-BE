@@ -26,4 +26,9 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
     );
 
     void deleteByOrganizationMember_Id(Long memberId);
+
+    List<Organization> findAllByOrganizationMember_IdAndOrganizationNameOrderByIdAsc(
+            Long memberId,
+            String organizationName
+    );
 }
