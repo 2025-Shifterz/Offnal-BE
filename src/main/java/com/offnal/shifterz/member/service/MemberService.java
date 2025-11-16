@@ -104,9 +104,7 @@ public class MemberService {
             s3Service.uploadImageBytes(bytes, key);
 
             member.updateMemberInfo(
-                    member.getEmail(),
                     member.getMemberName(),
-                    member.getPhoneNumber(),
                     key
             );
         } catch (Exception e) {
@@ -214,9 +212,7 @@ public class MemberService {
                 .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         member.updateMemberInfo(
-                request.getEmail(),
                 request.getName(),
-                request.getPhoneNumber(),
                 member.getProfileImageKey()
         );
 
@@ -238,8 +234,6 @@ public class MemberService {
         if (currentKey == null || currentKey.isEmpty()) {
             member.updateMemberInfo(
                     member.getEmail(),
-                    member.getMemberName(),
-                    member.getPhoneNumber(),
                     newImageKey
             );
         }
@@ -260,9 +254,7 @@ public class MemberService {
         s3Service.deleteFile(currentKey);
 
         member.updateMemberInfo(
-                member.getEmail(),
                 member.getMemberName(),
-                member.getPhoneNumber(),
                 null
         );
     }
