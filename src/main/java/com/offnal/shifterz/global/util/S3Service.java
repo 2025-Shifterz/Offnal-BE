@@ -38,6 +38,8 @@ public class S3Service {
     private String bucket;
 
     private static final String FOLDER = "profile";
+    private static final long PRESIGNED_URL_DURATION_MINUTES = 10;
+
 
 
     // S3에 이미지 업로드할 presigned url 발급
@@ -58,7 +60,7 @@ public class S3Service {
 
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(
                 r -> r.putObjectRequest(objectRequest)
-                        .signatureDuration(Duration.ofMinutes(5))
+                        .signatureDuration(Duration.ofMinutes(PRESIGNED_URL_DURATION_MINUTES))
         );
 
         return new PresignedUrlResponse(presignedRequest.url().toString(), key);
@@ -88,7 +90,7 @@ public class S3Service {
                 .build();
 
         PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(
-                r -> r.signatureDuration(Duration.ofMinutes(10))
+                r -> r.signatureDuration(Duration.ofMinutes(PRESIGNED_URL_DURATION_MINUTES))
                         .getObjectRequest(getObjectRequest)
         );
 
