@@ -1,6 +1,5 @@
 package com.offnal.shifterz.member.controller;
 
-import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.ErrorApiResponses;
 import com.offnal.shifterz.global.response.SuccessApiResponses;
 import com.offnal.shifterz.global.response.SuccessCode;
@@ -8,7 +7,6 @@ import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.global.util.S3Service;
 import com.offnal.shifterz.global.util.dto.PresignedUrlRequestDto;
 import com.offnal.shifterz.global.util.dto.PresignedUrlResponse;
-import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.dto.MemberRequestDto;
 import com.offnal.shifterz.member.dto.MemberResponseDto;
 import com.offnal.shifterz.member.service.MemberService;
@@ -42,14 +40,7 @@ public class MemberController {
     public SuccessResponse<PresignedUrlResponse> generateUploadUrl(
             @RequestBody PresignedUrlRequestDto request
     ) {
-        PresignedUrlResponse response = s3Service.generateUploadPresignedUrl(request.getExtension());
-        Member member = AuthService.getCurrentMember();
-
-        if (member.getProfileImageKey() == null || member.getProfileImageKey().isEmpty()) {
-            memberService.updateProfileImage(response.getKey());
-        }
-
-        memberService.updateProfileImage(response.getKey());
+        PresignedUrlResponse response = memberService.generateProfileUploadUrl(request.getExtension());
         return SuccessResponse.success(SuccessCode.PROFILE_UPLOAD_URL_CREATED, response);
     }
 
