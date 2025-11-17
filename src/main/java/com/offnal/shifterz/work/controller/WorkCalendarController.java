@@ -223,6 +223,36 @@ public class WorkCalendarController {
 
 
     /**
+     * 회원의 조직 중 organizationName이 같은 조의 근무 일정 조회
+     */
+    @Operation(summary = "organizationName이 같은 조의 근무 일정 조회",
+            description = "회원이 속한 조직 중 **organizationName 이 같은 모든 팀(조)** 의 근무 일정을 조회합니다.\n\n" +
+                    " - startDate, endDate 둘 다 null: 전체 일정 조회\n" +
+                    " - startDate만 전달: 해당 날짜 이상 모든 일정\n" +
+                    " - endDate만 전달: 해당 날짜 이하 모든 일정\n" +
+                    " - 둘 다 전달: 범위 내 일정만 조회")
+    @SuccessApiResponses.SameOrgWorkInstance
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.Organization
+    @GetMapping("/organizations/{organizationName}/work-instances")
+    public SuccessResponse<SameOrganizationWorkResDto> getSameOrganizationNameWork(
+            @PathVariable String organizationName,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate
+    ) {
+        SameOrganizationWorkResDto response = workCalendarService.getSameOrganizationNameWork(
+                organizationName,
+                startDate,
+                endDate
+        );
+
+        return SuccessResponse.success(SuccessCode.CALENDAR_DATA_FETCHED,response);
+    }
+
+
+
+    /**
      * 근무일 수정
      */
     @Operation(summary = "근무일 수정", description = "특정 연도와 월의 근무 일정을 수정합니다. 해당 날짜에 기존의 근무 일정이 없을 경우, 근무 일정을 추가합니다.")

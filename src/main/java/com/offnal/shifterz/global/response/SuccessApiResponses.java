@@ -264,6 +264,122 @@ public @interface SuccessApiResponses {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "organizationName이 같은 조직의 근무 일정 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(name = "organizationName이 같은 조직의 근무 일정 조회 예시", value = """
+                                    {
+                                      "code": "CALENDAR_DATA_FETCHED",
+                                      "message": "캘린더 정보를 조회했습니다.",
+                                      "data": {
+                                        "teams": [
+                                          {
+                                            "team": "1조",
+                                            "workInstances": [
+                                              {
+                                                "date": "2025-07-01",
+                                                "workType": "E",
+                                                "startTime": "16:00:00",
+                                                "duration": "PT6H30M"
+                                              },
+                                              {
+                                                "date": "2025-07-02",
+                                                "workType": "E",
+                                                "startTime": "16:00:00",
+                                                "duration": "PT6H30M"
+                                              },
+                                              {
+                                                "date": "2025-07-03",
+                                                "workType": "N",
+                                                "startTime": "00:00:00",
+                                                "duration": "PT6H30M"
+                                              },
+                                              {
+                                                "date": "2025-07-04",
+                                                "workType": "-",
+                                                "startTime": null,
+                                                "duration": null
+                                              },
+                                              {
+                                                "date": "2025-07-05",
+                                                "workType": "D",
+                                                "startTime": "08:00:00",
+                                                "duration": "PT6H30M"
+                                              },
+                                              {
+                                                "date": "2025-07-06",
+                                                "workType": "D",
+                                                "startTime": "08:00:00",
+                                                "duration": "PT6H30M"
+                                              },
+                                              {
+                                                "date": "2025-07-07",
+                                                "workType": "-",
+                                                "startTime": null,
+                                                "duration": null
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "team": "2조",
+                                            "workInstances": [
+                                              {
+                                                "date": "2025-07-08",
+                                                "workType": "D",
+                                                "startTime": "08:00:00",
+                                                "duration": "PT6H30M"
+                                              },
+                                              {
+                                                "date": "2025-07-09",
+                                                "workType": "D",
+                                                "startTime": "08:00:00",
+                                                "duration": "PT6H30M"
+                                              },
+                                              {
+                                                "date": "2025-07-10",
+                                                "workType": "E",
+                                                "startTime": "16:00:00",
+                                                "duration": "PT6H30M"
+                                              },
+                                              {
+                                                "date": "2025-07-11",
+                                                "workType": "E",
+                                                "startTime": "16:00:00",
+                                                "duration": "PT6H30M"
+                                              },
+                                              {
+                                                "date": "2025-07-12",
+                                                "workType": "N",
+                                                "startTime": "00:00:00",
+                                                "duration": "PT6H30M"
+                                              },
+                                              {
+                                                "date": "2025-07-13",
+                                                "workType": "N",
+                                                "startTime": "00:00:00",
+                                                "duration": "PT6H30M"
+                                              },
+                                              {
+                                                "date": "2025-07-14",
+                                                "workType": "-",
+                                                "startTime": null,
+                                                "duration": null
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    }
+                                    """)
+                    )
+            )
+    })
+    public @interface SameOrgWorkInstance {}
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "프로필 수정 성공",
                     content = @Content(
                             mediaType = "application/json",
