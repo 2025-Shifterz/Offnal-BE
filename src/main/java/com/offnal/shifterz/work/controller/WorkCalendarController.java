@@ -237,7 +237,7 @@ public class WorkCalendarController {
     @ErrorApiResponses.Organization
     @GetMapping("/organizations/{organizationName}/work-instances")
     public SuccessResponse<SameOrganizationWorkResDto> getSameOrganizationNameWork(
-            @PathVariable String organizationName,
+            @PathVariable @NotNull String organizationName,
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate
     ) {
