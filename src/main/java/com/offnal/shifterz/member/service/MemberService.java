@@ -5,6 +5,7 @@ import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.global.util.RedisUtil;
 import com.offnal.shifterz.global.util.S3Service;
+import com.offnal.shifterz.global.util.dto.PresignedUrlResponse;
 import com.offnal.shifterz.jwt.TokenService;
 import com.offnal.shifterz.log.domain.Log;
 import com.offnal.shifterz.log.repository.LogRepository;
@@ -96,16 +97,14 @@ public class MemberService {
         try{
             String extension = extractExtensionFromUrl(socialProfileImageUrl);
 
-            String key = "profile/member-" + member.getId() + "-profile-" + UUID.randomUUID() + "." + extension;
+            String key = "profile/" + UUID.randomUUID() + "." + extension;
 
             byte[] bytes = s3Service.downloadImageFromUrl(socialProfileImageUrl);
 
             s3Service.uploadImageBytes(bytes, key);
 
             member.updateMemberInfo(
-                    member.getEmail(),
                     member.getMemberName(),
-                    member.getPhoneNumber(),
                     key
             );
         } catch (Exception e) {
@@ -213,9 +212,7 @@ public class MemberService {
                 .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         member.updateMemberInfo(
-                request.getEmail(),
                 request.getName(),
-                request.getPhoneNumber(),
                 member.getProfileImageKey()
         );
 
@@ -234,16 +231,12 @@ public class MemberService {
 
         String currentKey = member.getProfileImageKey();
 
-        if (currentKey != null && !currentKey.isEmpty()) {
-            s3Service.deleteFile(currentKey);
+        if (currentKey == null || currentKey.isEmpty()) {
+            member.updateMemberInfo(
+                    member.getMemberName(),
+                    newImageKey
+            );
         }
-
-        member.updateMemberInfo(
-                member.getEmail(),
-                member.getMemberName(),
-                member.getPhoneNumber(),
-                newImageKey
-        );
     }
 
     @Transactional
@@ -261,12 +254,31 @@ public class MemberService {
         s3Service.deleteFile(currentKey);
 
         member.updateMemberInfo(
-                member.getEmail(),
                 member.getMemberName(),
-                member.getPhoneNumber(),
                 null
         );
     }
+
+    @Transactional
+    public PresignedUrlResponse generateProfileUploadUrl(String extension){
+        Long memberId = AuthService.getCurrentUserId();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        String existingKey = member.getProfileImageKey();
+
+        PresignedUrlResponse presigned = s3Service.createPresignedUrl(
+                extension,
+                existingKey
+        );
+
+        if (existingKey == null || existingKey.isEmpty()) {
+            updateProfileImage(presigned.getKey());
+        }
+
+        return presigned;
+    }
+
 
     @Getter
     @AllArgsConstructor

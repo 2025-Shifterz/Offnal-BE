@@ -76,6 +76,46 @@ public class OrganizationService {
                 .toList();
     }
 
+    // 회원의 조직 이름이 같은 조 조회
+    @Transactional(readOnly = true)
+    public List<OrganizationResponseDto.OrganizationDto> getOrganizationsByName(String organizationName) {
+        Long memberId = AuthService.getCurrentUserId();
+        String normalizedName = normalizeOrganizationNameOrThrow(organizationName);
+
+        List<Organization> organizations = findOrganizationsByMemberAndNameOrThrow(memberId, normalizedName);
+
+        return convertOrganizationListToDto(organizations);
+    }
+
+    private List<OrganizationResponseDto.OrganizationDto> convertOrganizationListToDto(List<Organization> organizations) {
+        return organizations.stream()
+                .map(OrganizationConverter::toDto)
+                .toList();
+    }
+
+    private List<Organization> findOrganizationsByMemberAndNameOrThrow(Long memberId, String organizationName) {
+        List<Organization> organizations =
+                organizationRepository.findAllByOrganizationMember_IdAndOrganizationNameOrderByIdAsc(
+                        memberId, organizationName
+                );
+
+        if (organizations.isEmpty()) {
+            throw new CustomException(OrganizationErrorCode.ORGANIZATION_NOT_FOUND);
+        }
+
+        return organizations;
+    }
+
+    private String normalizeOrganizationNameOrThrow(String organizationName) {
+        String name = normalize(organizationName);
+
+        if (name == null || name.isEmpty()) {
+            throw new CustomException(OrganizationErrorCode.ORGANIZATION_NOT_VALIDATE);
+        }
+
+        return name;
+    }
+
     // 없으면 조직 생성, 있으면 조직 조회
     @Transactional
     public Organization getOrCreateByMemberAndNameAndTeam(String organizationName, String organizationTeam) {

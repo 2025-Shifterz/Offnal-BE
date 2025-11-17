@@ -249,6 +249,73 @@ public class WorkCalendarService {
         return toListItemDtos(calendars);
     }
 
+    // 회원의 조직 중 organizationName이 같은 조직의 근무 일정 조회
+    public SameOrganizationWorkResDto getSameOrganizationNameWork(
+            String organizationName,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        Long memberId = AuthService.getCurrentUserId();
+
+        List<Organization> organizations = findOrganizationsWithSameName(memberId, organizationName);
+
+        List<TeamWorkInstanceResDto> teamResponses = organizations.stream()
+                .map(org -> {
+                    List<TeamWorkInstanceResDto.WorkInstanceDto> workInstances =
+                            mapWorkInstances(org, startDate, endDate);
+                    return toTeamWorkInstanceDto(org, workInstances);
+                })
+                .toList();
+
+        return SameOrganizationWorkResDto.builder()
+                .teams(teamResponses)
+                .build();
+    }
+
+    private TeamWorkInstanceResDto toTeamWorkInstanceDto(Organization org, List<TeamWorkInstanceResDto.WorkInstanceDto> workInstances) {
+        return TeamWorkInstanceResDto.builder()
+                .team(org.getTeam())
+                .workInstances(workInstances)
+                .build();
+    }
+
+    private List<TeamWorkInstanceResDto.WorkInstanceDto> mapWorkInstances(Organization org, LocalDate startDate, LocalDate endDate) {
+        List<WorkInstance> instances =
+                workInstanceRepository.findByOrganizationIdAndDateRange(
+                        org.getId(), startDate, endDate
+                );
+
+        return instances.stream()
+                .map(i -> {
+
+                    WorkTime workTime = WorkCalendarConverter.resolveWorkTimeFor(i);
+
+                    LocalTime startTime = (workTime != null) ? workTime.getStartTime() : null;
+                    Duration duration   = (workTime != null) ? workTime.getDuration()   : null;
+
+                    return TeamWorkInstanceResDto.WorkInstanceDto.builder()
+                            .date(i.getWorkDate())
+                            .workType(i.getWorkTimeType().getSymbol())
+                            .startTime(startTime)
+                            .duration(duration)
+                            .build();
+                })
+                .toList();
+    }
+
+    private List<Organization> findOrganizationsWithSameName(Long memberId, String organizationName) {
+        List<Organization> organizations =
+                organizationRepository.findAllByOrganizationMember_IdAndOrganizationNameOrderByIdAsc(
+                        memberId,
+                        organizationName
+                );
+
+        if (organizations.isEmpty()) {
+            throw new CustomException(OrganizationService.OrganizationErrorCode.ORGANIZATION_NOT_FOUND);
+        }
+        return organizations;
+    }
+
 
     // ===== private =====
 

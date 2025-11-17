@@ -95,7 +95,7 @@ public class WorkCalendarConverter {
     }
 
 
-    private static WorkTime resolveWorkTimeFor(WorkInstance instance) {
+    public static WorkTime resolveWorkTimeFor(WorkInstance instance) {
         if (instance == null || instance.getWorkCalendar() == null)
             return null;
 

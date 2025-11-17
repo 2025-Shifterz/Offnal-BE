@@ -1,12 +1,9 @@
 package com.offnal.shifterz.global.util;
 
-import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.global.util.dto.PresignedUrlResponse;
-import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.repository.MemberRepository;
-import com.offnal.shifterz.member.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -40,29 +38,18 @@ public class S3Service {
     private String bucket;
 
     private static final String FOLDER = "profile";
+    private static final long PRESIGNED_URL_DURATION_MINUTES = 10;
+
 
 
     // S3에 이미지 업로드할 presigned url 발급
-    public PresignedUrlResponse generateUploadPresignedUrl(String extension){
-        Long memberId = AuthService.getCurrentUserId();
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(MemberService.MemberErrorCode.MEMBER_NOT_FOUND));
-
-        if (member.getProfileImageKey() != null && !member.getProfileImageKey().isEmpty()) {
-            throw new CustomException(S3ErrorCode.S3_KEY_ALREADY_EXISTS);
-        }
-
+    public PresignedUrlResponse createPresignedUrl(String extension, String existingKey){
         extension = normalizeExtension(extension);
-
         String contentType = getContentTypeFromExtension(extension);
 
-        String key;
-        if (member.getProfileImageKey() != null && !member.getProfileImageKey().isEmpty()) {
-            key = member.getProfileImageKey();
-        } else{
-            key = FOLDER + "/member-" + memberId + "-profile-" + UUID.randomUUID() + "." + extension;
-        }
+        String key = StringUtils.hasText(existingKey)
+                ? existingKey
+                : FOLDER + "/" + UUID.randomUUID() + "." + extension;
 
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
@@ -73,13 +60,10 @@ public class S3Service {
 
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(
                 r -> r.putObjectRequest(objectRequest)
-                        .signatureDuration(Duration.ofMinutes(5))
+                        .signatureDuration(Duration.ofMinutes(PRESIGNED_URL_DURATION_MINUTES))
         );
 
-        return PresignedUrlResponse.builder()
-                .uploadUrl(presignedRequest.url().toString())
-                .key(key)
-                .build();
+        return new PresignedUrlResponse(presignedRequest.url().toString(), key);
     }
 
     private String normalizeExtension(String extension) {
@@ -106,7 +90,7 @@ public class S3Service {
                 .build();
 
         PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(
-                r -> r.signatureDuration(Duration.ofMinutes(10))
+                r -> r.signatureDuration(Duration.ofMinutes(PRESIGNED_URL_DURATION_MINUTES))
                         .getObjectRequest(getObjectRequest)
         );
 
