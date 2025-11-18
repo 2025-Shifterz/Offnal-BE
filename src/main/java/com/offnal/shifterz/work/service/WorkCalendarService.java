@@ -295,7 +295,7 @@ public class WorkCalendarService {
 
                     return TeamWorkInstanceResDto.WorkInstanceDto.builder()
                             .date(i.getWorkDate())
-                            .workType(i.getWorkTimeType().getSymbol())
+                            .workType(i.getWorkTimeType().getKoreanName())
                             .startTime(startTime)
                             .duration(duration)
                             .build();

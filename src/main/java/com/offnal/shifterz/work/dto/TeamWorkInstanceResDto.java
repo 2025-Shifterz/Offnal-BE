@@ -1,5 +1,6 @@
 package com.offnal.shifterz.work.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class TeamWorkInstanceResDto {
     public static class WorkInstanceDto {
         private LocalDate date;
         private String workType;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
         private LocalTime startTime;
         private Duration duration;
     }

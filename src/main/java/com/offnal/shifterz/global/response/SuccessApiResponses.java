@@ -279,31 +279,31 @@ public @interface SuccessApiResponses {
                                             "workInstances": [
                                               {
                                                 "date": "2025-07-01",
-                                                "workType": "E",
-                                                "startTime": "16:00:00",
+                                                "workType": "오후",
+                                                "startTime": "16:00",
                                                 "duration": "PT6H30M"
                                               },
                                               {
                                                 "date": "2025-07-02",
-                                                "workType": "E",
-                                                "startTime": "16:00:00",
+                                                "workType": "오후",
+                                                "startTime": "16:00",
                                                 "duration": "PT6H30M"
                                               },
                                               {
                                                 "date": "2025-07-03",
-                                                "workType": "N",
-                                                "startTime": "00:00:00",
+                                                "workType": "야간",
+                                                "startTime": "00:00",
                                                 "duration": "PT6H30M"
                                               },
                                               {
                                                 "date": "2025-07-04",
-                                                "workType": "-",
+                                                "workType": "휴일",
                                                 "startTime": null,
                                                 "duration": null
                                               },
                                               {
                                                 "date": "2025-07-05",
-                                                "workType": "D",
+                                                "workType": "주간",
                                                 "startTime": "08:00:00",
                                                 "duration": "PT6H30M"
                                               },
@@ -315,7 +315,7 @@ public @interface SuccessApiResponses {
                                               },
                                               {
                                                 "date": "2025-07-07",
-                                                "workType": "-",
+                                                "workType": "휴일",
                                                 "startTime": null,
                                                 "duration": null
                                               }
@@ -326,43 +326,43 @@ public @interface SuccessApiResponses {
                                             "workInstances": [
                                               {
                                                 "date": "2025-07-08",
-                                                "workType": "D",
-                                                "startTime": "08:00:00",
+                                                "workType": "주간",
+                                                "startTime": "08:00",
                                                 "duration": "PT6H30M"
                                               },
                                               {
                                                 "date": "2025-07-09",
-                                                "workType": "D",
-                                                "startTime": "08:00:00",
+                                                "workType": "주간",
+                                                "startTime": "08:00",
                                                 "duration": "PT6H30M"
                                               },
                                               {
                                                 "date": "2025-07-10",
-                                                "workType": "E",
-                                                "startTime": "16:00:00",
+                                                "workType": "오후",
+                                                "startTime": "16:00",
                                                 "duration": "PT6H30M"
                                               },
                                               {
                                                 "date": "2025-07-11",
-                                                "workType": "E",
-                                                "startTime": "16:00:00",
+                                                "workType": "오후",
+                                                "startTime": "16:00",
                                                 "duration": "PT6H30M"
                                               },
                                               {
                                                 "date": "2025-07-12",
-                                                "workType": "N",
-                                                "startTime": "00:00:00",
+                                                "workType": "야간",
+                                                "startTime": "00:00",
                                                 "duration": "PT6H30M"
                                               },
                                               {
                                                 "date": "2025-07-13",
-                                                "workType": "N",
-                                                "startTime": "00:00:00",
+                                                "workType": "야간",
+                                                "startTime": "00:00",
                                                 "duration": "PT6H30M"
                                               },
                                               {
                                                 "date": "2025-07-14",
-                                                "workType": "-",
+                                                "workType": "휴일",
                                                 "startTime": null,
                                                 "duration": null
                                               }
