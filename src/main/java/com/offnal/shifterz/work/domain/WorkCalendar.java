@@ -77,4 +77,8 @@ public class WorkCalendar extends BaseTimeEntity {
     }
 
     public void putWorkTime(String symbol, WorkTime time) { this.workTimes.put(symbol, time); }
+
+    public void updateStartDate(LocalDate newStart) { this.startDate = newStart; }
+    public void updateEndDate(LocalDate newEnd) { this.endDate = newEnd; }
+
 }
