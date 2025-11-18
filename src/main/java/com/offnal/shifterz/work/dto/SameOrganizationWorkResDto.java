@@ -12,5 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SameOrganizationWorkResDto {
+
+    private String myTeam;
     private List<TeamWorkInstanceResDto> teams;
 }

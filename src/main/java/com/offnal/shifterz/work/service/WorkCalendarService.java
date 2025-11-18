@@ -20,6 +20,7 @@ import com.offnal.shifterz.work.repository.WorkCalendarRepository;
 import com.offnal.shifterz.work.repository.WorkInstanceRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,7 @@ public class WorkCalendarService {
     private final OrganizationService organizationService;
     private final MemberRepository memberRepository;
     private final MyTeamService myTeamService;
+
     // 조직 생성 또는 조회 + 근무표 및 근무 일정 등록
     @Transactional
     public void saveWorkCalendar(@Valid WorkCalendarRequestDto workCalendarRequestDto) {
@@ -57,8 +59,9 @@ public class WorkCalendarService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        // 2) 본인 근무조 (없으면 null/빈값일 수 있음)
+        // 본인 근무조 (없으면 null/빈값일 수 있음)
         String myTeam = workCalendarRequestDto.getMyTeam();
+
         for (WorkCalendarUnitDto unitDto : workCalendarRequestDto.getCalendars()) {
 
             // 조직 + 조 조회 (없으면 생성)
@@ -66,7 +69,7 @@ public class WorkCalendarService {
                     unitDto.getOrganizationName(),
                     unitDto.getTeam()
             );
-            myTeamService.saveOrUpdateMyTeam(member, org, myTeam);
+
             // 중복 확인 (member + org + startDate + endDate)
             boolean exists = workCalendarRepository.existsByMemberIdAndOrganizationAndStartDateAndEndDate(
                     memberId, org, unitDto.getStartDate(), unitDto.getEndDate());
@@ -82,6 +85,20 @@ public class WorkCalendarService {
 
             List<WorkInstance> instances = WorkCalendarConverter.toWorkInstances(unitDto, savedCalendar);
             workInstanceRepository.saveAll(instances);
+        }
+        // 2) 근무표 저장 후, 나의 근무조 저장 (이제 조직이 DB에 존재함!)
+        Set<String> organizationNames = workCalendarRequestDto.getCalendars().stream()
+                .map(WorkCalendarUnitDto::getOrganizationName)
+                .collect(Collectors.toSet());
+
+        for (String orgName : organizationNames) {
+
+            List<Organization> orgList =
+                    organizationRepository.findAllByOrganizationMember_IdAndOrganizationName(memberId, orgName);
+
+            if (!orgList.isEmpty() && myTeam != null && !myTeam.isBlank()) {
+                myTeamService.saveOrUpdateMyTeam(member, orgList.get(0), myTeam);
+            }
         }
     }
 
@@ -267,6 +284,9 @@ public class WorkCalendarService {
     ) {
         Long memberId = AuthService.getCurrentUserId();
 
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
         List<Organization> organizations = findOrganizationsWithSameName(memberId, organizationName);
 
         List<TeamWorkInstanceResDto> teamResponses = organizations.stream()
@@ -277,7 +297,10 @@ public class WorkCalendarService {
                 })
                 .toList();
 
+        String myTeam = myTeamService.getMyTeamForOrganization(member, organizationName);
+
         return SameOrganizationWorkResDto.builder()
+                .myTeam(myTeam)
                 .teams(teamResponses)
                 .build();
     }

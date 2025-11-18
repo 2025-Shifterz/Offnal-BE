@@ -226,8 +226,9 @@ public class WorkCalendarController {
     /**
      * 회원의 조직 중 organizationName이 같은 조의 근무 일정 조회
      */
-    @Operation(summary = "organizationName이 같은 조의 근무 일정 조회",
+    @Operation(summary = "organizationName이 같은 모든 조의 근무 일정 조회",
             description = "회원이 속한 조직 중 **organizationName 이 같은 모든 팀(조)** 의 근무 일정을 조회합니다.\n\n" +
+                    " - myTeam: 나의 근무조 조회\n" +
                     " - startDate, endDate 둘 다 null: 전체 일정 조회\n" +
                     " - startDate만 전달: 해당 날짜 이상 모든 일정\n" +
                     " - endDate만 전달: 해당 날짜 이하 모든 일정\n" +

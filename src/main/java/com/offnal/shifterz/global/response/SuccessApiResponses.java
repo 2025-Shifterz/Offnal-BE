@@ -46,15 +46,16 @@ public @interface SuccessApiResponses {
                             mediaType = "application/json",
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = @ExampleObject(name = "근무표 등록 성공 예시", value = """
-                                    {
-                                      "code": "CALENDAR_CREATED",
-                                      "message": "근무표 등록에 성공했습니다.",
-                                      "data": null
-                                    }
-                                """)
+                                        {
+                                          "code": "CALENDAR_CREATED",
+                                          "message": "근무표 등록에 성공했습니다.",
+                                          "data": null
+                                        }
+                                    """)
                     ))
     })
-    public @interface CreateCalendar {}
+    public @interface CreateCalendar {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -65,15 +66,16 @@ public @interface SuccessApiResponses {
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = {
                                     @ExampleObject(name = "근무표 수정 성공 예시", value = """
-                                    {
-                                      "code": "CALENDAR_UPDATED",
-                                      "message": "근무표 수정에 성공했습니다.",
-                                      "data": null
-                                    }
-                                    """)}
+                                            {
+                                              "code": "CALENDAR_UPDATED",
+                                              "message": "근무표 수정에 성공했습니다.",
+                                              "data": null
+                                            }
+                                            """)}
                     ))
     })
-    public @interface UpdateCalendar {}
+    public @interface UpdateCalendar {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -84,15 +86,16 @@ public @interface SuccessApiResponses {
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = {
                                     @ExampleObject(name = "근무 시간 수정 성공 예시", value = """
-                                    {
-                                      "code": "WORK_TIME_UPDATED",
-                                      "message": "근무 시간 수정에 성공했습니다.",
-                                      "data": null
-                                    }
-                                    """)}
+                                            {
+                                              "code": "WORK_TIME_UPDATED",
+                                              "message": "근무 시간 수정에 성공했습니다.",
+                                              "data": null
+                                            }
+                                            """)}
                     ))
     })
-    public @interface UpdateWorkTime {}
+    public @interface UpdateWorkTime {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -103,15 +106,16 @@ public @interface SuccessApiResponses {
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = {
                                     @ExampleObject(name = "근무 일정 삭제 성공 예시", value = """
-                                    {
-                                      "code": "WORK_INSTANCES_DELETED",
-                                      "message": "근무 일정 삭제에 성공했습니다.",
-                                      "data": null
-                                    }
-                                    """)}
+                                            {
+                                              "code": "WORK_INSTANCES_DELETED",
+                                              "message": "근무 일정 삭제에 성공했습니다.",
+                                              "data": null
+                                            }
+                                            """)}
                     ))
     })
-    public @interface DeleteInstance {}
+    public @interface DeleteInstance {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -122,15 +126,16 @@ public @interface SuccessApiResponses {
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = {
                                     @ExampleObject(name = "근무표 삭제 성공 예시", value = """
-                                    {
-                                      "code": "CALENDAR_DELETED",
-                                      "message": "근무표 삭제에 성공했습니다.",
-                                      "data": null
-                                    }
-                                    """)}
+                                            {
+                                              "code": "CALENDAR_DELETED",
+                                              "message": "근무표 삭제에 성공했습니다.",
+                                              "data": null
+                                            }
+                                            """)}
                     ))
     })
-    public @interface DeleteCalendar {}
+    public @interface DeleteCalendar {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -144,6 +149,7 @@ public @interface SuccessApiResponses {
                                         "code": "WORK_DAY_FETCHED",
                                         "message": "근무일 조회에 성공했습니다.",
                                         "data": [
+                                           "myTeam": "2조",
                                           {
                                             "date": "2025-07-01",
                                             "workTypeName": "오후",
@@ -192,7 +198,8 @@ public @interface SuccessApiResponses {
                     )
             )
     })
-    public @interface WorkDay {}
+    public @interface WorkDay {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -229,7 +236,8 @@ public @interface SuccessApiResponses {
                     )
             )
     })
-    public @interface WorkCalendarMeta {}
+    public @interface WorkCalendarMeta {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -259,7 +267,8 @@ public @interface SuccessApiResponses {
                     )
             )
     })
-    public @interface WorkCalendarList {}
+    public @interface WorkCalendarList {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -273,6 +282,7 @@ public @interface SuccessApiResponses {
                                       "code": "CALENDAR_DATA_FETCHED",
                                       "message": "캘린더 정보를 조회했습니다.",
                                       "data": {
+                                        "myTeam": "2조",
                                         "teams": [
                                           {
                                             "team": "1조",
@@ -375,7 +385,8 @@ public @interface SuccessApiResponses {
                     )
             )
     })
-    public @interface SameOrgWorkInstance {}
+    public @interface SameOrgWorkInstance {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -385,23 +396,24 @@ public @interface SuccessApiResponses {
                             mediaType = "application/json",
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = @ExampleObject(name = "프로필 수정 성공 예시", value = """
-                                    {
-                                       "code": "PROFILE_UPDATED",
-                                       "message": "프로필 수정에 성공했습니다.",
-                                       "data": {
-                                         "id": 3,
-                                         "email": "test@offnal.com",
-                                         "memberName": "테스트",
-                                         "phoneNumber": "010-1111-1111",
-                                         "profileImageKey": "profile/a360f82d-88e6-4e18-947b-804598d5570a.jpg",
-                                         "profileImageUrl": "https://bucket.s3.ap-northeast-2.amazonaws.com/profile/member-1-profile"
-                                       }
-                                     }
-                                """)
+                                        {
+                                           "code": "PROFILE_UPDATED",
+                                           "message": "프로필 수정에 성공했습니다.",
+                                           "data": {
+                                             "id": 3,
+                                             "email": "test@offnal.com",
+                                             "memberName": "테스트",
+                                             "phoneNumber": "010-1111-1111",
+                                             "profileImageKey": "profile/a360f82d-88e6-4e18-947b-804598d5570a.jpg",
+                                             "profileImageUrl": "https://bucket.s3.ap-northeast-2.amazonaws.com/profile/member-1-profile"
+                                           }
+                                         }
+                                    """)
                     )
             )
     })
-    public @interface UpdateProfile {}
+    public @interface UpdateProfile {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -411,23 +423,24 @@ public @interface SuccessApiResponses {
                             mediaType = "application/json",
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = @ExampleObject(name = "내 정보 조회 성공 예시", value = """
-                                    {
-                                       "code": "MY_INFO_FETCHED",
-                                       "message": "내 정보 조회에 성공했습니다.",
-                                       "data": {
-                                         "id": 1,
-                                         "email": "example@offnal.com",
-                                         "memberName": "홍길동",
-                                         "phoneNumber": null,
-                                         "profileImageKey": "profile/a360f82d-88e6-4e18-947b-804598d5570a.jpg",
-                                         "profileImageUrl": "https://bucket.s3.ap-northeast-2.amazonaws.com/profile/member-1-profile"
-                                       }
-                                     }
-                                """)
+                                        {
+                                           "code": "MY_INFO_FETCHED",
+                                           "message": "내 정보 조회에 성공했습니다.",
+                                           "data": {
+                                             "id": 1,
+                                             "email": "example@offnal.com",
+                                             "memberName": "홍길동",
+                                             "phoneNumber": null,
+                                             "profileImageKey": "profile/a360f82d-88e6-4e18-947b-804598d5570a.jpg",
+                                             "profileImageUrl": "https://bucket.s3.ap-northeast-2.amazonaws.com/profile/member-1-profile"
+                                           }
+                                         }
+                                    """)
                     )
             )
     })
-    public @interface MyInfo {}
+    public @interface MyInfo {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -437,19 +450,20 @@ public @interface SuccessApiResponses {
                             mediaType = "application/json",
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = @ExampleObject(name = "S3 업로드 url 생성 성공 예시", value = """
-                                    {
-                                          "code": "PROFILE_UPLOAD_URL_CREATED",
-                                          "message": "S3용 프로필 사진 업로드 url 생성을 성공했습니다.",
-                                          "data": {
-                                            "uploadUrl": "https://offnal-s3-bucket.s3.ap-northeast-2.amazonaws.com/profile/member-3-profile?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20251112T190907Z&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Expires=300&X-Amz-Credential=AKIARGOKMTMG4PU4K2HM%2F20251112%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Signature=61ef9208f6d3e492e22dedee14aeed989ec52bfa76e30787746b0e3bcd62f58e",
-                                            "key": "profile/a360f82d-88e6-4e18-947b-804598d5570a.jpg"
-                                          }
-                                        }
-                                """)
+                                        {
+                                              "code": "PROFILE_UPLOAD_URL_CREATED",
+                                              "message": "S3용 프로필 사진 업로드 url 생성을 성공했습니다.",
+                                              "data": {
+                                                "uploadUrl": "https://offnal-s3-bucket.s3.ap-northeast-2.amazonaws.com/profile/member-3-profile?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20251112T190907Z&X-Amz-SignedHeaders=content-type%3Bhost&X-Amz-Expires=300&X-Amz-Credential=AKIARGOKMTMG4PU4K2HM%2F20251112%2Fap-northeast-2%2Fs3%2Faws4_request&X-Amz-Signature=61ef9208f6d3e492e22dedee14aeed989ec52bfa76e30787746b0e3bcd62f58e",
+                                                "key": "profile/a360f82d-88e6-4e18-947b-804598d5570a.jpg"
+                                              }
+                                            }
+                                    """)
                     )
             )
     })
-    public @interface S3_URL {}
+    public @interface S3_URL {
+    }
 
     @ApiResponses(value = {
             @ApiResponse(
@@ -462,18 +476,18 @@ public @interface SuccessApiResponses {
                                     @ExampleObject(
                                             name = "할 일 생성 성공 예시",
                                             value = """
-                    {
-                      "code": "TODO201",
-                      "message": "할 일이 생성되었습니다.",
-                      "result": {
-                        "id": 1,
-                        "content": "스터디 준비",
-                        "completed": false,
-                        "targetDate": "2025-09-23",
-                        "organizationId": 10
-                      }
-                    }
-                    """
+                                                    {
+                                                      "code": "TODO201",
+                                                      "message": "할 일이 생성되었습니다.",
+                                                      "result": {
+                                                        "id": 1,
+                                                        "content": "스터디 준비",
+                                                        "completed": false,
+                                                        "targetDate": "2025-09-23",
+                                                        "organizationId": 10
+                                                      }
+                                                    }
+                                                    """
                                     )
                             }
                     )
@@ -481,8 +495,8 @@ public @interface SuccessApiResponses {
     })
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface TodoCreate {}
-
+    public @interface TodoCreate {
+    }
 
 
     @ApiResponses(value = {
@@ -496,18 +510,18 @@ public @interface SuccessApiResponses {
                                     @ExampleObject(
                                             name = "할 일 수정 성공 예시",
                                             value = """
-                    {
-                      "code": "TODO200",
-                      "message": "할 일이 수정되었습니다.",
-                      "result": {
-                        "id": 1,
-                        "content": "스터디 준비 - 수정",
-                        "completed": true,
-                        "targetDate": "2025-09-24",
-                        "organizationId": 10
-                      }
-                    }
-                    """
+                                                    {
+                                                      "code": "TODO200",
+                                                      "message": "할 일이 수정되었습니다.",
+                                                      "result": {
+                                                        "id": 1,
+                                                        "content": "스터디 준비 - 수정",
+                                                        "completed": true,
+                                                        "targetDate": "2025-09-24",
+                                                        "organizationId": 10
+                                                      }
+                                                    }
+                                                    """
                                     )
                             }
                     )
@@ -515,8 +529,8 @@ public @interface SuccessApiResponses {
     })
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface TodoUpdate {}
-
+    public @interface TodoUpdate {
+    }
 
 
     @ApiResponses(value = {
@@ -530,19 +544,19 @@ public @interface SuccessApiResponses {
                                     @ExampleObject(
                                             name = "할 일 조회 성공 예시",
                                             value = """
-                    {
-                      "code": "TODO200",
-                      "message": "할 일을 조회했습니다.",
-                      "result": {
-                        "id": 1,
-                        "content": "스터디 준비",
-                        "completed": false,
-                        "targetDate": "2025-09-23",
-                        "organizationId": 10
-           
-                      }
-                    }
-                    """
+                                                    {
+                                                      "code": "TODO200",
+                                                      "message": "할 일을 조회했습니다.",
+                                                      "result": {
+                                                        "id": 1,
+                                                        "content": "스터디 준비",
+                                                        "completed": false,
+                                                        "targetDate": "2025-09-23",
+                                                        "organizationId": 10
+                                                    
+                                                      }
+                                                    }
+                                                    """
                                     )
                             }
                     )
@@ -550,7 +564,8 @@ public @interface SuccessApiResponses {
     })
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface TodoGet {}
+    public @interface TodoGet {
+    }
 
     @ApiResponse(
             responseCode = "200",
@@ -560,33 +575,34 @@ public @interface SuccessApiResponses {
                     examples = @ExampleObject(
                             name = "할 일 목록 조회 성공 예시",
                             value = """
-                {
-                  "code": "TODO004",
-                  "message": "할 일 목록을 성공적으로 조회했습니다.",
-                  "result": [
-                    {
-                      "id": 1,
-                      "content": "스터디 준비",
-                      "completed": false,
-                      "targetDate": "2025-09-23",
-                      "organizationId": null
-                    },
-                    {
-                      "id": 2,
-                      "content": "야간 근무 교대",
-                      "completed": true,
-                      "targetDate": "2025-09-25",
-                      "organizationId": 10
-                    }
-                  ]
-                }
-                """
+                                    {
+                                      "code": "TODO004",
+                                      "message": "할 일 목록을 성공적으로 조회했습니다.",
+                                      "result": [
+                                        {
+                                          "id": 1,
+                                          "content": "스터디 준비",
+                                          "completed": false,
+                                          "targetDate": "2025-09-23",
+                                          "organizationId": null
+                                        },
+                                        {
+                                          "id": 2,
+                                          "content": "야간 근무 교대",
+                                          "completed": true,
+                                          "targetDate": "2025-09-25",
+                                          "organizationId": 10
+                                        }
+                                      ]
+                                    }
+                                    """
                     )
             )
     )
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface TodoGetAll {}
+    public @interface TodoGetAll {
+    }
 
 
     @ApiResponses(value = {
@@ -600,12 +616,12 @@ public @interface SuccessApiResponses {
                                     @ExampleObject(
                                             name = "할 일 삭제 성공 예시",
                                             value = """
-                    {
-                      "code": "TODO204",
-                      "message": "할 일이 삭제되었습니다.",
-                      "result": null
-                    }
-                    """
+                                                    {
+                                                      "code": "TODO204",
+                                                      "message": "할 일이 삭제되었습니다.",
+                                                      "result": null
+                                                    }
+                                                    """
                                     )
                             }
                     )
@@ -613,7 +629,8 @@ public @interface SuccessApiResponses {
     })
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface TodoDelete {}
+    public @interface TodoDelete {
+    }
 
 
     @ApiResponses(value = {
@@ -627,17 +644,17 @@ public @interface SuccessApiResponses {
                                     @ExampleObject(
                                             name = "메모 생성 성공 예시",
                                             value = """
-                    {
-                      "code": "MEMO001",
-                      "message": "메모가 성공적으로 생성되었습니다.",
-                      "result": {
-                        "id": 1,
-                        "content": "야간 근무 교대",
-                        "targetDate": "2025-09-23",
-                        "organizationId": 5
-                      }
-                    }
-                    """
+                                                    {
+                                                      "code": "MEMO001",
+                                                      "message": "메모가 성공적으로 생성되었습니다.",
+                                                      "result": {
+                                                        "id": 1,
+                                                        "content": "야간 근무 교대",
+                                                        "targetDate": "2025-09-23",
+                                                        "organizationId": 5
+                                                      }
+                                                    }
+                                                    """
                                     )
                             }
                     )
@@ -645,8 +662,8 @@ public @interface SuccessApiResponses {
     })
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface MemoCreate {}
-
+    public @interface MemoCreate {
+    }
 
 
     @ApiResponses(value = {
@@ -660,17 +677,17 @@ public @interface SuccessApiResponses {
                                     @ExampleObject(
                                             name = "메모 수정 성공 예시",
                                             value = """
-                    {
-                      "code": "MEMO002",
-                      "message": "메모가 성공적으로 수정되었습니다.",
-                      "result": {
-                        "id": 1,
-                        "content": "야간 근무 -> 주간 근무",
-                        "targetDate": "2025-09-24",
-                        "organizationId": 5
-                      }
-                    }
-                    """
+                                                    {
+                                                      "code": "MEMO002",
+                                                      "message": "메모가 성공적으로 수정되었습니다.",
+                                                      "result": {
+                                                        "id": 1,
+                                                        "content": "야간 근무 -> 주간 근무",
+                                                        "targetDate": "2025-09-24",
+                                                        "organizationId": 5
+                                                      }
+                                                    }
+                                                    """
                                     )
                             }
                     )
@@ -678,8 +695,8 @@ public @interface SuccessApiResponses {
     })
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface MemoUpdate {}
-
+    public @interface MemoUpdate {
+    }
 
 
     @ApiResponses(value = {
@@ -693,17 +710,17 @@ public @interface SuccessApiResponses {
                                     @ExampleObject(
                                             name = "메모 조회 성공 예시",
                                             value = """
-                    {
-                      "code": "MEMO003",
-                      "message": "메모가 성공적으로 조회되었습니다.",
-                      "result": {
-                        "id": 1,
-                        "content": "야간 근무 교대",
-                        "targetDate": "2025-09-23",
-                        "organizationId": 5
-                      }
-                    }
-                    """
+                                                    {
+                                                      "code": "MEMO003",
+                                                      "message": "메모가 성공적으로 조회되었습니다.",
+                                                      "result": {
+                                                        "id": 1,
+                                                        "content": "야간 근무 교대",
+                                                        "targetDate": "2025-09-23",
+                                                        "organizationId": 5
+                                                      }
+                                                    }
+                                                    """
                                     )
                             }
                     )
@@ -711,8 +728,8 @@ public @interface SuccessApiResponses {
     })
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface MemoGet {}
-
+    public @interface MemoGet {
+    }
 
 
     @ApiResponses(value = {
@@ -726,12 +743,12 @@ public @interface SuccessApiResponses {
                                     @ExampleObject(
                                             name = "메모 삭제 성공 예시",
                                             value = """
-                    {
-                      "code": "MEMO004",
-                      "message": "메모가 성공적으로 삭제되었습니다.",
-                      "result": null
-                    }
-                    """
+                                                    {
+                                                      "code": "MEMO004",
+                                                      "message": "메모가 성공적으로 삭제되었습니다.",
+                                                      "result": null
+                                                    }
+                                                    """
                                     )
                             }
                     )
@@ -739,7 +756,9 @@ public @interface SuccessApiResponses {
     })
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface MemoDelete {}
+    public @interface MemoDelete {
+    }
+
     @ApiResponse(
             responseCode = "200",
             description = "메모 전체 조회 성공",
@@ -748,35 +767,36 @@ public @interface SuccessApiResponses {
                     examples = @ExampleObject(
                             name = "메모 전체 조회 성공 예시",
                             value = """
-                {
-                  "code": "MEMO_LIST_FETCHED",
-                  "message": "메모 목록을 성공적으로 조회했습니다.",
-                  "result": [
-                    {
-                      "id": 1,
-                      "content": "스터디 준비",
-                      "targetDate": "2025-09-23",
-                      "organizationId": null,
-                      "createdAt": "2025-09-20T10:15:30",
-                      "updatedAt": "2025-09-21T12:00:00"
-                    },
-                    {
-                      "id": 2,
-                      "content": "야간 근무 교대",
-                      "targetDate": "2025-09-25",
-                      "organizationId": 10,
-                      "createdAt": "2025-09-22T09:00:00",
-                      "updatedAt": "2025-09-23T14:20:00"
-                    }
-                  ]
-                }
-                """
+                                    {
+                                      "code": "MEMO_LIST_FETCHED",
+                                      "message": "메모 목록을 성공적으로 조회했습니다.",
+                                      "result": [
+                                        {
+                                          "id": 1,
+                                          "content": "스터디 준비",
+                                          "targetDate": "2025-09-23",
+                                          "organizationId": null,
+                                          "createdAt": "2025-09-20T10:15:30",
+                                          "updatedAt": "2025-09-21T12:00:00"
+                                        },
+                                        {
+                                          "id": 2,
+                                          "content": "야간 근무 교대",
+                                          "targetDate": "2025-09-25",
+                                          "organizationId": 10,
+                                          "createdAt": "2025-09-22T09:00:00",
+                                          "updatedAt": "2025-09-23T14:20:00"
+                                        }
+                                      ]
+                                    }
+                                    """
                     )
             )
     )
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface MemoGetAll {}
+    public @interface MemoGetAll {
+    }
 
 
     @ApiResponse(
@@ -802,7 +822,8 @@ public @interface SuccessApiResponses {
     )
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface OrganizationCreate {}
+    public @interface OrganizationCreate {
+    }
 
     @ApiResponse(
             responseCode = "200",
@@ -827,7 +848,8 @@ public @interface SuccessApiResponses {
     )
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface OrganizationUpdate {}
+    public @interface OrganizationUpdate {
+    }
 
 
     @ApiResponse(
@@ -838,22 +860,23 @@ public @interface SuccessApiResponses {
                     examples = @ExampleObject(
                             name = "특정 조직 조회 성공 예시",
                             value = """
-                                    {
-                                       "code": "ORGANIZATION_FETCHED",
-                                       "message": "조직이 성공적으로 조회되었습니다.",
-                                       "data": {
-                                         "id": 1,
-                                         "organizationName": "옾날 병원",
-                                         "team": "1조"
-                                       }
-                                     }
-                """
+                                                        {
+                                                           "code": "ORGANIZATION_FETCHED",
+                                                           "message": "조직이 성공적으로 조회되었습니다.",
+                                                           "data": {
+                                                             "id": 1,
+                                                             "organizationName": "옾날 병원",
+                                                             "team": "1조"
+                                                           }
+                                                         }
+                                    """
                     )
             )
     )
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface OrganizationGet {}
+    public @interface OrganizationGet {
+    }
 
     @ApiResponse(
             responseCode = "200",
@@ -863,29 +886,30 @@ public @interface SuccessApiResponses {
                     examples = @ExampleObject(
                             name = "같은 이름의 조직 조회 성공 예시",
                             value = """
-                                    {
-                                           "code": "ORGANIZATION_FETCHED",
-                                           "message": "조직이 성공적으로 조회되었습니다.",
-                                           "data": [
-                                                {
-                                                    "id": 1,
-                                                    "organizationName": "병원 1",
-                                                    "team": "1조"
-                                                },
-                                                {
-                                                     "id": 2,
-                                                     "organizationName": "병원 1",
-                                                     "team": "2조"
-                                                }
-                                           ]
-                                     }
-                """
+                                                        {
+                                                               "code": "ORGANIZATION_FETCHED",
+                                                               "message": "조직이 성공적으로 조회되었습니다.",
+                                                               "data": [
+                                                                    {
+                                                                        "id": 1,
+                                                                        "organizationName": "병원 1",
+                                                                        "team": "1조"
+                                                                    },
+                                                                    {
+                                                                         "id": 2,
+                                                                         "organizationName": "병원 1",
+                                                                         "team": "2조"
+                                                                    }
+                                                               ]
+                                                         }
+                                    """
                     )
             )
     )
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface OrganizationTeamGet {}
+    public @interface OrganizationTeamGet {
+    }
 
     @ApiResponse(
             responseCode = "200",
@@ -917,7 +941,8 @@ public @interface SuccessApiResponses {
     )
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface AllOrganizationGet{}
+    public @interface AllOrganizationGet {
+    }
 
     @ApiResponse(
             responseCode = "200",
@@ -927,19 +952,20 @@ public @interface SuccessApiResponses {
                     examples = @ExampleObject(
                             name = "조직 삭제 성공 예시",
                             value = """
-                {
-                  "code": "ORG005",
-                  "message": "조직이 성공적으로 삭제되었습니다.",
-                  "result": null
-                }
-                """
+                                    {
+                                      "code": "ORG005",
+                                      "message": "조직이 성공적으로 삭제되었습니다.",
+                                      "result": null
+                                    }
+                                    """
                     )
             )
     )
     @ApiResponse()
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface OrganizationDelete {}
+    public @interface OrganizationDelete {
+    }
 
     @ApiResponse(
             responseCode = "200",
@@ -949,21 +975,22 @@ public @interface SuccessApiResponses {
                     examples = @ExampleObject(
                             name = "토큰 재발급 성공 예시",
                             value = """
-                {
-                  "code": "TOKEN_REISSUED",
-                  "message": "토큰이 재발급되었습니다.",
-                  "data": {
-                    "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
-                    "refreshToken": "eyJhbGciOiJIUzI1NiJ9..."
-                  }
-                }
-                """
+                                    {
+                                      "code": "TOKEN_REISSUED",
+                                      "message": "토큰이 재발급되었습니다.",
+                                      "data": {
+                                        "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+                                        "refreshToken": "eyJhbGciOiJIUzI1NiJ9..."
+                                      }
+                                    }
+                                    """
                     )
             )
     )
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface TokenReissue {}
+    public @interface TokenReissue {
+    }
 
     @ApiResponse(
             responseCode = "200",
@@ -972,18 +999,19 @@ public @interface SuccessApiResponses {
                     examples = @ExampleObject(
                             name = "로그아웃 성공 예시",
                             value = """
-                                    {
-                                       "code": "LOGOUT_SUCCESS",
-                                       "message": "로그아웃에 성공했습니다.",
-                                       "data": null
-                                     }
-                """
+                                                        {
+                                                           "code": "LOGOUT_SUCCESS",
+                                                           "message": "로그아웃에 성공했습니다.",
+                                                           "data": null
+                                                         }
+                                    """
                     )
             )
     )
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface Logout {}
+    public @interface Logout {
+    }
 
     @ApiResponse(
             responseCode = "200",
@@ -1003,7 +1031,8 @@ public @interface SuccessApiResponses {
     )
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    public @interface Withdraw {}
+    public @interface Withdraw {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -1018,22 +1047,23 @@ public @interface SuccessApiResponses {
                                     @ExampleObject(
                                             name = "근무 일정 조회 성공 예시",
                                             value = """
-                                            {
-                                              "code": "HOME001",
-                                              "message": "근무 일정을 성공적으로 조회했습니다.",
-                                              "data": {
-                                                "yesterdayType": "DAY",
-                                                "todayType": "OFF",
-                                                "tomorrowType": "DAY"
-                                              }
-                                            }
-                                            """
+                                                    {
+                                                      "code": "HOME001",
+                                                      "message": "근무 일정을 성공적으로 조회했습니다.",
+                                                      "data": {
+                                                        "yesterdayType": "DAY",
+                                                        "todayType": "OFF",
+                                                        "tomorrowType": "DAY"
+                                                      }
+                                                    }
+                                                    """
                                     )
                             }
                     )
             )
     })
-    public @interface HomeSchedule {}
+    public @interface HomeSchedule {
+    }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -1048,33 +1078,34 @@ public @interface SuccessApiResponses {
                                     @ExampleObject(
                                             name = "오늘의 루틴 조회 성공 예시",
                                             value = """
-                                            {
-                                              "code": "HOME002",
-                                              "message": "루틴을 성공적으로 조회했습니다.",
-                                              "data": {
-                                                "meals": [
-                                                  {
-                                                    "label": "점심",
-                                                    "time": "13:30",
-                                                    "description": "기상 후 체력 회복",
-                                                    "items": ["김밥", "칼국수"]
-                                                  }
-                                                ],
-                                                "health": {
-                                                  "fastingComment": "생체 리듬 유지에 집중",
-                                                  "fastingSchedule": "저녁 식사 후 공복 유지",
-                                                  "sleepGuide": ["08:00 ~ 13:00 수면"],
-                                                  "sleepSchedule": "수면 22:00 ~ 05:00"
-                                                }
-                                              }
-                                            }
-                                            """
+                                                    {
+                                                      "code": "HOME002",
+                                                      "message": "루틴을 성공적으로 조회했습니다.",
+                                                      "data": {
+                                                        "meals": [
+                                                          {
+                                                            "label": "점심",
+                                                            "time": "13:30",
+                                                            "description": "기상 후 체력 회복",
+                                                            "items": ["김밥", "칼국수"]
+                                                          }
+                                                        ],
+                                                        "health": {
+                                                          "fastingComment": "생체 리듬 유지에 집중",
+                                                          "fastingSchedule": "저녁 식사 후 공복 유지",
+                                                          "sleepGuide": ["08:00 ~ 13:00 수면"],
+                                                          "sleepSchedule": "수면 22:00 ~ 05:00"
+                                                        }
+                                                      }
+                                                    }
+                                                    """
                                     )
                             }
                     )
             )
     })
-    public @interface HomeRoutine {}
+    public @interface HomeRoutine {
+    }
 
 
 }

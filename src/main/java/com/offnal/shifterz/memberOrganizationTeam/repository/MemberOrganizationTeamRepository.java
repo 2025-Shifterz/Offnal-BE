@@ -5,6 +5,8 @@ import com.offnal.shifterz.memberOrganizationTeam.domain.MemberOrganizationTeam;
 import com.offnal.shifterz.organization.domain.Organization;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -12,5 +14,16 @@ public interface MemberOrganizationTeamRepository
         extends JpaRepository<MemberOrganizationTeam, Long> {
 
     Optional<MemberOrganizationTeam> findByMemberAndOrganization(Member member, Organization organization);
+    @Query("""
+    SELECT mot
+    FROM MemberOrganizationTeam mot
+    WHERE mot.member.id = :memberId
+      AND mot.organization.organizationName = :organizationName
+""")
+    Optional<MemberOrganizationTeam> findByMemberAndOrganizationName(
+            @Param("memberId") Long memberId,
+            @Param("organizationName") String organizationName
+    );
+
 }
 

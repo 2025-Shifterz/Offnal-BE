@@ -39,4 +39,13 @@ public class MyTeamService {
         memberOrganizationTeamRepository.save(newEntity);
     }
 
+    @Transactional(readOnly = true)
+    public String getMyTeamForOrganization(Member member, String organizationName) {
+
+        return memberOrganizationTeamRepository
+                .findByMemberAndOrganizationName(member.getId(), organizationName)
+                .map(MemberOrganizationTeam::getTeam)
+                .orElse(null);
+    }
+
 }
