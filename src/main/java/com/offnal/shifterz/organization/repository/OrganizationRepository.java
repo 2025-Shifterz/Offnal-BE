@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
-    List<Organization> findAllByOrganizationMember_Id(Long memberId);
+    List<Organization> findAllByOrganizationMember_IdOrderByIdAsc(Long memberId);
 
     boolean existsByOrganizationMemberAndOrganizationNameAndTeam(
             Member member, String organizationName, String team
@@ -26,4 +26,9 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
     );
 
     void deleteByOrganizationMember_Id(Long memberId);
+
+    List<Organization> findAllByOrganizationMember_IdAndOrganizationNameOrderByIdAsc(
+            Long memberId,
+            String organizationName
+    );
 }

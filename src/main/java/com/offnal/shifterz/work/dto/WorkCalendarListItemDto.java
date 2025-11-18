@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WorkCalendarListItemDto {
-    private String calendarName;
+    private Long calendarId;
     private LocalDate startDate;
     private LocalDate endDate;
 }

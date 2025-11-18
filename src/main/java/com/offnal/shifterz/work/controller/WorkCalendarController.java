@@ -41,7 +41,6 @@ public class WorkCalendarController {
             description = "사용자의 근무표를 월별로 등록합니다.\n" +
                     "조직명이나 조 이름이 기존과 다르면, 새로운 조직으로 자동 생성됩니다.\n\n" +
                     "✅ 요청 본문에 포함할 수 있는 값:\n" +
-                    "- calendarName: 근무표 이름\n" +
                     "- workTimes: 근무 시간 정보\n" +
                     "  - startTime: 근무 시작 시간\n" +
                     "  - duration: 근무 지속 시간 (HH:mm 형식)\n" +
@@ -66,7 +65,6 @@ public class WorkCalendarController {
                             name = "근무표 등록 예시",
                             value = """
                                     {
-                                      "calendarName": "2025년 7월 근무표",
                                       "workTimes": {
                                         "D": {
                                           "startTime": "08:00",
@@ -189,19 +187,19 @@ public class WorkCalendarController {
      * 특정 캘린더 메타 정보 및 근무시간 조회
      */
     @Operation(summary = "특정 캘린더 메타 정보 및 근무시간 조회",
-            description = "조직(OrganizationName, team)과 calendarName으로 특정 캘린더의 근무표 정보와 workTimes(D/E/N/-)을 조회합니다.")
+            description = "조직(OrganizationName, team)과 calendarId로 특정 캘린더의 근무표 정보와 workTimes(D/E/N/-)을 조회합니다.")
     @SuccessApiResponses.WorkCalendarMeta
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @ErrorApiResponses.Organization
-    @GetMapping("/organizations/{organizationName}/teams/{team}/calendars/{calendarName}")
+    @GetMapping("/organizations/{organizationName}/teams/{team}/calendars/{calendarId}")
     public SuccessResponse<WorkCalendarMetaDto> getCalendarMeta(
             @PathVariable String organizationName,
             @PathVariable String team,
-            @PathVariable String calendarName
+            @PathVariable Long calendarId
     ){
         WorkCalendarMetaDto dto =
-                workCalendarService.getWorkCalendarMeta(organizationName, team, calendarName);
+                workCalendarService.getWorkCalendarMeta(organizationName, team, calendarId);
         return SuccessResponse.success(SuccessCode.CALENDAR_DATA_FETCHED, dto);
     }
 
@@ -222,6 +220,36 @@ public class WorkCalendarController {
                 workCalendarService.listWorkCalendars(organizationName, team);
         return SuccessResponse.success(SuccessCode.CALENDAR_DATA_FETCHED, list);
     }
+
+
+    /**
+     * 회원의 조직 중 organizationName이 같은 조의 근무 일정 조회
+     */
+    @Operation(summary = "organizationName이 같은 조의 근무 일정 조회",
+            description = "회원이 속한 조직 중 **organizationName 이 같은 모든 팀(조)** 의 근무 일정을 조회합니다.\n\n" +
+                    " - startDate, endDate 둘 다 null: 전체 일정 조회\n" +
+                    " - startDate만 전달: 해당 날짜 이상 모든 일정\n" +
+                    " - endDate만 전달: 해당 날짜 이하 모든 일정\n" +
+                    " - 둘 다 전달: 범위 내 일정만 조회")
+    @SuccessApiResponses.SameOrgWorkInstance
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.Organization
+    @GetMapping("/organizations/{organizationName}/work-instances")
+    public SuccessResponse<SameOrganizationWorkResDto> getSameOrganizationNameWork(
+            @PathVariable @NotNull String organizationName,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate
+    ) {
+        SameOrganizationWorkResDto response = workCalendarService.getSameOrganizationNameWork(
+                organizationName,
+                startDate,
+                endDate
+        );
+
+        return SuccessResponse.success(SuccessCode.CALENDAR_DATA_FETCHED,response);
+    }
+
 
 
     /**
@@ -303,7 +331,7 @@ public class WorkCalendarController {
     /**
      * 근무표 삭제
      */
-    @Operation(summary = "근무표 삭제", description = "조직명, 팀, 근무표 이름에 해당하는 근무표와 하위 근무 일정 전체를 삭제합니다.")
+    @Operation(summary = "근무표 삭제", description = "조직명, 팀, 근무표 Id에 해당하는 근무표와 하위 근무 일정 전체를 삭제합니다.")
     @SuccessApiResponses.DeleteCalendar
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
@@ -312,9 +340,9 @@ public class WorkCalendarController {
     public SuccessResponse<Void> deleteWorkCalendar(
             @RequestParam @NotNull String organizationName,
             @RequestParam @NotNull String team,
-            @RequestParam @NotNull String calendarName
+            @RequestParam @NotNull Long calendarId
     ){
-        workCalendarService.deleteWorkCalendar(organizationName, team, calendarName);
+        workCalendarService.deleteWorkCalendar(organizationName, team, calendarId);
         return SuccessResponse.success(SuccessCode.CALENDAR_DELETED);
     }
 
@@ -322,13 +350,13 @@ public class WorkCalendarController {
      * 근무 시간 수정
      */
     @Operation(summary = "근무 시간 수정",
-            description = "calendarName과 team으로 근무표를 찾아 workTimes(D/E/N/- 별 근무 시간)를 수정합니다. ")
+            description = "calendarId와 team으로 근무표를 찾아 workTimes(D/E/N/- 별 근무 시간)를 수정합니다. ")
     @SuccessApiResponses.UpdateWorkTime
     @ErrorApiResponses.Common
     @ErrorApiResponses.Auth
     @ErrorApiResponses.CreateWorkCalendar
     @ErrorApiResponses.UpdateWorkCalendar
-    @PatchMapping("/{organizationName}/{team}/{calendarName}/work-times")
+    @PatchMapping("/{organizationName}/{team}/{calendarId}/work-times")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "근무 시간 수정 예시",
             required = true,
@@ -361,10 +389,10 @@ public class WorkCalendarController {
     public SuccessResponse<Void> updateWorkTimes(
             @PathVariable String organizationName,
             @PathVariable String team,
-            @PathVariable String calendarName,
+            @PathVariable Long calendarId,
             @RequestBody @Valid WorkTimeUpdateDto request
     ){
-        workCalendarService.updateWorkTimes(organizationName, team, calendarName, request);
+        workCalendarService.updateWorkTimes(organizationName, team, calendarId, request);
         return SuccessResponse.success(SuccessCode.WORK_TIME_UPDATED);
     }
 }

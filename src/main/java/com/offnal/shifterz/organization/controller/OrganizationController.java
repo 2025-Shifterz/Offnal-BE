@@ -131,6 +131,24 @@ public class OrganizationController {
     }
 
     /**
+     * OrganizationName이 같은 조 조회
+     */
+    @Operation(summary = "같은 이름의 조직 조회", description = "회원의 조직 중 OrganizationName이 같은 조를 조회합니다.")
+    @SuccessApiResponses.OrganizationTeamGet
+    @ErrorApiResponses.Organization
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @GetMapping("/name/{organizationName}")
+    public SuccessResponse<List<OrganizationResponseDto.OrganizationDto>> getOrganizationsByName(
+            @PathVariable String organizationName
+    ) {
+        List<OrganizationResponseDto.OrganizationDto> result =
+                organizationService.getOrganizationsByName(organizationName);
+
+        return SuccessResponse.success(SuccessCode.ORGANIZATION_FETCHED, result);
+    }
+
+    /**
      * Organization 삭제
      */
     @Operation(summary = "조직 삭제", description = "조직을 삭제합니다.")

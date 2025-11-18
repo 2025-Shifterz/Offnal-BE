@@ -35,13 +35,11 @@ public class Member extends BaseTimeEntity {
     private String memberName;
     private String phoneNumber;
 
-    private String profileImageUrl;
+    private String profileImageKey;
 
-    public void updateMemberInfo(String email, String memberName, String phoneNumber, String profileImageUrl) {
-        this.email = email;
+    public void updateMemberInfo(String memberName, String profileImageKey) {
         this.memberName = memberName;
-        this.phoneNumber = phoneNumber;
-        this.profileImageUrl = profileImageUrl;
+        this.profileImageKey = profileImageKey;
 
     }
 

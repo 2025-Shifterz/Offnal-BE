@@ -29,6 +29,15 @@ spring:
       port: 6379
       repositories:
         enabled: false
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      s3:
+        bucket: ${AWS_S3_BUCKET}
+      region:
+        static: ap-northeast-2
 
 # JWT
 jwt:
