@@ -160,9 +160,9 @@ public class WorkCalendarService {
 
         Organization org = findOrganization(memberId, organizationName, team);
 
-        WorkCalendar calendar = findCalendarByRange(memberId, org, minDay, maxDay);
+        WorkCalendar calendar = findIntersectingCalendar(memberId, org, minDay, maxDay);
 
-        validateAllDatesWithin(calendar, shifts.keySet());
+        expandCalendarRange(calendar, minDay, maxDay);
 
         // 캘린더 범위 내 근무 일정 조회
         List<WorkInstance> existingInstances = fetchInstancesForCalendarRange(memberId, org, calendar);
@@ -171,6 +171,15 @@ public class WorkCalendarService {
                 .collect(Collectors.toMap(WorkInstance::date, wi -> wi, (a, b) -> a));
 
         upsertInstances(calendar, memberId, org, shifts, existingMap);
+    }
+
+    // 일정이 하나라도 포함된 캘린더 조회
+    private WorkCalendar findIntersectingCalendar(Long memberId, Organization org, LocalDate minDay, LocalDate maxDay) {
+        return workCalendarRepository
+                .findByMemberIdAndOrganizationAndEndDateGreaterThanEqualAndStartDateLessThanEqual(
+                        memberId, org, minDay, maxDay
+                )
+                .orElseThrow(() -> new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND));
     }
 
     // 근무 시간 수정
@@ -479,6 +488,17 @@ public class WorkCalendarService {
     private String normalize(String s) {
         return s == null ? null : s.trim();
     }
+
+    // 요청한 근무 일정이 캘린더 범위 초과시 캘린더 범위 확장
+    private void expandCalendarRange(WorkCalendar calendar, LocalDate minDay, LocalDate maxDay) {
+        if (minDay.isBefore(calendar.startDate())) {
+            calendar.updateStartDate(minDay);
+        }
+        if (maxDay.isAfter(calendar.endDate())) {
+            calendar.updateEndDate(maxDay);
+        }
+    }
+
 
     // ===== ErrorCode =====
 

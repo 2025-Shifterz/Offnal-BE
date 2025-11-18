@@ -39,6 +39,10 @@ public class WorkScheduleService {
                 .findByWorkDateAndMemberIdThroughWorkCalendar(date, memberId)
                 .orElseThrow(() -> new CustomException(HomeErrorCode.WORK_INSTANCE_NOT_FOUND));
 
+        if (todayType == null) {
+            todayType = WorkTimeType.OFF;
+        }
+
         WorkTime workTime = null;
         if (todayType != WorkTimeType.OFF) {
             String typeKey = todayType.getSymbol();
