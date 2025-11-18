@@ -42,9 +42,9 @@ public class HomeService {
                 .orElse(null);
 
         WorkTime workTime = null;
-        if (workCalendar != null && todayType != null) {
 
-            workTime = workCalendar.workTimes().get(todayType.name());
+        if (workCalendar != null && todayType != null) {
+            workTime = workCalendar.workTimes().get(todayType.getSymbol());
         }
 
         WorkScheduleContext context = contextConverter.toContext(
@@ -56,12 +56,14 @@ public class HomeService {
                 workTime
         );
 
-        dailyRoutineService.buildRoutine(context);
+        if (context.getTodayType() != null && context.getTodayType() != WorkTimeType.OFF) {
+            dailyRoutineService.buildRoutine(context);
+        }
 
         return WorkScheduleResponseDto.builder()
-                .yesterdayType(yesterdayType != null ? yesterdayType : WorkTimeType.OFF)
-                .todayType(todayType != null ? todayType : WorkTimeType.OFF)
-                .tomorrowType(tomorrowType != null ? tomorrowType : WorkTimeType.OFF)
+                .yesterdayType(yesterdayType)
+                .todayType(todayType)
+                .tomorrowType(tomorrowType)
                 .build();
     }
 

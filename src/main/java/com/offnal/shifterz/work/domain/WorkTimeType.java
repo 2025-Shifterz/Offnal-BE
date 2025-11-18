@@ -28,4 +28,8 @@ public enum WorkTimeType {
         throw new IllegalArgumentException("Unknown shift type: " + symbol);
     }
 
+    public static WorkTimeType nullToOFF(WorkTimeType type) {
+        return type == null ? OFF : type;
+    }
+
 }
