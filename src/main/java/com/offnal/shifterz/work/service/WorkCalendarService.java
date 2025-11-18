@@ -3,6 +3,10 @@ package com.offnal.shifterz.work.service;
 import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
+import com.offnal.shifterz.member.domain.Member;
+import com.offnal.shifterz.member.repository.MemberRepository;
+import com.offnal.shifterz.member.service.MemberService.MemberErrorCode;
+import com.offnal.shifterz.memberOrganizationTeam.service.MyTeamService;
 import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.organization.repository.OrganizationRepository;
 import com.offnal.shifterz.organization.service.OrganizationService;
@@ -42,13 +46,19 @@ public class WorkCalendarService {
     private final WorkInstanceRepository workInstanceRepository;
     private final OrganizationRepository organizationRepository;
     private final OrganizationService organizationService;
-
+    private final MemberRepository memberRepository;
+    private final MyTeamService myTeamService;
     // 조직 생성 또는 조회 + 근무표 및 근무 일정 등록
     @Transactional
     public void saveWorkCalendar(@Valid WorkCalendarRequestDto workCalendarRequestDto) {
 
         Long memberId = AuthService.getCurrentUserId();
 
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        // 2) 본인 근무조 (없으면 null/빈값일 수 있음)
+        String myTeam = workCalendarRequestDto.getMyTeam();
         for (WorkCalendarUnitDto unitDto : workCalendarRequestDto.getCalendars()) {
 
             // 조직 + 조 조회 (없으면 생성)
@@ -56,7 +66,7 @@ public class WorkCalendarService {
                     unitDto.getOrganizationName(),
                     unitDto.getTeam()
             );
-
+            myTeamService.saveOrUpdateMyTeam(member, org, myTeam);
             // 중복 확인 (member + org + startDate + endDate)
             boolean exists = workCalendarRepository.existsByMemberIdAndOrganizationAndStartDateAndEndDate(
                     memberId, org, unitDto.getStartDate(), unitDto.getEndDate());

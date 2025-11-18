@@ -44,7 +44,7 @@ public class WorkCalendarController {
                     "- workTimes: 근무 시간 정보\n" +
                     "  - startTime: 근무 시작 시간\n" +
                     "  - duration: 근무 지속 시간 (HH:mm 형식)\n" +
-                    "- calendars: 월별 근무 스케줄 목록\n" +
+                    "  - calendars: 월별 근무 스케줄 목록\n" +
                     "  - organizationName: 조직 이름\n" +
                     "  - team: 조 이름\n" +
                     "  - startDate, endDate: 스케줄 기간 (YYYY-MM-DD)\n" +
@@ -65,6 +65,7 @@ public class WorkCalendarController {
                             name = "근무표 등록 예시",
                             value = """
                                     {
+                                      "myTeam": "2조",
                                       "workTimes": {
                                         "D": {
                                           "startTime": "08:00",
@@ -197,7 +198,7 @@ public class WorkCalendarController {
             @PathVariable String organizationName,
             @PathVariable String team,
             @PathVariable Long calendarId
-    ){
+    ) {
         WorkCalendarMetaDto dto =
                 workCalendarService.getWorkCalendarMeta(organizationName, team, calendarId);
         return SuccessResponse.success(SuccessCode.CALENDAR_DATA_FETCHED, dto);
@@ -247,9 +248,8 @@ public class WorkCalendarController {
                 endDate
         );
 
-        return SuccessResponse.success(SuccessCode.CALENDAR_DATA_FETCHED,response);
+        return SuccessResponse.success(SuccessCode.CALENDAR_DATA_FETCHED, response);
     }
-
 
 
     /**
@@ -267,16 +267,16 @@ public class WorkCalendarController {
                             examples = @ExampleObject(
                                     name = "근무일 수정 예시",
                                     value = """
-                                        {
-                                            "shifts": {
-                                                "2025-09-01": "N",
-                                                "2025-09-02": "D",
-                                                "2025-09-03": "-",
-                                                "2025-09-04": "E",
-                                                "2025-09-05": "N"
+                                            {
+                                                "shifts": {
+                                                    "2025-09-01": "N",
+                                                    "2025-09-02": "D",
+                                                    "2025-09-03": "-",
+                                                    "2025-09-04": "E",
+                                                    "2025-09-05": "N"
+                                                }
                                             }
-                                        }
-                                        """
+                                            """
                             )
                     )
             ),
@@ -302,7 +302,7 @@ public class WorkCalendarController {
                                     }
                                     """))
             )
-            @RequestBody @Valid WorkCalendarUpdateDto workCalendarUpdateDto){
+            @RequestBody @Valid WorkCalendarUpdateDto workCalendarUpdateDto) {
         workCalendarService.updateWorkCalendar(organizationName, team, workCalendarUpdateDto);
         return SuccessResponse.success(SuccessCode.CALENDAR_UPDATED);
     }
@@ -322,7 +322,7 @@ public class WorkCalendarController {
             @RequestParam @NotNull String team,
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate
-    ){
+    ) {
         workCalendarService.deleteWorkInstances(organizationName, team, startDate, endDate);
         return SuccessResponse.success(SuccessCode.WORK_INSTANCES_DELETED);
     }
@@ -341,7 +341,7 @@ public class WorkCalendarController {
             @RequestParam @NotNull String organizationName,
             @RequestParam @NotNull String team,
             @RequestParam @NotNull Long calendarId
-    ){
+    ) {
         workCalendarService.deleteWorkCalendar(organizationName, team, calendarId);
         return SuccessResponse.success(SuccessCode.CALENDAR_DELETED);
     }
@@ -391,7 +391,7 @@ public class WorkCalendarController {
             @PathVariable String team,
             @PathVariable Long calendarId,
             @RequestBody @Valid WorkTimeUpdateDto request
-    ){
+    ) {
         workCalendarService.updateWorkTimes(organizationName, team, calendarId, request);
         return SuccessResponse.success(SuccessCode.WORK_TIME_UPDATED);
     }
