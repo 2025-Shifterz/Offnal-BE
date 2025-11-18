@@ -31,4 +31,12 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
             Long memberId,
             String organizationName
     );
+
+    List<Organization> findAllByOrganizationMember_IdAndOrganizationName(
+            Long memberId,
+            String organizationName
+    );
+
+
+
 }

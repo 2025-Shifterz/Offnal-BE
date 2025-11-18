@@ -135,7 +135,7 @@ public class MemoController {
                     **주의사항**
                     - `filter`, `organizationId`, `date`는 모두 **선택 파라미터**입니다.
                     - 조합에 따라 동적으로 결과가 결정됩니다.
-                    - 파라미터를 생략하면 `filter=all` 기본값으로 전체 메모를 조회합니다.
+                    - 파라미터를 생략하면 `filter=all` 기본값으로 전체 메모를 조회하며, 날짜와 함꼐 요청해야 합니다.
                     """
     )
     @ApiResponses(value = {
