@@ -18,8 +18,16 @@ public interface WorkCalendarRepository extends JpaRepository<WorkCalendar, Long
     boolean existsByMemberIdAndOrganizationAndStartDateAndEndDate(
             Long memberId, Organization organization, LocalDate startDate, LocalDate  endDate);
 
+    // 캘린더에 포함된 date
     Optional<WorkCalendar> findByMemberIdAndOrganizationAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
             Long memberId,Organization organization, LocalDate startDate, LocalDate  endDate);
+
+    // 캘린더에 한쪽이라도 포함된 date
+    Optional<WorkCalendar> findByMemberIdAndOrganizationAndEndDateGreaterThanEqualAndStartDateLessThanEqual(
+            Long memberId, Organization organization,
+            LocalDate startDate, LocalDate endDate
+    );
+
 
 
     List<WorkCalendar> findByMemberIdAndOrganizationOrderByStartDateDesc(Long memberId, Organization organization);
