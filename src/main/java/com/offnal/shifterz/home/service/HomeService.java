@@ -56,7 +56,7 @@ public class HomeService {
                 workTime
         );
 
-        if (context.getTodayType() != null && context.getTodayType() != WorkTimeType.OFF) {
+        if (context.getTodayType() != null) {
             dailyRoutineService.buildRoutine(context);
         }
 
