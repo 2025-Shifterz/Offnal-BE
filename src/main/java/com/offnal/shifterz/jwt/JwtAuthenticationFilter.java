@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authenticationEntryPoint.commence(
                         request,
                         response,
-                        new AuthenticationException("로그아웃된 토큰입니다.") {}
+                        new AuthenticationException("유효하지 않은 토큰입니다.") {}
                 );
                 return;
             }

@@ -15,6 +15,7 @@ import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.dto.MemberRequestDto;
 import com.offnal.shifterz.member.dto.MemberResponseDto;
 import com.offnal.shifterz.member.repository.MemberRepository;
+import com.offnal.shifterz.memberOrganizationTeam.repository.MemberOrganizationTeamRepository;
 import com.offnal.shifterz.memo.repository.MemoRepository;
 import com.offnal.shifterz.organization.repository.OrganizationRepository;
 import com.offnal.shifterz.todo.repository.TodoRepository;
@@ -47,6 +48,7 @@ public class MemberService {
     private final RedisUtil redisUtil;
     private final WorkInstanceRepository workInstanceRepository;
     private final WorkCalendarRepository workCalendarRepository;
+    private final MemberOrganizationTeamRepository memberOrganizationTeamRepository;
     private final TokenService tokenService;
 
     /**
@@ -178,6 +180,8 @@ public class MemberService {
             todoRepository.deleteByMemberId(memberId);
             workInstanceRepository.deleteByMemberId(memberId);
             workCalendarRepository.deleteByMemberId(memberId);
+            memberOrganizationTeamRepository.deleteAllByMemberId(memberId);
+
             organizationRepository.deleteByOrganizationMember_Id(memberId);
 
             memberRepository.deleteById(memberId);
