@@ -80,13 +80,15 @@ public class WorkCalendarService {
 
             validateShiftDateRange(unitDto);
 
+            validateNoDuplicateWork(memberId, unitDto);
+
             WorkCalendar calendar = WorkCalendarConverter.toEntity(memberId, org, workCalendarRequestDto, unitDto);
             WorkCalendar savedCalendar = workCalendarRepository.save(calendar);
 
             List<WorkInstance> instances = WorkCalendarConverter.toWorkInstances(unitDto, savedCalendar);
             workInstanceRepository.saveAll(instances);
         }
-        // 2) 근무표 저장 후, 나의 근무조 저장 (이제 조직이 DB에 존재함!)
+        // 2) 근무표 저장 후, 나의 근무조 저장
         Set<String> organizationNames = workCalendarRequestDto.getCalendars().stream()
                 .map(WorkCalendarUnitDto::getOrganizationName)
                 .collect(Collectors.toSet());
@@ -99,6 +101,28 @@ public class WorkCalendarService {
             if (!orgList.isEmpty() && myTeam != null && !myTeam.isBlank()) {
                 myTeamService.saveOrUpdateMyTeam(member, orgList.get(0), myTeam);
             }
+        }
+    }
+
+    private void validateNoDuplicateWork(Long memberId, WorkCalendarUnitDto unitDto) {
+        if (unitDto.getShifts() == null || unitDto.getShifts().isEmpty()) {
+            return;
+        }
+
+        for (Map.Entry<LocalDate, String> entry : unitDto.getShifts().entrySet()) {
+            LocalDate date = entry.getKey();
+            WorkTimeType type = WorkTimeType.fromSymbol(entry.getValue());
+
+            validateNoDuplicateWorkTypeAcrossOrganizations(memberId, date, type);
+        }
+    }
+
+    private void validateNoDuplicateWorkTypeAcrossOrganizations(Long memberId, LocalDate date, WorkTimeType type) {
+        boolean exists = workInstanceRepository
+                .existsByWorkCalendarMemberIdAndWorkDateAndWorkTimeType(memberId, date, type);
+
+        if (exists) {
+            throw new CustomException(WorkCalendarErrorCode.WORK_TYPE_DUPLICATION_ACROSS_ORG);
         }
     }
 
@@ -454,9 +478,11 @@ public class WorkCalendarService {
             WorkInstance cur = existingMap.get(day);
 
             if (cur == null) {
+                validateNoDuplicateWorkTypeAcrossOrganizations(memberId, day, target);
                 toCreate.add(WorkInstance.create(calendar, day, target));
             }
             else if (!cur.isType(target)) {
+                validateNoDuplicateWorkTypeAcrossOrganizations(memberId, day, target);
                 cur.changeType(target, memberId, org);
                 toUpdate.add(cur);
             }
@@ -532,7 +558,9 @@ public class WorkCalendarService {
         CALENDAR_INVALID_DATE_RANGE("CAL015", HttpStatus.BAD_REQUEST, "기간 범위가 올바르지 않습니다."),
         SHIFTS_NOT_FOUND("CAL016", HttpStatus.NOT_FOUND, "존재하는 근무 일정이 없습니다."),
 
-        INVALID_SHIFT_DATE("CAL017", HttpStatus.BAD_REQUEST, "근무 일정이 캘린더의 범위를 벗어났습니다.");
+        INVALID_SHIFT_DATE("CAL017", HttpStatus.BAD_REQUEST, "근무 일정이 캘린더의 범위를 벗어났습니다."),
+        WORK_TYPE_DUPLICATION_ACROSS_ORG("CAL018", HttpStatus.BAD_REQUEST,"같은 날짜에 동일한 근무 타입은 다른 조직에서도 중복 저장할 수 없습니다."),
+        ;
         private final String code;
         private final HttpStatus status;
         private final String message;
