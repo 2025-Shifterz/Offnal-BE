@@ -30,17 +30,14 @@ public class LoginService {
             return handleKakaoLogin(userInfo);
         }
 
-        else if (provider == Provider.APPLE) {
-
-            TokenResponseDto token = appleService.getAppleToken(code);
-
-            AppleUserInfoResponseDto userInfo = appleService.getUserInfo(token.getIdToken());
-
-            return handleAppleLogin(userInfo);
-        }
         else {
             throw new CustomException(LoginErrorCode.UNSUPPORTED_PROVIDER);
         }
+    }
+
+    public AuthResponseDto loginWithAppleNative(AppleLoginRequest request) {
+        AppleUserInfoResponseDto userInfo = appleService.getUserInfoFromIdentityToken(request);
+        return handleAppleLogin(userInfo, request);
     }
 
     private AuthResponseDto handleKakaoLogin(KakaoUserInfoResponseDto userInfo) {
@@ -55,16 +52,24 @@ public class LoginService {
 
         return issueTokens(result);
     }
-    private AuthResponseDto handleAppleLogin(AppleUserInfoResponseDto userInfo) {
+    private AuthResponseDto handleAppleLogin(AppleUserInfoResponseDto userInfo, AppleLoginRequest request) {
+        // 닉네임은 클라이언트에서 전송한 fullName 사용 (최초 로그인 시에만 제공됨)
+        String nickname = null;
+        if (request.getFullName() != null) {
+            nickname = request.getFullName().getFullName();
+        }
 
-        String nickname = userInfo.getName() != null ?
-                userInfo.getName().getFullName() :
-                "Apple User";
+        if (nickname == null || nickname.isBlank()) {
+            nickname = "Apple User";
+        }
+
+        // 이메일도 클라이언트에서 전송한 값 우선 사용
+        String email = request.getEmail() != null ? request.getEmail() : userInfo.getEmail();
 
         MemberResponseDto.MemberRegisterResponseDto result = memberService.registerMemberIfAbsent(
                 Provider.APPLE,
                 userInfo.getSub(),
-                userInfo.getEmail(),
+                email,
                 nickname,
                 null,
                 null
@@ -72,6 +77,7 @@ public class LoginService {
 
         return issueTokens(result);
     }
+
     private AuthResponseDto issueTokens(MemberResponseDto.MemberRegisterResponseDto result) {
         if (result.getId() == null) {
             throw new CustomException(MemberService.MemberErrorCode.MEMBER_SAVE_FAILED);

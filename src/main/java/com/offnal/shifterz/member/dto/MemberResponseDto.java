@@ -10,6 +10,8 @@ public class MemberResponseDto {
 
     @Data
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class MemberRegisterResponseDto {
         private Long id;
         private String email;

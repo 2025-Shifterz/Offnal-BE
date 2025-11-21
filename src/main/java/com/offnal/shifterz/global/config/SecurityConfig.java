@@ -33,7 +33,7 @@ public class SecurityConfig {
         http.cors().and() //CORS 활성화 추가
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.requestMatchers(
-                                        "/login",
+                                        "/login/**",
                                         "/login/page/**",
                                         "/tokens/reissue",
                                         "/callback/**",
@@ -54,14 +54,35 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://api.offnal.site", "http://localhost:8081")); // 허용할 Origin
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+
+        /*
+         * 1) Apple callback은 Origin:null 요청
+         * 모든 Origin 허용 필요
+         */
+        CorsConfiguration appleCors = new CorsConfiguration();
+        appleCors.setAllowedOriginPatterns(List.of("*")); // Origin:null 허용
+        appleCors.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
+        appleCors.setAllowedHeaders(List.of("*"));
+        appleCors.setAllowCredentials(true);
+
+        source.registerCorsConfiguration("/callback/**", appleCors);
+
+
+        /*
+         * 일반 API는 Origin 제한
+         */
+        CorsConfiguration normalCors = new CorsConfiguration();
+        normalCors.setAllowedOrigins(List.of("https://api.offnal.site", "http://localhost:8081"));
+        normalCors.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
+        normalCors.setAllowedHeaders(List.of("*"));
+        normalCors.setAllowCredentials(true);
+
+        source.registerCorsConfiguration("/**", normalCors);
+
         return source;
     }
+
+
 }
