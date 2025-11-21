@@ -26,5 +26,6 @@ public interface MemberOrganizationTeamRepository
             @Param("organizationName") String organizationName
     );
     void deleteAllByMemberId(Long memberId);
+    void deleteAllByOrganization(Organization organization);
 }
 
