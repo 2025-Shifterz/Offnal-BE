@@ -301,5 +301,7 @@ certbot/**
 nginx/
 nginx/**
 
+*.p8
+keys/
 
 # End of https://www.toptal.com/developers/gitignore/api/java,macos,windows,intellij,intellij+all,gradle

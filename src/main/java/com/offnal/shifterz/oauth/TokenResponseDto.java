@@ -1,4 +1,4 @@
-package com.offnal.shifterz.kakao;
+package com.offnal.shifterz.oauth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,16 +10,24 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TokenResponseDto {
 
+    @JsonProperty("id_token")
+    private String idToken; // Apple 로그인 시에만 반환
+
     @JsonProperty("token_type")
-    public String tokenType;
+    private String tokenType;
+
     @JsonProperty("access_token")
-    public String accessToken;
+    private String accessToken;
+
     @JsonProperty("expires_in")
-    public Integer expiresIn;
+    private Integer expiresIn;
+
     @JsonProperty("refresh_token")
-    public String refreshToken;
+    private String refreshToken;
+
     @JsonProperty("refresh_token_expires_in")
-    public Integer refreshTokenExpiresIn;
+    private Integer refreshTokenExpiresIn;
+
     @JsonProperty("scope")
-    public String scope;
+    private String scope;
 }

@@ -1,4 +1,4 @@
-package com.offnal.shifterz.kakao;
+package com.offnal.shifterz.oauth;
 
 import com.offnal.shifterz.global.config.KakaoProperties;
 import com.offnal.shifterz.member.service.SocialService;

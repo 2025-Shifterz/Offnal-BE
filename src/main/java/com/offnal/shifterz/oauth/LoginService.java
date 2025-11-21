@@ -1,4 +1,4 @@
-package com.offnal.shifterz.kakao;
+package com.offnal.shifterz.oauth;
 
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
@@ -18,19 +18,27 @@ import org.springframework.stereotype.Service;
 public class LoginService {
 
     private final KakaoService kakaoService;
+    private final AppleService appleService;
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
 
     public AuthResponseDto loginWithSocial(Provider provider, String code) {
-        String accessToken;
-        Object userInfo;
 
         if (provider == Provider.KAKAO) {
-            accessToken = kakaoService.getAccessToken(code);
-            userInfo = kakaoService.getUserInfo(accessToken);
-            return handleKakaoLogin((KakaoUserInfoResponseDto) userInfo);
+            String accessToken = kakaoService.getAccessToken(code);
+            KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken);
+            return handleKakaoLogin(userInfo);
+        }
 
-        } else {
+        else if (provider == Provider.APPLE) {
+
+            TokenResponseDto token = appleService.getAppleToken(code);
+
+            AppleUserInfoResponseDto userInfo = appleService.getUserInfo(token.getIdToken());
+
+            return handleAppleLogin(userInfo);
+        }
+        else {
             throw new CustomException(LoginErrorCode.UNSUPPORTED_PROVIDER);
         }
     }
@@ -47,7 +55,23 @@ public class LoginService {
 
         return issueTokens(result);
     }
+    private AuthResponseDto handleAppleLogin(AppleUserInfoResponseDto userInfo) {
 
+        String nickname = userInfo.getName() != null ?
+                userInfo.getName().getFullName() :
+                "Apple User";
+
+        MemberResponseDto.MemberRegisterResponseDto result = memberService.registerMemberIfAbsent(
+                Provider.APPLE,
+                userInfo.getSub(),
+                userInfo.getEmail(),
+                nickname,
+                null,
+                null
+        );
+
+        return issueTokens(result);
+    }
     private AuthResponseDto issueTokens(MemberResponseDto.MemberRegisterResponseDto result) {
         if (result.getId() == null) {
             throw new CustomException(MemberService.MemberErrorCode.MEMBER_SAVE_FAILED);
