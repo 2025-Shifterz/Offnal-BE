@@ -463,4 +463,64 @@ public @interface ErrorApiResponses {
     })
     @interface S3 {}
 
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "유효하지 않은 Apple identity token",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "APPLE_TOKEN_INVALID",
+                                    value = """
+                                {
+                                  "code": "APL001",
+                                  "message": "유효하지 않은 Apple identity token입니다."
+                                }
+                                """
+                            )
+                    )
+            ),
+
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "kid에 해당하는 Apple 공개키 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "APPLE_PUBLIC_KEY_NOT_FOUND",
+                                    value = """
+                                {
+                                  "code": "APL002",
+                                  "message": "kid에 해당하는 Apple 공개키를 찾을 수 없습니다."
+                                }
+                                """
+                            )
+                    )
+            ),
+
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Apple 공개키 처리 중 오류 발생",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "APPLE_PUBLIC_KEY_ERROR",
+                                    value = """
+                                {
+                                  "code": "APL003",
+                                  "message": "Apple 공개키 처리 중 오류가 발생했습니다."
+                                }
+                                """
+                            )
+                    )
+            )
+    })
+    public @interface AppleLoginError { }
+
 }
