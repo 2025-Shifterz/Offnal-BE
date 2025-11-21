@@ -1,4 +1,4 @@
-package com.offnal.shifterz.kakao;
+package com.offnal.shifterz.oauth;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
