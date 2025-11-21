@@ -9,6 +9,7 @@ import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.global.util.AuthResponseUtil;
 import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.dto.AuthResponseDto;
+import com.offnal.shifterz.oauth.apple.AppleLoginRequest;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -96,23 +97,61 @@ public class OauthLoginController {
         AuthResponseDto dto = loginService.loginWithSocial(Provider.KAKAO, code);
         return AuthResponseUtil.buildAuthResponse(dto);
     }
+
     @Operation(
             summary = "애플 로그인 (네이티브)",
             description = """
-        iOS / React Native에서 받은 identityToken(JWT)을 검증하여 애플 로그인 또는 회원가입을 처리합니다.
-
-        • identityToken을 Apple 공개키로 검증하고 사용자 식별자(sub)와 이메일을 파싱합니다.  
-        • provider=APPLE, providerId=sub 조건으로 회원을 조회합니다.  
-        • 기존 회원이면 바로 로그인 처리하고, 없으면 신규 회원을 자동 생성합니다.  
-        • 애플 정책상 email과 이름은 최초 로그인에서만 제공될 수 있습니다.  
-          이후 로그인에서는 전송되지 않아도 저장된 기존 정보로 정상적으로 로그인됩니다.
-
-        클라이언트는 매 로그인마다 identityToken만 전송하면 됩니다.
-        email/fullName은 최초 로그인 시 1회만 전달되어도 무방합니다.
-
-        응답에는 회원 기본정보, 신규회원 여부(newMember), Access/Refresh Token이 포함됩니다.
-        """
+                    ---
+                    
+                    # Apple Native Login
+                    
+                    iOS 또는 React Native에서 전달된 identityToken(JWT)을 이용하여  
+                    애플 로그인 또는 신규 회원가입을 처리하는 API입니다.
+                    
+                    ---
+                    
+                    ## 인증 처리 흐름
+                    
+                    1) identityToken 검증  
+                    - Apple 공개키(JWK)를 사용하여 RS256 서명을 검증합니다.  
+                    - 토큰 내부에서 sub(사용자 고유 식별자), email 정보를 파싱합니다.
+                    
+                    2) 회원 조회 또는 가입  
+                    - provider = APPLE, providerId = sub 조건으로 기존 회원을 조회합니다.  
+                    - 이미 회원이 존재하면 로그인 처리됩니다.  
+                    - 존재하지 않으면 새 회원을 자동 생성하여 가입 처리됩니다.
+                    
+                    3) Access / Refresh Token 발급  
+                    - 로그인 또는 신규 가입 후 서버에서 JWT 토큰을 발급합니다.
+                    
+                    ---
+                    
+                    ## Apple 개인정보 제공 정책 안내
+                    
+                    Apple은 최초 로그인 시에만 email, fullName(이름) 정보를 전달할 수 있습니다.  
+                    이후 로그인 요청에서는 해당 정보가 전달되지 않아도,  
+                    서버는 기존 저장된 회원 정보를 기반으로 정상적으로 로그인 처리를 수행합니다.
+                    
+                    ---
+                    
+                    ## 요청 데이터 안내
+                    
+                    클라이언트는 로그인 시마다 identityToken만 전송하면 됩니다.  
+                    email 및 fullName 정보를 null로 요청 시, 서버는 기존 회원 정보를 사용합니다.  
+        
+                    ## 응답 데이터 구성
+                    
+                    서버는 다음 정보를 포함하여 응답합니다:
+                    
+                    - 회원 기본 정보  
+                    - 신규 가입 여부 (newMember = true/false)  
+                    - Access Token  
+                    - Refresh Token  
+                    
+                    ---
+                    """
     )
+
     @AppleLoginSuccess
     @AppleLoginError
     @PostMapping("/login/apple")

@@ -1,7 +1,8 @@
-package com.offnal.shifterz.oauth;
+package com.offnal.shifterz.oauth.kakao;
 
 import com.offnal.shifterz.global.config.KakaoProperties;
 import com.offnal.shifterz.member.service.SocialService;
+import com.offnal.shifterz.oauth.TokenResponseDto;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
