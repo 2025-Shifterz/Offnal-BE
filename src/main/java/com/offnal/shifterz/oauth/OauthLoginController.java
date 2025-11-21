@@ -1,7 +1,11 @@
 package com.offnal.shifterz.oauth;
 
 import com.offnal.shifterz.global.exception.ErrorApiResponses;
+import com.offnal.shifterz.global.exception.ErrorApiResponses.AppleLoginError;
 import com.offnal.shifterz.global.exception.ErrorResponse;
+import com.offnal.shifterz.global.response.SuccessApiResponses.AppleLoginSuccess;
+import com.offnal.shifterz.global.response.SuccessCode;
+import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.global.util.AuthResponseUtil;
 import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.dto.AuthResponseDto;
@@ -94,20 +98,30 @@ public class OauthLoginController {
     }
     @Operation(
             summary = "애플 로그인 (네이티브)",
-            description = "React Native / iOS 애플 로그인에서 받은 identityToken(JWT)을 서버로 보내면, "
-                    + "Apple 토큰 검증 → 회원가입/로그인 → Access/Refresh Token 발급을 수행합니다."
+            description = """
+        iOS / React Native에서 받은 identityToken(JWT)을 검증하여 애플 로그인 또는 회원가입을 처리합니다.
+
+        • identityToken을 Apple 공개키로 검증하고 사용자 식별자(sub)와 이메일을 파싱합니다.  
+        • provider=APPLE, providerId=sub 조건으로 회원을 조회합니다.  
+        • 기존 회원이면 바로 로그인 처리하고, 없으면 신규 회원을 자동 생성합니다.  
+        • 애플 정책상 email과 이름은 최초 로그인에서만 제공될 수 있습니다.  
+          이후 로그인에서는 전송되지 않아도 저장된 기존 정보로 정상적으로 로그인됩니다.
+
+        클라이언트는 매 로그인마다 identityToken만 전송하면 됩니다.
+        email/fullName은 최초 로그인 시 1회만 전달되어도 무방합니다.
+
+        응답에는 회원 기본정보, 신규회원 여부(newMember), Access/Refresh Token이 포함됩니다.
+        """
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공"),
-            @ApiResponse(responseCode = "401", description = "잘못된 Apple identityToken 입니다."),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
-    })
+    @AppleLoginSuccess
+    @AppleLoginError
     @PostMapping("/login/apple")
-    public ResponseEntity<AuthResponseDto> appleNativeLogin(
+    public SuccessResponse<AuthResponseDto> appleNativeLogin(
             @RequestBody AppleLoginRequest request
     ) {
         AuthResponseDto response = loginService.loginWithAppleNative(request);
-        return ResponseEntity.ok(response);
+        return SuccessResponse.success(SuccessCode.LOGIN_SUCCESS, response);
     }
+
 
 }

@@ -1100,5 +1100,35 @@ public @interface SuccessApiResponses {
     public @interface HomeRoutine {
     }
 
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "애플 로그인 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(
+                                    name = "APPLE_LOGIN_SUCCESS",
+                                    value = """
+                            {
+                              "code": "LOGIN_SUCCESS",
+                              "message": "로그인을 성공했습니다.",
+                              "data": {
+                                "memberName": "거누쓰",
+                                "email": "string",
+                                "profileImageKey": null,
+                                "newMember": false,
+                                "accessToken": "eyJhbGciOiJIUzUxMiJ9....",
+                                "refreshToken": "eyJhbGciOiJIUzUxMiJ9...."
+                              }
+                            }
+                            """
+                            )
+                    )
+            )
+    })
+    public @interface AppleLoginSuccess { }
 
 }
