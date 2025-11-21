@@ -20,23 +20,9 @@ public class AppleUserInfoResponseDto {
     @JsonProperty("is_private_email")
     private Boolean isPrivateEmail;
 
-    // 실명은 최초 로그인시에만 제공됨
-    private Name name;
-
-    @Getter
-    @NoArgsConstructor
-    public static class Name {
-        @JsonProperty("firstName")
-        private String firstName;
-
-        @JsonProperty("lastName")
-        private String lastName;
-
-        public String getFullName() {
-            if (firstName == null && lastName == null) {
-                return null;
-            }
-            return (lastName != null ? lastName : "") + (firstName != null ? firstName : "");
-        }
+    // 생성자 추가 (토큰 파싱 후 직접 생성용)
+    public AppleUserInfoResponseDto(String sub, String email) {
+        this.sub = sub;
+        this.email = email;
     }
 }

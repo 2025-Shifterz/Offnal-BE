@@ -2,8 +2,6 @@ package com.offnal.shifterz.oauth;
 
 import com.offnal.shifterz.global.exception.ErrorApiResponses;
 import com.offnal.shifterz.global.exception.ErrorResponse;
-import com.offnal.shifterz.global.response.SuccessCode;
-import com.offnal.shifterz.global.response.SuccessResponse;
 import com.offnal.shifterz.global.util.AuthResponseUtil;
 import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.dto.AuthResponseDto;
@@ -12,12 +10,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/callback")
+@RequestMapping("")
 public class OauthLoginController {
 
     private final LoginService loginService;
@@ -89,74 +87,27 @@ public class OauthLoginController {
                     ))
     })
     @Hidden
-    @GetMapping("")
+    @GetMapping("/callback")
     public ResponseEntity<?> kakaoCallback(@RequestParam("code") String code) {
         AuthResponseDto dto = loginService.loginWithSocial(Provider.KAKAO, code);
         return AuthResponseUtil.buildAuthResponse(dto);
     }
-
-    @Operation(summary = "애플 로그인 콜백 처리", description = "애플 인가 코드(code)를 기반으로 JWT 토큰과 사용자 정보를 반환합니다.")
-    @ErrorApiResponses.Common
-    @ErrorApiResponses.Auth
-    @ErrorApiResponses.Member
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "로그인 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = AuthResponseDto.class),
-                            examples = {
-                                    @ExampleObject(name = "기존 회원 로그인", value = """
-                                            {"code":"LOGIN_SUCCESS",
-                                            "message":"로그인을 성공했습니다.",
-                                            "data":{
-                                                "nickname":"Apple User",
-                                                "newMember":false
-                                                }
-                                               }
-                                            """),
-                                    @ExampleObject(name = "신규 회원 로그인", value = """
-                                             {"code":"LOGIN_SUCCESS",
-                                            "message":"로그인을 성공했습니다.",
-                                            "data":{
-                                                "nickname":"Apple User",
-                                                "newMember":true
-                                                }
-                                               }
-                                            """)
-                            }),
-                    headers = {
-                            @io.swagger.v3.oas.annotations.headers.Header(
-                                    name = "Authorization",
-                                    description = "Bearer {accessToken}",
-                                    schema = @Schema(type = "string", example = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
-                            ),
-                            @io.swagger.v3.oas.annotations.headers.Header(
-                                    name = "Refresh-Token",
-                                    description = "Refresh Token",
-                                    schema = @Schema(type = "string", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
-                            )
-                    }),
-            @ApiResponse(responseCode = "500", description = "회원 등록 실패",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(name = "MEMBER_SAVE_FAILED", value = """
-                                    {
-                                      "code": "MEMBER_SAVE_FAILED",
-                                      "message": "회원 등록에 실패했습니다."
-                                    }
-                                    """)
-                    ))
+    @Operation(
+            summary = "애플 로그인 (네이티브)",
+            description = "React Native / iOS 애플 로그인에서 받은 identityToken(JWT)을 서버로 보내면, "
+                    + "Apple 토큰 검증 → 회원가입/로그인 → Access/Refresh Token 발급을 수행합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그인 성공"),
+            @ApiResponse(responseCode = "401", description = "잘못된 Apple identityToken 입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
-    @Hidden
-    @PostMapping("/apple")
-    public ResponseEntity<?> appleCallback(
-            @RequestParam("code") String code,
-            @RequestParam(value = "user", required = false) String user,
-            @RequestParam(value = "state", required = false) String state
+    @PostMapping("/login/apple")
+    public ResponseEntity<AuthResponseDto> appleNativeLogin(
+            @RequestBody AppleLoginRequest request
     ) {
-        AuthResponseDto dto = loginService.loginWithSocial(Provider.APPLE, code);
-        return AuthResponseUtil.buildAuthResponse(dto);
+        AuthResponseDto response = loginService.loginWithAppleNative(request);
+        return ResponseEntity.ok(response);
     }
 
 }
