@@ -123,6 +123,35 @@ public class WorkCalendarService {
         upsertInstances(calendar, memberId, org, shifts, existingMap);
     }
 
+    // 단체 근무 일정 수정
+    @Transactional
+    public void updateGroupWorkCalendar(String organizationName, GroupWorkCalendarUpdateReqDto request) {
+
+        Long memberId = AuthService.getCurrentUserId();
+
+        List<Organization> orgList = findOrganizationsWithSameName(memberId, organizationName);
+
+        for (GroupWorkCalendarUpdateReqDto.GroupUnit unit : request.getCalendars()){
+            String team = unit.getTeam();
+            Map<LocalDate, String> shifts = nonEmptyShifts(unit.getShifts());
+
+            List<Organization> targetOrgs = orgList.stream()
+                    .filter(o -> o.getTeam().equals(team))
+                    .toList();
+
+            for (Organization org : targetOrgs) {
+
+                LocalDate minDay = extractMinDate(shifts);
+                LocalDate maxDay = extractMaxDate(shifts);
+
+                WorkCalendar calendar = getExistingCalendar(memberId, org);
+                Map<LocalDate, WorkInstance> existingMap = loadExistingInstances(memberId, org, minDay, maxDay);
+
+                upsertInstances(calendar, memberId, org, shifts, existingMap);
+            }
+        }
+    }
+
     // 근무 시간 수정
     @Transactional
     public void updateWorkTimes(String organizationName, String team, Long calendarId, @Valid WorkTimeUpdateDto request) {
