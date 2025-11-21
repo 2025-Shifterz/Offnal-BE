@@ -304,6 +304,65 @@ public class WorkCalendarController {
         return SuccessResponse.success(SuccessCode.CALENDAR_UPDATED);
     }
 
+    /**
+     * 단체 근무 일정 수정
+     */
+    @PatchMapping("/group")
+    @Operation(summary = "단체 근무 일정 수정",
+            description = """
+                같은 조직명(organizationName)을 가진 모든 팀(또는 특정 team)에 대해 날짜별 근무 타입을 수정합니다.
+
+                - organizationName: 필수
+                - team: 선택 (null이면 동일 조직명 전체 팀 적용)
+                - shifts: 날짜별 근무 타입(E/D/N/-)
+
+                기존 일정이 있으면 수정, 없으면 새로 생성(upsert)
+                """)
+    @SuccessApiResponses.UpdateCalendar
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Auth
+    @ErrorApiResponses.UpdateWorkCalendar
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "단체 근무 일정 수정 예시",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = {
+                            @ExampleObject(
+                                    name = "단체 근무 일정 수정 예시",
+                                    value = """
+                                            {
+                                                "calendars": [
+                                                  {
+                                                    "team": "1조",
+                                                    "shifts": {
+                                                      "2025-07-01": "D",
+                                                      "2025-07-02": "E"
+                                                    }
+                                                  },
+                                                  {
+                                                    "team": "2조",
+                                                    "shifts": {
+                                                      "2025-07-01": "D",
+                                                      "2025-07-02": "E"
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                        """
+                            )
+                    }
+            )
+    )
+    public SuccessResponse<Void> updateGroupWorkCalendar(
+            @RequestParam @NotNull String organizationName,
+            @Valid @RequestBody GroupWorkCalendarUpdateReqDto request
+    ) {
+        workCalendarService.updateGroupWorkCalendar(organizationName, request);
+        return SuccessResponse.success(SuccessCode.CALENDAR_UPDATED);
+    }
+
+
 
     /**
      * 근무 일정 삭제
