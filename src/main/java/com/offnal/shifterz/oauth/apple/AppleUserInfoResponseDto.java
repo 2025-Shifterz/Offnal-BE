@@ -1,4 +1,4 @@
-package com.offnal.shifterz.oauth;
+package com.offnal.shifterz.oauth.apple;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

@@ -1,5 +1,8 @@
 package com.offnal.shifterz.oauth;
 
+import com.offnal.shifterz.oauth.apple.AppleService;
+import com.offnal.shifterz.oauth.kakao.KakaoLoginPageResponse;
+import com.offnal.shifterz.oauth.kakao.KakaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;

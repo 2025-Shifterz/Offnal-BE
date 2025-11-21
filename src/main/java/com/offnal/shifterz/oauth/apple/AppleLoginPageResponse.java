@@ -1,4 +1,4 @@
-package com.offnal.shifterz.oauth;
+package com.offnal.shifterz.oauth.apple;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
