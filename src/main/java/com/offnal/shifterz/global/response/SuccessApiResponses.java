@@ -146,54 +146,53 @@ public @interface SuccessApiResponses {
                             schema = @Schema(implementation = SuccessResponse.class),
                             examples = @ExampleObject(name = "근무일 조회 성공 예시", value = """
                                     {
-                                        "code": "WORK_DAY_FETCHED",
-                                        "message": "근무일 조회에 성공했습니다.",
-                                        "data": [
-                                           "myTeam": "2조",
-                                          {
-                                            "date": "2025-07-01",
-                                            "workTypeName": "오후",
-                                            "startTime": "16:00",
-                                            "duration": "PT6H30M"
-                                          },
-                                          {
-                                            "date": "2025-07-02",
-                                            "workTypeName": "오후",
-                                            "startTime": "16:00",
-                                            "duration": "PT6H30M"
-                                          },
-                                          {
-                                            "date": "2025-07-03",
-                                            "workTypeName": "야간",
-                                            "startTime": "00:00",
-                                            "duration": "PT6H30M"
-                                          },
-                                          {
-                                            "date": "2025-07-04",
-                                            "workTypeName": "휴일",
-                                            "startTime": null,
-                                            "duration": null
-                                          },
-                                          {
-                                            "date": "2025-07-05",
-                                            "workTypeName": "주간",
-                                            "startTime": "08:00",
-                                            "duration": "PT6H30M"
-                                          },
-                                          {
-                                            "date": "2025-07-06",
-                                            "workTypeName": "주간",
-                                            "startTime": "08:00",
-                                            "duration": "PT6H30M"
-                                          },
-                                          {
-                                            "date": "2025-07-07",
-                                            "workTypeName": "휴일",
-                                            "startTime": null,
-                                            "duration": null
-                                          }
-                                        ]
-                                      }
+                                      "code": "WORK_DAY_FETCHED",
+                                      "message": "근무일 조회에 성공했습니다.",
+                                      "data": [
+                                        {
+                                          "date": "2025-07-01",
+                                          "workTypeName": "오후",
+                                          "startTime": "16:00",
+                                          "duration": "PT6H30M"
+                                        },
+                                        {
+                                          "date": "2025-07-02",
+                                          "workTypeName": "오후",
+                                          "startTime": "16:00",
+                                          "duration": "PT6H30M"
+                                        },
+                                        {
+                                          "date": "2025-07-03",
+                                          "workTypeName": "야간",
+                                          "startTime": "00:00",
+                                          "duration": "PT6H30M"
+                                        },
+                                        {
+                                          "date": "2025-07-04",
+                                          "workTypeName": "휴일",
+                                          "startTime": null,
+                                          "duration": null
+                                        },
+                                        {
+                                          "date": "2025-07-05",
+                                          "workTypeName": "주간",
+                                          "startTime": "08:00",
+                                          "duration": "PT6H30M"
+                                        },
+                                        {
+                                          "date": "2025-07-06",
+                                          "workTypeName": "주간",
+                                          "startTime": "08:00",
+                                          "duration": "PT6H30M"
+                                        },
+                                        {
+                                          "date": "2025-07-07",
+                                          "workTypeName": "휴일",
+                                          "startTime": null,
+                                          "duration": null
+                                        }
+                                      ]
+                                    }
                                     """)
                     )
             )
@@ -214,8 +213,6 @@ public @interface SuccessApiResponses {
                                       "message": "데이터 조회에 성공했습니다.",
                                       "data": {
                                         "calendarId": 1,
-                                        "startDate": "2025-07-01",
-                                        "endDate": "2025-07-07",
                                         "workTimes": {
                                           "D": {
                                             "startTime": "08:00",
@@ -253,13 +250,9 @@ public @interface SuccessApiResponses {
                                                    "data": [
                                                      {
                                                        "calendarId": 1,
-                                                       "startDate": "2025-08-01",
-                                                       "endDate": "2025-08-07"
                                                      },
                                                      {
                                                        "calendarId": 2,
-                                                       "startDate": "2025-07-01",
-                                                       "endDate": "2025-07-07"
                                                      }
                                                    ]
                                                  }

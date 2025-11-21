@@ -5,7 +5,6 @@ import com.offnal.shifterz.organization.domain.Organization;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Entity
@@ -31,12 +30,6 @@ public class WorkCalendar extends BaseTimeEntity {
     @Column(nullable = false)
     private Long memberId;
 
-    @Column(nullable = false)
-    private LocalDate startDate;
-
-    @Column(nullable = false)
-    private LocalDate endDate;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
@@ -59,8 +52,6 @@ public class WorkCalendar extends BaseTimeEntity {
     // ===== 메서드 =====
 
     public Long id() { return this.id; }
-    public LocalDate startDate() { return this.startDate; }
-    public LocalDate endDate() { return this.endDate; }
     public Map<String, WorkTime> workTimes() { return this.workTimes; }
 
     // 해당 회원 및 조직 소유 캘린더인지
@@ -71,14 +62,6 @@ public class WorkCalendar extends BaseTimeEntity {
                 && Objects.equals(this.organization.getId(), org.getId());
     }
 
-    // 캘린더의 startDate, endDate 범위를 포함하는지
-    public boolean contains(LocalDate date) {
-        return date != null && !date.isBefore(startDate) && !date.isAfter(endDate);
-    }
-
     public void putWorkTime(String symbol, WorkTime time) { this.workTimes.put(symbol, time); }
-
-    public void updateStartDate(LocalDate newStart) { this.startDate = newStart; }
-    public void updateEndDate(LocalDate newEnd) { this.endDate = newEnd; }
 
 }

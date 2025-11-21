@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.util.Map;
 
 @Data
 @Builder
@@ -13,6 +13,5 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class WorkCalendarListItemDto {
     private Long calendarId;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private Map<String, WorkTimeDto> workTimes;
 }

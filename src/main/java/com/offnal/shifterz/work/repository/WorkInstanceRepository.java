@@ -2,6 +2,7 @@ package com.offnal.shifterz.work.repository;
 
 import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.work.domain.WorkInstance;
+import com.offnal.shifterz.work.domain.WorkTimeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -63,5 +64,9 @@ public interface WorkInstanceRepository extends JpaRepository<WorkInstance, Long
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    boolean existsByWorkCalendarMemberIdAndWorkDateAndWorkTimeType(
+            Long memberId, LocalDate date, WorkTimeType type);
+
 
 }
