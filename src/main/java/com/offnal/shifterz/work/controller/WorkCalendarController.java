@@ -313,7 +313,7 @@ public class WorkCalendarController {
                 같은 조직명(organizationName)을 가진 모든 팀(또는 특정 team)에 대해 날짜별 근무 타입을 수정합니다.
 
                 - organizationName: 필수
-                - team: 선택 (null이면 동일 조직명 전체 팀 적용)
+                - team: 필수
                 - shifts: 날짜별 근무 타입(E/D/N/-)
 
                 기존 일정이 있으면 수정, 없으면 새로 생성(upsert)

@@ -125,13 +125,13 @@ public class WorkCalendarService {
 
     // 단체 근무 일정 수정
     @Transactional
-    public void updateGroupWorkCalendar(String organizationName, GroupWorkCalendarUpdateReqDto reqest) {
+    public void updateGroupWorkCalendar(String organizationName, GroupWorkCalendarUpdateReqDto request) {
 
         Long memberId = AuthService.getCurrentUserId();
 
         List<Organization> orgList = findOrganizationsWithSameName(memberId, organizationName);
 
-        for (GroupWorkCalendarUpdateReqDto.GroupUnit unit : reqest.getCalendars()){
+        for (GroupWorkCalendarUpdateReqDto.GroupUnit unit : request.getCalendars()){
             String team = unit.getTeam();
             Map<LocalDate, String> shifts = nonEmptyShifts(unit.getShifts());
 
