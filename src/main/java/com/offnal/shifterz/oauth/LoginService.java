@@ -1,4 +1,4 @@
-package com.offnal.shifterz.kakao;
+package com.offnal.shifterz.oauth;
 
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class LoginService {
 
     private final KakaoService kakaoService;
+    private final AppleService appleService;
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -29,6 +30,11 @@ public class LoginService {
             accessToken = kakaoService.getAccessToken(code);
             userInfo = kakaoService.getUserInfo(accessToken);
             return handleKakaoLogin((KakaoUserInfoResponseDto) userInfo);
+
+        } else if (provider == Provider.APPLE) {
+            accessToken = appleService.getAccessToken(code);
+            userInfo = appleService.getUserInfo(accessToken);
+            return handleAppleLogin((AppleUserInfoResponseDto) userInfo);
 
         } else {
             throw new CustomException(LoginErrorCode.UNSUPPORTED_PROVIDER);
@@ -47,7 +53,23 @@ public class LoginService {
 
         return issueTokens(result);
     }
+    private AuthResponseDto handleAppleLogin(AppleUserInfoResponseDto userInfo) {
 
+        String nickname = userInfo.getName() != null ?
+                userInfo.getName().getFullName() :
+                "Apple User";
+
+        MemberResponseDto.MemberRegisterResponseDto result = memberService.registerMemberIfAbsent(
+                Provider.APPLE,
+                userInfo.getSub(), // Apple 고유 ID
+                userInfo.getEmail(),
+                nickname,
+                null,
+                null
+        );
+
+        return issueTokens(result);
+    }
     private AuthResponseDto issueTokens(MemberResponseDto.MemberRegisterResponseDto result) {
         if (result.getId() == null) {
             throw new CustomException(MemberService.MemberErrorCode.MEMBER_SAVE_FAILED);

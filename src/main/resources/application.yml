@@ -52,3 +52,13 @@ kakao:
   url:
     token: https://kauth.kakao.com
     user: https://kapi.kakao.com
+apple:
+  team-id: ${APPLE_TEAM_ID}              # Apple Developer Team ID
+  client-id: ${APPLE_CLIENT_ID}          # Service ID (com.yourcompany.serviceid)
+  key-id: ${APPLE_KEY_ID}                # Key ID from Apple Developer
+  private-key-path: ${APPLE_PRIVATE_KEY_PATH}      # P8 파일 내용 (개행문자 포함)
+  redirect-uri: ${APPLE_REDIRECT_URI}
+  url:
+    token: https://appleid.apple.com
+    public-key: https://appleid.apple.com/auth/keys
+    revoke: https://appleid.apple.com/auth/revoke
