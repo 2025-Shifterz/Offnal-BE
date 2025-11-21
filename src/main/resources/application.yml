@@ -5,6 +5,8 @@ server:
       enabled: true
       force: true
 spring:
+  jackson:
+    time-zone: Asia/Seoul
   application:
     name: shifterz
   config:
