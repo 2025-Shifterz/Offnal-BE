@@ -25,7 +25,7 @@ spring:
     password: ${DB_PASSWORD}
   data:
     redis:
-      host: ${REDIS_HOST}
+      host: localhost
       port: 6379
       repositories:
         enabled: false
@@ -53,10 +53,10 @@ kakao:
     token: https://kauth.kakao.com
     user: https://kapi.kakao.com
 apple:
-  team-id: ${APPLE_TEAM_ID}              # Apple Developer Team ID
-  client-id: ${APPLE_CLIENT_ID}          # Service ID (com.yourcompany.serviceid)
-  key-id: ${APPLE_KEY_ID}                # Key ID from Apple Developer
-  private-key-path: ${APPLE_PRIVATE_KEY_PATH}      # P8 파일 내용 (개행문자 포함)
+  team-id: ${APPLE_TEAM_ID}
+  client-id: ${APPLE_CLIENT_ID}
+  key-id: ${APPLE_KEY_ID}
+  private-key-path: ${APPLE_PRIVATE_KEY_PATH}
   redirect-uri: ${APPLE_REDIRECT_URI}
   url:
     token: https://appleid.apple.com

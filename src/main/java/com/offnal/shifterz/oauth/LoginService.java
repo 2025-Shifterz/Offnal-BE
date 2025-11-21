@@ -23,20 +23,22 @@ public class LoginService {
     private final JwtTokenProvider jwtTokenProvider;
 
     public AuthResponseDto loginWithSocial(Provider provider, String code) {
-        String accessToken;
-        Object userInfo;
 
         if (provider == Provider.KAKAO) {
-            accessToken = kakaoService.getAccessToken(code);
-            userInfo = kakaoService.getUserInfo(accessToken);
-            return handleKakaoLogin((KakaoUserInfoResponseDto) userInfo);
+            String accessToken = kakaoService.getAccessToken(code);
+            KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken);
+            return handleKakaoLogin(userInfo);
+        }
 
-        } else if (provider == Provider.APPLE) {
-            accessToken = appleService.getAccessToken(code);
-            userInfo = appleService.getUserInfo(accessToken);
-            return handleAppleLogin((AppleUserInfoResponseDto) userInfo);
+        else if (provider == Provider.APPLE) {
 
-        } else {
+            TokenResponseDto token = appleService.getAppleToken(code);
+
+            AppleUserInfoResponseDto userInfo = appleService.getUserInfo(token.getIdToken());
+
+            return handleAppleLogin(userInfo);
+        }
+        else {
             throw new CustomException(LoginErrorCode.UNSUPPORTED_PROVIDER);
         }
     }
@@ -61,7 +63,7 @@ public class LoginService {
 
         MemberResponseDto.MemberRegisterResponseDto result = memberService.registerMemberIfAbsent(
                 Provider.APPLE,
-                userInfo.getSub(), // Apple 고유 ID
+                userInfo.getSub(),
                 userInfo.getEmail(),
                 nickname,
                 null,
