@@ -81,7 +81,7 @@ public class WorkCalendarController {
                                        },
                                        "calendars": [
                                          {
-                                           "organizationName": "병원 2",
+                                           "organizationName": "병원 1",
                                            "team": "1조",
                                            "shifts": {
                                              "2025-07-01": "E",
@@ -94,7 +94,7 @@ public class WorkCalendarController {
                                            }
                                          },
                                          {
-                                           "organizationName": "병원 2",
+                                           "organizationName": "병원 1",
                                            "team": "2조",
                                            "shifts": {
                                              "2025-07-08": "D",
