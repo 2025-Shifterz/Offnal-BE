@@ -68,8 +68,6 @@ public class WorkCalendarService {
 
             validateCalendarNotExists(memberId, org);
 
-            validateNoDuplicateWork(memberId, unitDto);
-
             WorkCalendar savedCalendar = createAndSaveCalendar(memberId, org, workCalendarRequestDto, unitDto);
 
             saveWorkInstances(unitDto, savedCalendar);
@@ -395,11 +393,9 @@ public class WorkCalendarService {
             WorkInstance cur = existingMap.get(day);
 
             if (cur == null) {
-                validateNoDuplicateWorkTypeAcrossOrganizations(memberId, day, target);
                 toCreate.add(WorkInstance.create(calendar, day, target));
             }
             else if (!cur.isType(target)) {
-                validateNoDuplicateWorkTypeAcrossOrganizations(memberId, day, target);
                 cur.changeType(target, memberId, org);
                 toUpdate.add(cur);
             }
@@ -475,28 +471,6 @@ public class WorkCalendarService {
                 unitDto.getOrganizationName(),
                 unitDto.getTeam()
         );
-    }
-
-    private void validateNoDuplicateWork(Long memberId, WorkCalendarUnitDto unitDto) {
-        if (unitDto.getShifts() == null || unitDto.getShifts().isEmpty()) {
-            return;
-        }
-
-        for (Map.Entry<LocalDate, String> entry : unitDto.getShifts().entrySet()) {
-            LocalDate date = entry.getKey();
-            WorkTimeType type = WorkTimeType.fromSymbol(entry.getValue());
-
-            validateNoDuplicateWorkTypeAcrossOrganizations(memberId, date, type);
-        }
-    }
-
-    private void validateNoDuplicateWorkTypeAcrossOrganizations(Long memberId, LocalDate date, WorkTimeType type) {
-        boolean exists = workInstanceRepository
-                .existsByWorkCalendarMemberIdAndWorkDateAndWorkTimeType(memberId, date, type);
-
-        if (exists) {
-            throw new CustomException(WorkCalendarErrorCode.WORK_TYPE_DUPLICATION_ACROSS_ORG);
-        }
     }
 
     private LocalDate extractMaxDate(Map<LocalDate, String> shifts) {
