@@ -68,8 +68,6 @@ public class WorkCalendarService {
 
             validateCalendarNotExists(memberId, org);
 
-            validateNoDuplicateWork(memberId, unitDto);
-
             WorkCalendar savedCalendar = createAndSaveCalendar(memberId, org, workCalendarRequestDto, unitDto);
 
             saveWorkInstances(unitDto, savedCalendar);
@@ -121,6 +119,35 @@ public class WorkCalendarService {
         Map<LocalDate, WorkInstance> existingMap =  loadExistingInstances(memberId, org, minDay, maxDay);
 
         upsertInstances(calendar, memberId, org, shifts, existingMap);
+    }
+
+    // 단체 근무 일정 수정
+    @Transactional
+    public void updateGroupWorkCalendar(String organizationName, GroupWorkCalendarUpdateReqDto request) {
+
+        Long memberId = AuthService.getCurrentUserId();
+
+        List<Organization> orgList = findOrganizationsWithSameName(memberId, organizationName);
+
+        for (GroupWorkCalendarUpdateReqDto.GroupUnit unit : request.getCalendars()){
+            String team = unit.getTeam();
+            Map<LocalDate, String> shifts = nonEmptyShifts(unit.getShifts());
+
+            List<Organization> targetOrgs = orgList.stream()
+                    .filter(o -> o.getTeam().equals(team))
+                    .toList();
+
+            for (Organization org : targetOrgs) {
+
+                LocalDate minDay = extractMinDate(shifts);
+                LocalDate maxDay = extractMaxDate(shifts);
+
+                WorkCalendar calendar = getExistingCalendar(memberId, org);
+                Map<LocalDate, WorkInstance> existingMap = loadExistingInstances(memberId, org, minDay, maxDay);
+
+                upsertInstances(calendar, memberId, org, shifts, existingMap);
+            }
+        }
     }
 
     // 근무 시간 수정
@@ -366,11 +393,9 @@ public class WorkCalendarService {
             WorkInstance cur = existingMap.get(day);
 
             if (cur == null) {
-                validateNoDuplicateWorkTypeAcrossOrganizations(memberId, day, target);
                 toCreate.add(WorkInstance.create(calendar, day, target));
             }
             else if (!cur.isType(target)) {
-                validateNoDuplicateWorkTypeAcrossOrganizations(memberId, day, target);
                 cur.changeType(target, memberId, org);
                 toUpdate.add(cur);
             }
@@ -446,28 +471,6 @@ public class WorkCalendarService {
                 unitDto.getOrganizationName(),
                 unitDto.getTeam()
         );
-    }
-
-    private void validateNoDuplicateWork(Long memberId, WorkCalendarUnitDto unitDto) {
-        if (unitDto.getShifts() == null || unitDto.getShifts().isEmpty()) {
-            return;
-        }
-
-        for (Map.Entry<LocalDate, String> entry : unitDto.getShifts().entrySet()) {
-            LocalDate date = entry.getKey();
-            WorkTimeType type = WorkTimeType.fromSymbol(entry.getValue());
-
-            validateNoDuplicateWorkTypeAcrossOrganizations(memberId, date, type);
-        }
-    }
-
-    private void validateNoDuplicateWorkTypeAcrossOrganizations(Long memberId, LocalDate date, WorkTimeType type) {
-        boolean exists = workInstanceRepository
-                .existsByWorkCalendarMemberIdAndWorkDateAndWorkTimeType(memberId, date, type);
-
-        if (exists) {
-            throw new CustomException(WorkCalendarErrorCode.WORK_TYPE_DUPLICATION_ACROSS_ORG);
-        }
     }
 
     private LocalDate extractMaxDate(Map<LocalDate, String> shifts) {

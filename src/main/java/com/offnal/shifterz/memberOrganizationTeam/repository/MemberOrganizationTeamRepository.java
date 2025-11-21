@@ -27,6 +27,5 @@ public interface MemberOrganizationTeamRepository
     );
     void deleteAllByMemberId(Long memberId);
     void deleteAllByOrganization(Organization organization);
-
 }
 
