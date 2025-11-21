@@ -5,7 +5,6 @@ import com.offnal.shifterz.organization.domain.Organization;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Entity
