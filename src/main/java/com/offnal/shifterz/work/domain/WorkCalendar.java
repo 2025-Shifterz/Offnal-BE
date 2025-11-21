@@ -12,15 +12,6 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
-@Table(
-        name = "work_calendar",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "uk_org_calendar_unique",
-                        columnNames = {"organization_id"}
-                )
-        }
-)
 public class WorkCalendar extends BaseTimeEntity {
 
     @Id
