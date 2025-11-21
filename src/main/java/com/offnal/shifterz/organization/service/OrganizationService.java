@@ -4,6 +4,7 @@ import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.member.domain.Member;
+import com.offnal.shifterz.memberOrganizationTeam.repository.MemberOrganizationTeamRepository;
 import com.offnal.shifterz.memo.repository.MemoRepository;
 import com.offnal.shifterz.organization.converter.OrganizationConverter;
 import com.offnal.shifterz.organization.domain.Organization;
@@ -29,6 +30,7 @@ public class OrganizationService {
     private final OrganizationRepository organizationRepository;
     private final MemoRepository memoRepository;
     private final TodoRepository todoRepository;
+    private final MemberOrganizationTeamRepository memberOrganizationTeamRepository;
     private static final String ORG_CONSTRAINT_NAME = "uk_org_member_name_team";
 
 
@@ -167,7 +169,7 @@ public class OrganizationService {
 
         memoRepository.deleteAllByOrganization(org);
         todoRepository.deleteAllByOrganization(org);
-
+        memberOrganizationTeamRepository.deleteAllByOrganization(org);
         organizationRepository.delete(org);
     }
 
