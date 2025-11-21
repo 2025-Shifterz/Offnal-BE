@@ -5,6 +5,8 @@ server:
       enabled: true
       force: true
 spring:
+  jackson:
+    time-zone: Asia/Seoul
   application:
     name: shifterz
   config:
@@ -25,7 +27,7 @@ spring:
     password: ${DB_PASSWORD}
   data:
     redis:
-      host: localhost
+      host: ${REDIS_HOST}
       port: 6379
       repositories:
         enabled: false
