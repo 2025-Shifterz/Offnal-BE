@@ -15,6 +15,12 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
+@Table(uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_work_instance_calendar_date_type",
+                columnNames = {"work_calendar_id", "work_date", "work_time_type"}
+        )
+})
 public class WorkInstance extends BaseTimeEntity {
 
     @Id
@@ -22,10 +28,12 @@ public class WorkInstance extends BaseTimeEntity {
     private Long id;
 
     //근무 날짜
+    @Column(name = "work_date")
     private LocalDate workDate;
 
     //근무 유형
     @Enumerated(EnumType.STRING)
+    @Column(name = "work_time_type")
     private WorkTimeType workTimeType;
 
     //근무표와 매핑
@@ -50,9 +58,11 @@ public class WorkInstance extends BaseTimeEntity {
     }
 
     public static WorkInstance create(WorkCalendar workCalendar, LocalDate date, WorkTimeType type){
-        if(workCalendar == null || date == null || type == null || !workCalendar.contains(date)){
+        if (workCalendar == null)
+            throw new CustomException(WorkCalendarService.WorkCalendarErrorCode.CALENDAR_NOT_FOUND);
+        if (date == null || type == null)
             throw new CustomException(WorkCalendarService.WorkCalendarErrorCode.WORK_INSTANCE_NOT_FOUND);
-        }
+
         return WorkInstance.builder()
                 .workDate(date)
                 .workTimeType(type)

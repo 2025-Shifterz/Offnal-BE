@@ -170,7 +170,7 @@ public @interface ErrorApiResponses {
                                     @ExampleObject(name = "CALENDAR_DUPLICATION", value = """
                                         {
                                           "code": "CALENDAR_DUPLICATION",
-                                          "message": "이미 존재하는 연도/월의 캘린더입니다."
+                                          "message": "이미 존재하는 조직의 캘린더입니다."
                                         }
                                         """),
                                     @ExampleObject(name = "CALENDAR_START_TIME_INVALID", value = """

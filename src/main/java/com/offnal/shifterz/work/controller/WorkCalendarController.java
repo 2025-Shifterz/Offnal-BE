@@ -41,13 +41,13 @@ public class WorkCalendarController {
             description = "사용자의 근무표를 월별로 등록합니다.\n" +
                     "조직명이나 조 이름이 기존과 다르면, 새로운 조직으로 자동 생성됩니다.\n\n" +
                     "✅ 요청 본문에 포함할 수 있는 값:\n" +
+                    "- myTeam: 사용자가 속한 조 이름\n" +
                     "- workTimes: 근무 시간 정보\n" +
                     "  - startTime: 근무 시작 시간\n" +
                     "  - duration: 근무 지속 시간 (HH:mm 형식)\n" +
-                    "  - calendars: 월별 근무 스케줄 목록\n" +
+                    "- calendars: 월별 근무 스케줄 목록\n" +
                     "  - organizationName: 조직 이름\n" +
                     "  - team: 조 이름\n" +
-                    "  - startDate, endDate: 스케줄 기간 (YYYY-MM-DD)\n" +
                     "  - shifts: 날짜별 근무 타입 지정 (D=Day, E=Evening, N=Night, -=Off)"
     )
     @SuccessApiResponses.CreateCalendar
@@ -65,54 +65,50 @@ public class WorkCalendarController {
                             name = "근무표 등록 예시",
                             value = """
                                     {
-                                      "myTeam": "2조",
-                                      "workTimes": {
-                                        "D": {
-                                          "startTime": "08:00",
-                                          "duration": "PT6H30M"
-                                        },
-                                        "E": {
-                                          "startTime": "16:00",
-                                          "duration": "PT6H30M"
-                                        },
-                                        "N": {
-                                          "startTime": "00:00",
-                                          "duration": "PT6H30M"
-                                        }
-                                      },
-                                      "calendars": [
-                                        {
-                                          "organizationName": "병원 1",
-                                          "team": "1조",
-                                          "startDate": "2025-07-01",
-                                          "endDate": "2025-07-07",
-                                          "shifts": {
-                                            "2025-07-01": "E",
-                                            "2025-07-02": "E",
-                                            "2025-07-03": "N",
-                                            "2025-07-04": "-",
-                                            "2025-07-05": "D",
-                                            "2025-07-06": "D",
-                                            "2025-07-07": "-"
-                                          }
-                                        },
-                                        {
-                                          "organizationName": "병원 1",
-                                          "team": "2조",
-                                          "startDate": "2025-07-08",
-                                          "endDate": "2025-07-14",
-                                          "shifts": {
-                                            "2025-07-08": "D",
-                                            "2025-07-09": "D",
-                                            "2025-07-10": "E",
-                                            "2025-07-11": "E",
-                                            "2025-07-12": "N",
-                                            "2025-07-13": "N",
-                                            "2025-07-14": "-"
-                                          }
-                                        }
-                                      ]
-                                    }
+                                       "myTeam": "2조",
+                                       "workTimes": {
+                                         "D": {
+                                           "startTime": "08:00",
+                                           "duration": "PT6H30M"
+                                         },
+                                         "E": {
+                                           "startTime": "16:00",
+                                           "duration": "PT6H30M"
+                                         },
+                                         "N": {
+                                           "startTime": "00:00",
+                                           "duration": "PT6H30M"
+                                         }
+                                       },
+                                       "calendars": [
+                                         {
+                                           "organizationName": "병원 1",
+                                           "team": "1조",
+                                           "shifts": {
+                                             "2025-07-01": "E",
+                                             "2025-07-02": "E",
+                                             "2025-07-03": "N",
+                                             "2025-07-04": "-",
+                                             "2025-07-05": "D",
+                                             "2025-07-06": "D",
+                                             "2025-07-07": "-"
+                                           }
+                                         },
+                                         {
+                                           "organizationName": "병원 1",
+                                           "team": "2조",
+                                           "shifts": {
+                                             "2025-07-08": "D",
+                                             "2025-07-09": "D",
+                                             "2025-07-10": "E",
+                                             "2025-07-11": "E",
+                                             "2025-07-12": "N",
+                                             "2025-07-13": "N",
+                                             "2025-07-14": "-"
+                                           }
+                                         }
+                                       ]
+                                     }
                                     
                                     """
                     )
@@ -161,7 +157,7 @@ public class WorkCalendarController {
     @Operation(
             summary = "월별 근무 조회",
             description = "해당 연도와 월을 기반으로 조직의 근무일정을 조회합니다.\n\n" +
-                    "✅ 요청 파라미터:\n" +
+                    "\n✅ 요청 파라미터:\n" +
                     "- organizationName: 조직 이름 (필수)\n" +
                     "- team: 조 이름 (필수)\n" +
                     "- year: 조회할 연도\n" +

@@ -22,15 +22,6 @@ public class WorkCalendarUnitDto {
     @Schema(description = "조 이름")
     private String team;
 
-    @NotNull(message = "시작일은 필수입니다.")
-    @Schema(description = "시작일")
-    private LocalDate startDate;
-
-
-    @NotNull(message = "종료일은 필수입니다.")
-    @Schema(description = "종료일")
-    private LocalDate endDate;
-
     @Valid
     @NotNull(message = "근무일 정보는 필수입니다.")
     @Schema(description = "근무표(날짜별 근무타입)")
