@@ -41,6 +41,7 @@ public class WorkCalendarController {
             description = "사용자의 근무표를 월별로 등록합니다.\n" +
                     "조직명이나 조 이름이 기존과 다르면, 새로운 조직으로 자동 생성됩니다.\n\n" +
                     "✅ 요청 본문에 포함할 수 있는 값:\n" +
+                    "- myTeam: 사용자가 속한 조 이름\n" +
                     "- workTimes: 근무 시간 정보\n" +
                     "  - startTime: 근무 시작 시간\n" +
                     "  - duration: 근무 지속 시간 (HH:mm 형식)\n" +
