@@ -37,8 +37,6 @@ public class WorkCalendarConverter {
         }
 
         return WorkCalendar.builder()
-                .startDate(unitDto.getStartDate())
-                .endDate(unitDto.getEndDate())
                 .memberId(memberId)
                 .organization(organization)
                 .workTimes(workTimeMap)
@@ -80,8 +78,6 @@ public class WorkCalendarConverter {
     public static WorkCalendarMetaDto toMetaDto(WorkCalendar cal) {
         return WorkCalendarMetaDto.builder()
                 .calendarId(cal.getId())
-                .startDate(cal.startDate())
-                .endDate(cal.endDate())
                 .workTimes(toSymbolKeyWorkTimes(cal))
                 .build();
     }
@@ -89,8 +85,7 @@ public class WorkCalendarConverter {
     public static WorkCalendarListItemDto toListItemDto(WorkCalendar c) {
         return WorkCalendarListItemDto.builder()
                 .calendarId(c.getId())
-                .startDate(c.startDate())
-                .endDate(c.endDate())
+                .workTimes(toSymbolKeyWorkTimes(c))
                 .build();
     }
 
@@ -113,6 +108,15 @@ public class WorkCalendarConverter {
 
         return found;
     }
+
+    public static WorkCalendar emptyCalendar(Long memberId, Organization org, Map<String, WorkTime> defaultWorkTimes) {
+        return WorkCalendar.builder()
+                .memberId(memberId)
+                .organization(org)
+                .workTimes(defaultWorkTimes)
+                .build();
+    }
+
 
     private static Map<String, WorkTimeDto> toSymbolKeyWorkTimes(WorkCalendar cal) {
         return cal.workTimes().values().stream()

@@ -15,35 +15,13 @@ import java.util.Optional;
 
 @Repository
 public interface WorkCalendarRepository extends JpaRepository<WorkCalendar, Long> {
-    boolean existsByMemberIdAndOrganizationAndStartDateAndEndDate(
-            Long memberId, Organization organization, LocalDate startDate, LocalDate  endDate);
-
-    // 캘린더에 포함된 date
-    Optional<WorkCalendar> findByMemberIdAndOrganizationAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
-            Long memberId,Organization organization, LocalDate startDate, LocalDate  endDate);
-
-    // 캘린더에 한쪽이라도 포함된 date
-    Optional<WorkCalendar> findByMemberIdAndOrganizationAndEndDateGreaterThanEqualAndStartDateLessThanEqual(
-            Long memberId, Organization organization,
-            LocalDate startDate, LocalDate endDate
-    );
-
-
-
-    List<WorkCalendar> findByMemberIdAndOrganizationOrderByStartDateDesc(Long memberId, Organization organization);
-    @Query("""
-        select wc
-        from WorkCalendar wc
-        where wc.memberId = :memberId
-          and :date between wc.startDate and wc.endDate
-    """)
-    Optional<WorkCalendar> findByMemberIdAndDate(
-            @Param("memberId") Long memberId,
-            @Param("date") LocalDate date
-    );
-
     Optional<WorkCalendar> findByIdAndMemberIdAndOrganization(Long calendarId, Long memberId, Organization organization);
 
+    boolean existsByMemberIdAndOrganization(Long memberId, Organization organization);
+
+    Optional<WorkCalendar> findByMemberIdAndOrganization(Long memberId, Organization organization);
+
+    List<WorkCalendar> findByMemberIdAndOrganizationOrderByIdDesc(Long memberId, Organization organization);
 
     @Transactional
     @Modifying

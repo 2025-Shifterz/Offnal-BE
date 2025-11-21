@@ -14,7 +14,5 @@ import java.util.Map;
 @AllArgsConstructor
 public class WorkCalendarMetaDto {
     private Long calendarId;
-    private LocalDate startDate;
-    private LocalDate endDate;
     private Map<String, WorkTimeDto> workTimes;
 }

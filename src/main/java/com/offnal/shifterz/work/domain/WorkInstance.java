@@ -50,9 +50,11 @@ public class WorkInstance extends BaseTimeEntity {
     }
 
     public static WorkInstance create(WorkCalendar workCalendar, LocalDate date, WorkTimeType type){
-        if(workCalendar == null || date == null || type == null || !workCalendar.contains(date)){
+        if (workCalendar == null)
+            throw new CustomException(WorkCalendarService.WorkCalendarErrorCode.CALENDAR_NOT_FOUND);
+        if (date == null || type == null)
             throw new CustomException(WorkCalendarService.WorkCalendarErrorCode.WORK_INSTANCE_NOT_FOUND);
-        }
+
         return WorkInstance.builder()
                 .workDate(date)
                 .workTimeType(type)

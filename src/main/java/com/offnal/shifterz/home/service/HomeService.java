@@ -6,10 +6,13 @@ import com.offnal.shifterz.home.converter.WorkScheduleContextConverter;
 import com.offnal.shifterz.home.dto.DailyRoutineResDto;
 import com.offnal.shifterz.home.dto.WorkScheduleContext;
 import com.offnal.shifterz.home.dto.WorkScheduleResponseDto;
+import com.offnal.shifterz.work.converter.WorkCalendarConverter;
 import com.offnal.shifterz.work.domain.WorkCalendar;
+import com.offnal.shifterz.work.domain.WorkInstance;
 import com.offnal.shifterz.work.domain.WorkTime;
 import com.offnal.shifterz.work.domain.WorkTimeType;
 import com.offnal.shifterz.work.repository.WorkCalendarRepository;
+import com.offnal.shifterz.work.repository.WorkInstanceRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ public class HomeService {
     private final DailyRoutineService dailyRoutineService;
     private final WorkCalendarRepository workCalendarRepository;
     private final WorkScheduleContextConverter contextConverter;
+    private final WorkInstanceRepository workInstanceRepository;
 
     @Transactional(readOnly = true)
     public WorkScheduleResponseDto getWorkSchedule() {
@@ -37,14 +41,15 @@ public class HomeService {
         WorkTimeType todayType = workScheduleService.findWorkType(today, memberId);
         WorkTimeType tomorrowType = workScheduleService.findWorkType(today.plusDays(1), memberId);
 
-        WorkCalendar workCalendar = workCalendarRepository
-                .findByMemberIdAndDate(memberId, today)
-                .orElse(null);
+
+        WorkInstance todayInstance =
+                workInstanceRepository.findByWorkCalendarMemberIdAndWorkDate(memberId, today)
+                        .orElse(null);
 
         WorkTime workTime = null;
 
-        if (workCalendar != null && todayType != null) {
-            workTime = workCalendar.workTimes().get(todayType.getSymbol());
+        if (todayInstance != null) {
+            workTime = WorkCalendarConverter.resolveWorkTimeFor(todayInstance);
         }
 
         WorkScheduleContext context = contextConverter.toContext(
