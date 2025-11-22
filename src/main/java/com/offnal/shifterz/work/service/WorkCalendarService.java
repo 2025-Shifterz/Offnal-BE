@@ -429,21 +429,22 @@ public class WorkCalendarService {
     }
 
     private void saveMyTeam(Member member, @Valid WorkCalendarRequestDto workCalendarRequestDto, String myTeam) {
+        if (myTeam == null || myTeam.isBlank()) {
+            return;
+        }
         Long memberId = member.getId();
 
-        Set<String> organizationNames = workCalendarRequestDto.getCalendars().stream()
-                .map(WorkCalendarUnitDto::getOrganizationName)
-                .collect(Collectors.toSet());
+        String organizationName = workCalendarRequestDto.getCalendars().get(0).getOrganizationName();
 
-        for (String orgName : organizationNames) {
+        Organization myTeamOrg = organizationRepository
+                .findByOrganizationMember_IdAndOrganizationNameAndTeam(
+                        memberId,
+                        organizationName,
+                        myTeam
+                )
+                .orElseThrow(() -> new CustomException(OrganizationService.OrganizationErrorCode.ORGANIZATION_NOT_FOUND));
 
-            List<Organization> orgList =
-                    organizationRepository.findAllByOrganizationMember_IdAndOrganizationName(memberId, orgName);
-
-            if (!orgList.isEmpty() && myTeam != null && !myTeam.isBlank()) {
-                myTeamService.saveOrUpdateMyTeam(member, orgList.get(0), myTeam);
-            }
-        }
+        myTeamService.saveOrUpdateMyTeam(member, myTeamOrg, myTeam);
     }
 
     private void saveWorkInstances(WorkCalendarUnitDto unitDto, WorkCalendar calendar) {

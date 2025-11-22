@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface MemberOrganizationTeamRepository
         extends JpaRepository<MemberOrganizationTeam, Long> {
+    Optional<MemberOrganizationTeam> findByMemberId(Long memberId);
 
     Optional<MemberOrganizationTeam> findByMemberAndOrganization(Member member, Organization organization);
     @Query("""
@@ -25,6 +26,9 @@ public interface MemberOrganizationTeamRepository
             @Param("memberId") Long memberId,
             @Param("organizationName") String organizationName
     );
+
+    Optional<MemberOrganizationTeam> findByMemberIdAndTeam(Long memberId, String team);
+
     void deleteAllByMemberId(Long memberId);
     void deleteAllByOrganization(Organization organization);
 }
