@@ -65,8 +65,31 @@ public interface WorkInstanceRepository extends JpaRepository<WorkInstance, Long
             @Param("endDate") LocalDate endDate
     );
 
-    boolean existsByWorkCalendarMemberIdAndWorkDateAndWorkTimeType(
-            Long memberId, LocalDate date, WorkTimeType type);
+    Optional<WorkInstance> findByWorkCalendarOrganizationAndWorkDate(Organization organization, LocalDate date);
 
+
+    @Query("""
+    SELECT wi.workTimeType
+    FROM WorkInstance wi
+    WHERE wi.workDate = :date
+      AND wi.workCalendar.memberId = :memberId
+      AND wi.workCalendar.organization = :organization
+""")
+    Optional<WorkTimeType> findTypeByDateAndMemberAndOrganization(
+            @Param("date") LocalDate date,
+            @Param("memberId") Long memberId,
+            @Param("organization") Organization organization
+    );
+
+    @Query("""
+    SELECT wi FROM WorkInstance wi
+    WHERE wi.workDate = :date
+      AND wi.workCalendar.memberId= :memberId
+      AND wi.workCalendar.organization = :organization
+""")
+    Optional<WorkInstance> findByWorkDateAndMemberIdAndOrganization(
+            @Param("date") LocalDate date,
+            @Param("memberId") Long memberId,
+            @Param("organization") Organization organization);
 
 }
