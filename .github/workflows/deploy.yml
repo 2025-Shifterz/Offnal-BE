@@ -1,8 +1,10 @@
 name: Blue-Green Deploy with Docker Hub
 on:
-  push:
-    branches: [ "main" ]
-
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
 env:
   IMAGE_TAG: ${{ github.sha }}
 
