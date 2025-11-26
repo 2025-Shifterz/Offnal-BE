@@ -68,7 +68,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "docker-compose.yml,nginx"
-          target: "/home/ubuntu/offnal-be"
+          target: "/home/ubuntu/Offnal-BE"
 
       - name: Blue-Green Deploy on EC2
         uses: appleboy/ssh-action@v1.0.3
