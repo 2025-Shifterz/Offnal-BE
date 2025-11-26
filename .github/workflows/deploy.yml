@@ -106,7 +106,8 @@ jobs:
             docker pull $NEW_IMAGE
             
             echo "Step 2: Start $NEW_SERVICE"
-            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} IMAGE_TAG=${IMAGE_TAG} docker compose up -d $NEW_SERVICE
+            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} IMAGE_TAG=${IMAGE_TAG} 
+            sudo docker-compose up -d --build $NEW_SERVICE
             
             echo "Step 3: Health Check"
             HEALTH_CHECK_PASSED=false
@@ -122,9 +123,9 @@ jobs:
             
             if [ "$HEALTH_CHECK_PASSED" = false ]; then
               echo "Health check failed! Rolling back..."
-              docker compose logs $NEW_SERVICE --tail=100
-              docker compose stop $NEW_SERVICE
-              docker compose rm -f $NEW_SERVICE
+              sudo docker-compose logs $NEW_SERVICE --tail=100
+              sudo docker-compose stop $NEW_SERVICE
+              sudo docker-compose rm -f $NEW_SERVICE
               exit 1
             fi
             
@@ -135,8 +136,8 @@ jobs:
               sed -i 's/server spring_blue:8080/server spring_green:8081/g' nginx/conf.d/default.conf
             fi
             
-            if docker compose exec nginx nginx -t; then
-              docker compose exec nginx nginx -s reload
+            if sudo docker-compose exec nginx nginx -t; then
+              sudo docker-compose exec nginx nginx -s reload
               echo "Nginx reloaded"
             else
               echo " Nginx config failed! Rolling back..."
@@ -145,14 +146,14 @@ jobs:
               else
                 sed -i 's/server spring_green:8081/server spring_blue:8080/g' nginx/conf.d/default.conf
               fi
-              docker compose stop $NEW_SERVICE
+              sudo docker-compose stop $NEW_SERVICE
               exit 1
             fi
             
             echo "Step 5: Stop $CURRENT_SERVICE"
             sleep 10
-            docker compose stop $CURRENT_SERVICE || true
-            docker compose rm -f $CURRENT_SERVICE || true
+            sudo docker-compose stop $CURRENT_SERVICE || true
+            sudo docker-compose rm -f $CURRENT_SERVICE || true
             
             echo "Step 6: Cleanup old images"
             docker image prune -af --filter "until=48h"
