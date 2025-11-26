@@ -106,6 +106,9 @@ jobs:
             docker pull $NEW_IMAGE
             
             echo "Step 2: Start $NEW_SERVICE"
+            sudo docker-compose stop $NEW_SERVICE || true
+            sudo docker-compose rm -f $NEW_SERVICE || true
+            docker pull $NEW_IMAGE
             DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} IMAGE_TAG=${IMAGE_TAG} 
             sudo docker-compose up -d --build $NEW_SERVICE
             
