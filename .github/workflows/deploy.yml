@@ -83,7 +83,7 @@ jobs:
             
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             
-            NEW_IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/Offnal-BE:${IMAGE_TAG}"
+            NEW_IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/offnal-be:${IMAGE_TAG}"
             echo "===== Deploying image: $NEW_IMAGE ====="
             
             if grep -q "server spring_blue:8080" nginx/conf.d/default.conf; then
