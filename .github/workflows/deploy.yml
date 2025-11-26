@@ -86,7 +86,7 @@ jobs:
             NEW_IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/offnal-be:${IMAGE_TAG}"
             echo "===== Deploying image: $NEW_IMAGE ====="
             
-            if grep -q "server spring_blue:8080" nginx/conf.d/offnal.conf; then
+            if grep -q "server spring_blue:8080" Offnal-BE/nginx/conf.d/default.conf; then
               CURRENT_COLOR="blue"
               NEW_COLOR="green"
               NEW_SERVICE="spring_green"
@@ -130,9 +130,9 @@ jobs:
             
             echo "Step 4: Switch Nginx to $NEW_SERVICE"
             if [ "$NEW_COLOR" = "blue" ]; then
-              sed -i 's/server spring_green:8081/server spring_blue:8080/g' nginx/conf.d/offnal.conf
+              sed -i 's/server spring_green:8081/server spring_blue:8080/g' Offnal-BE/nginx/conf.d/default.conf
             else
-              sed -i 's/server spring_blue:8080/server spring_green:8081/g' nginx/conf.d/offnal.conf
+              sed -i 's/server spring_blue:8080/server spring_green:8081/g' Offnal-BE/nginx/conf.d/default.conf
             fi
             
             if docker compose exec nginx nginx -t; then
@@ -141,9 +141,9 @@ jobs:
             else
               echo " Nginx config failed! Rolling back..."
               if [ "$NEW_COLOR" = "blue" ]; then
-                sed -i 's/server spring_blue:8080/server spring_green:8081/g' nginx/conf.d/offnal.conf
+                sed -i 's/server spring_blue:8080/server spring_green:8081/g' Offnal-BE/nginx/conf.d/default.conf
               else
-                sed -i 's/server spring_green:8081/server spring_blue:8080/g' nginx/conf.d/offnal.conf
+                sed -i 's/server spring_green:8081/server spring_blue:8080/g' Offnal-BE/nginx/conf.d/default.conf
               fi
               docker compose stop $NEW_SERVICE
               exit 1
@@ -162,4 +162,4 @@ jobs:
             docker ps --filter "name=spring"
             echo ""
             echo "Nginx upstream:"
-            grep "server spring_" nginx/conf.d/offnal.conf | head -1
+            grep "server spring_" Offnal-BE/nginx/conf.d/default.conf | head -1
