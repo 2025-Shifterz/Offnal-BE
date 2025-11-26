@@ -148,12 +148,16 @@ jobs:
             fi
 
             echo "Step 4: Switch Nginx to $NEW_SERVICE"
+
+            sudo docker-compose up -d nginx
+
             if [ "$NEW_COLOR" = "blue" ]; then
               sed -i 's/server spring_green:8080/server spring_blue:8080/g' nginx/conf.d/default.conf
             else
               sed -i 's/server spring_blue:8080/server spring_green:8080/g' nginx/conf.d/default.conf
             fi
 
+            # 이제 Nginx가 확실히 켜져 있으므로 exec 명령어가 먹힘
             if sudo docker-compose exec nginx nginx -t; then
               sudo docker-compose exec nginx nginx -s reload
               echo "Nginx reloaded"
