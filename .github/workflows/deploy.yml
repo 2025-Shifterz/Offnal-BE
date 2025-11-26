@@ -1,19 +1,37 @@
 name: Blue-Green Deploy with Docker Hub
+
 on:
   pull_request:
     branches:
       - main
     types:
       - closed
+  push:
+    branches:
+      - main
+
 env:
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build-and-push:
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build Spring Boot Jar
+        run: ./gradlew clean bootJar
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -36,6 +54,7 @@ jobs:
           cache-to: type=inline
 
   deploy:
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
@@ -62,14 +81,11 @@ jobs:
             set -e
             cd /home/ubuntu/offnal-be
             
-            # Docker Hub 로그인
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             
-            # 새 이미지 정보
             NEW_IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/offnal-be:${IMAGE_TAG}"
             echo "===== Deploying image: $NEW_IMAGE ====="
             
-            # 현재 활성 환경 감지
             if grep -q "server spring_blue:8080" nginx/conf.d/offnal.conf; then
               CURRENT_COLOR="blue"
               NEW_COLOR="green"
@@ -86,28 +102,24 @@ jobs:
             
             echo "Current: $CURRENT_COLOR → New: $NEW_COLOR"
             
-            # 새 이미지 Pull
             echo "Step 1: Pull new image"
             docker pull $NEW_IMAGE
             
-            # 컨테이너 시작
             echo "Step 2: Start $NEW_SERVICE"
             DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} IMAGE_TAG=${IMAGE_TAG} docker compose up -d $NEW_SERVICE
             
-            # Health Check
             echo "Step 3: Health Check"
             HEALTH_CHECK_PASSED=false
             for i in {1..20}; do
               echo "  Checking $i/20..."
               sleep 3
               if curl -f http://localhost:${NEW_PORT}/actuator/health > /dev/null 2>&1; then
-                echo "$NEW_SERVICE is healthy!"
+                echo "$NEW_SERVICE is healthy"
                 HEALTH_CHECK_PASSED=true
                 break
               fi
             done
             
-            # Health Check 실패 시 롤백
             if [ "$HEALTH_CHECK_PASSED" = false ]; then
               echo "Health check failed! Rolling back..."
               docker compose logs $NEW_SERVICE --tail=100
@@ -116,7 +128,6 @@ jobs:
               exit 1
             fi
             
-            # Nginx 전환
             echo "Step 4: Switch Nginx to $NEW_SERVICE"
             if [ "$NEW_COLOR" = "blue" ]; then
               sed -i 's/server spring_green:8081/server spring_blue:8080/g' nginx/conf.d/offnal.conf
@@ -124,12 +135,11 @@ jobs:
               sed -i 's/server spring_blue:8080/server spring_green:8081/g' nginx/conf.d/offnal.conf
             fi
             
-            # Nginx 재로드
             if docker compose exec nginx nginx -t; then
               docker compose exec nginx nginx -s reload
               echo "Nginx reloaded"
             else
-              echo "Nginx config failed! Rolling back..."
+              echo " Nginx config failed! Rolling back..."
               if [ "$NEW_COLOR" = "blue" ]; then
                 sed -i 's/server spring_blue:8080/server spring_green:8081/g' nginx/conf.d/offnal.conf
               else
@@ -139,17 +149,15 @@ jobs:
               exit 1
             fi
             
-            # 기존 서비스 종료
             echo "Step 5: Stop $CURRENT_SERVICE"
             sleep 10
             docker compose stop $CURRENT_SERVICE || true
             docker compose rm -f $CURRENT_SERVICE || true
             
-            # 정리
             echo "Step 6: Cleanup old images"
             docker image prune -af --filter "until=48h"
             
-            echo "=====Deployment Completed ====="
+            echo "===== Deployment Completed ====="
             echo "Active: $NEW_SERVICE with image $NEW_IMAGE"
             docker ps --filter "name=spring"
             echo ""
