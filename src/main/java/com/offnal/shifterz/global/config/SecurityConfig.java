@@ -40,7 +40,9 @@ public class SecurityConfig {
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
-                                        "/error").permitAll()
+                                        "/error",
+                                        "/actuator/health", 
+                                        "/actuator/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
