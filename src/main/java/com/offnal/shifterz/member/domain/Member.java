@@ -37,11 +37,14 @@ public class Member extends BaseTimeEntity {
 
     private String profileImageKey;
 
+    private String appleRefreshToken;
+
     public void updateMemberInfo(String memberName, String profileImageKey) {
         this.memberName = memberName;
         this.profileImageKey = profileImageKey;
 
     }
-
-
+    public void updateAppleRefreshToken(String token) {
+        this.appleRefreshToken = token;
+    }
 }
