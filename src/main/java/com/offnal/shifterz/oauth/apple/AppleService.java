@@ -66,8 +66,6 @@ public class AppleService implements AppleSocialService {
     private long lastFetchTime = 0L;
 
 
-    /* --------------------- 1) identityToken 검증 --------------------- */
-
     @Override
     public AppleUserInfoResponseDto getUserInfoFromIdentityToken(AppleLoginRequest request) {
 
@@ -102,8 +100,6 @@ public class AppleService implements AppleSocialService {
         }
     }
 
-
-    /* --------------------- JWKS 공개키 로딩 --------------------- */
 
     private PublicKey getApplePublicKey(String kid) {
         try {
@@ -149,7 +145,6 @@ public class AppleService implements AppleSocialService {
     }
 
 
-    /* --------------------- 2) AuthorizationCode → AppleToken 교환 --------------------- */
 
     public AppleAuthTokenResponse exchangeAuthorizationCode(String authorizationCode) {
 
@@ -172,7 +167,6 @@ public class AppleService implements AppleSocialService {
                         String.class
                 );
 
-        log.info("🍎 [Apple Token RAW] {}", rawResponse.getBody());
 
         if (!rawResponse.getStatusCode().is2xxSuccessful()) {
             throw new CustomException(AppleErrorCode.APPLE_TOKEN_EXCHANGE_FAIL);
@@ -185,7 +179,6 @@ public class AppleService implements AppleSocialService {
                     AppleAuthTokenResponse.class
             );
 
-            log.info("🍏 [Apple refresh_token] {}", token.getRefreshToken());
             return token;
 
         } catch (Exception e) {
@@ -197,12 +190,10 @@ public class AppleService implements AppleSocialService {
 
 
     private String createClientSecret() {
-        log.info("=== [Apple] createClientSecret() ENTER ===");
 
         try {
             String keyPath = appleProperties.privateKeyPath();
 
-            log.info("[Apple] privateKeyPath property = {}", keyPath);
 
             String privateKeyPem;
 
@@ -210,13 +201,10 @@ public class AppleService implements AppleSocialService {
 
                 Resource resource = resourceLoader.getResource(keyPath);
                 privateKeyPem = new String(resource.getInputStream().readAllBytes());
-                log.info("[Apple] Loaded private key from classpath");
             } else {
 
                 Path path = Paths.get(keyPath);
-                log.info("[Apple] Attempting to read file from: {}", path.toAbsolutePath());
                 privateKeyPem = Files.readString(path);
-                log.info("[Apple] Loaded private key from filesystem");
             }
 
             privateKeyPem = privateKeyPem
@@ -247,12 +235,10 @@ public class AppleService implements AppleSocialService {
         }
     }
 
-    /* --------------------- 4) Revoke --------------------- */
 
     public void revoke(Member member) {
 
         if (member.getAppleRefreshToken() == null) {
-            log.warn("[Apple Revoke] refresh_token 없음, skip");
             return;
         }
 

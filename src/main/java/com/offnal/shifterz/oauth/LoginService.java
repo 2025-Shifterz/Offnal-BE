@@ -44,14 +44,11 @@ public class LoginService {
 
     public AuthResponseDto loginWithAppleNative(AppleLoginRequest request) {
 
-        // 1) identityToken 검증 → Apple User Info 획득
         AppleUserInfoResponseDto userInfo = appleService.getUserInfoFromIdentityToken(request);
 
-        // 2) authorizationCode → Apple refresh_token 발급
         AppleAuthTokenResponse appleToken =
                 appleService.exchangeAuthorizationCode(request.getAuthorizationCode());
-        log.info("🔍 [Login Stage] refresh_token = {}", appleToken.getRefreshToken());
-        // 3) handleAppleLogin 에 refresh_token 도 넘김
+
         return handleAppleLogin(userInfo, request, appleToken);
     }
 
