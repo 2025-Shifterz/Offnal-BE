@@ -113,9 +113,6 @@ jobs:
 
             echo "CURRENT=$CURRENT_COLOR, NEW=$NEW_COLOR"
 
-            echo "IMAGE_TAG=${IMAGE_TAG}" > .env
-            echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
-
             docker pull $NEW_IMAGE
 
             sudo docker-compose stop $NEW_SERVICE || true
