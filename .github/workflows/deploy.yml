@@ -110,7 +110,7 @@ jobs:
               CURRENT_COLOR="green"
               NEW_COLOR="blue"
               NEW_SERVICE="spring_blue"
-              NEW_PORT=8080"
+              NEW_PORT=8080
               CURRENT_SERVICE="spring_green"
             fi
  
