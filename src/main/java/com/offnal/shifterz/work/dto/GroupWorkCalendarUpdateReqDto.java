@@ -14,7 +14,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class GroupWorkCalendarUpdateReqDto {
     @NotNull
-    private final List<GroupUnit> calendars;
+    private List<GroupUnit> calendars;
 
     @Getter
     @Builder
@@ -22,9 +22,9 @@ public class GroupWorkCalendarUpdateReqDto {
     public static class GroupUnit {
 
         @NotNull
-        private final String team;
+        private String team;
 
         @NotNull
-        private final Map<LocalDate, String> shifts;
+        private Map<LocalDate, String> shifts;
     }
 }

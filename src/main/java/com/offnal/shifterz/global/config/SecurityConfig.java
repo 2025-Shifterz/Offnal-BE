@@ -41,10 +41,8 @@ public class SecurityConfig {
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         "/error",
-                                        "/actuator/health",     // ← 추가!
-                                        "/actuator/**"
-
-                                ).permitAll()
+                                        "/actuator/health",
+                                        "/actuator/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)

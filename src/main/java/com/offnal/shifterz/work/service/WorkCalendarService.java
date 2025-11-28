@@ -31,10 +31,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,6 +134,24 @@ public class WorkCalendarService {
                     .filter(o -> o.getTeam().equals(team))
                     .toList();
 
+            if (targetOrgs.isEmpty()) {
+
+                Organization newOrg = organizationService.
+                        getOrCreateByMemberAndNameAndTeam(organizationName, team);
+
+                // 사용자의 기존 workTime 가져옴
+                Map<String, WorkTime> defaultWorkTimes =
+                        getDefaultWorkTimes(memberId, organizationName);
+
+                WorkCalendar newCalendar = workCalendarRepository.save(
+                        WorkCalendarConverter.emptyCalendar(memberId, newOrg, defaultWorkTimes)
+                );
+
+                saveWorkInstancesFromShifts(newCalendar, shifts);
+                
+                continue;
+            }
+
             for (Organization org : targetOrgs) {
 
                 LocalDate minDay = extractMinDate(shifts);
@@ -148,6 +163,44 @@ public class WorkCalendarService {
                 upsertInstances(calendar, memberId, org, shifts, existingMap);
             }
         }
+    }
+
+    private Map<String, WorkTime> getDefaultWorkTimes(Long memberId, String organizationName) {
+        List<Organization> orgs = findOrganizationsWithSameName(memberId, organizationName);
+
+        for (Organization org : orgs) {
+            Optional<WorkCalendar> calendar =
+                    workCalendarRepository.findByMemberIdAndOrganization(memberId, org);
+
+            if (calendar.isPresent()) {
+                WorkCalendar cal = calendar.get();
+
+                return cal.workTimes().entrySet().stream()
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                e -> WorkTime.builder()
+                                        .timeType(e.getValue().getTimeType())
+                                        .startTime(e.getValue().getStartTime())
+                                        .duration(e.getValue().getDuration())
+                                        .build()
+                        ));
+            }
+        }
+
+        // 없을 때
+        throw new CustomException(WorkCalendarErrorCode.CALENDAR_NOT_FOUND);
+    }
+
+    private void saveWorkInstancesFromShifts(WorkCalendar calendar, Map<LocalDate, String> shifts) {
+        List<WorkInstance> list = shifts.entrySet().stream()
+                .map(e -> WorkInstance.create(
+                        calendar,
+                        e.getKey(),
+                        WorkTimeType.fromSymbol(e.getValue())
+                ))
+                .toList();
+
+        workInstanceRepository.saveAll(list);
     }
 
     // 근무 시간 수정

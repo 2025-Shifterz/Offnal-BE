@@ -2,13 +2,10 @@ name: Blue-Green Deploy with Docker Hub
 
 on:
   pull_request:
-    branches:
-      - main
-    types:
-      - closed
+    branches: [ main ]
+    types: [ closed ]
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 env:
   IMAGE_TAG: ${{ github.sha }}
@@ -17,58 +14,72 @@ jobs:
   build-and-push:
     if: github.event_name == 'push' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: 17
+          distribution: temurin
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+      - name: Build Jar
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean bootJar --no-daemon
 
-      - name: Build Spring Boot Jar
-        run: ./gradlew clean bootJar
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and Push Docker Image
+          
+      - name: Build & Push Docker Image
         uses: docker/build-push-action@v4
         with:
           context: .
+          file: Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/offnal-be:${{ env.IMAGE_TAG }}
             ${{ secrets.DOCKERHUB_USERNAME }}/offnal-be:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/offnal-be:latest
-          cache-to: type=inline
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
 
   deploy:
     if: github.event_name == 'push' || github.event.pull_request.merged == true
     needs: build-and-push
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Upload docker-compose to EC2
+      - name: Upload docker-compose and nginx folder to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "docker-compose.yml,nginx"
-          target: "/home/ubuntu/offnal-be"
+          target: "/home/ubuntu/Offnal-BE"
 
       - name: Blue-Green Deploy on EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -79,14 +90,17 @@ jobs:
           envs: IMAGE_TAG
           script: |
             set -e
-            cd /home/ubuntu/offnal-be
-            
+            cd /home/ubuntu/Offnal-BE
+
+            # Docker Hub login
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-            
-            NEW_IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/offnal-be:${IMAGE_TAG}"
-            echo "===== Deploying image: $NEW_IMAGE ====="
-            
-            if grep -q "server spring_blue:8080" nginx/conf.d/offnal.conf; then
+
+            NEW_IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/offnal-be:latest"
+            echo "===== Deploying $NEW_IMAGE ====="
+
+            docker pull $NEW_IMAGE
+
+            if grep -q "server spring_blue:8080" nginx/conf.d/default.conf; then
               CURRENT_COLOR="blue"
               NEW_COLOR="green"
               NEW_SERVICE="spring_green"
@@ -99,67 +113,55 @@ jobs:
               NEW_PORT=8080
               CURRENT_SERVICE="spring_green"
             fi
-            
-            echo "Current: $CURRENT_COLOR → New: $NEW_COLOR"
-            
-            echo "Step 1: Pull new image"
-            docker pull $NEW_IMAGE
-            
-            echo "Step 2: Start $NEW_SERVICE"
-            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} IMAGE_TAG=${IMAGE_TAG} docker compose up -d $NEW_SERVICE
-            
-            echo "Step 3: Health Check"
-            HEALTH_CHECK_PASSED=false
-            for i in {1..20}; do
-              echo "  Checking $i/20..."
+ 
+            echo "CURRENT=$CURRENT_COLOR, NEW=$NEW_COLOR"
+
+            sudo docker-compose stop $NEW_SERVICE || true
+            sudo docker-compose rm -f $NEW_SERVICE || true
+
+            sudo docker-compose up -d redis
+            sudo docker-compose up -d $NEW_SERVICE
+
+            echo "Health Check..."
+            HEALTH=false
+            for i in {1..40}; do
               sleep 3
               if curl -f http://localhost:${NEW_PORT}/actuator/health > /dev/null 2>&1; then
-                echo "$NEW_SERVICE is healthy"
-                HEALTH_CHECK_PASSED=true
+                echo "Health OK"
+                HEALTH=true
                 break
               fi
             done
-            
-            if [ "$HEALTH_CHECK_PASSED" = false ]; then
-              echo "Health check failed! Rolling back..."
-              docker compose logs $NEW_SERVICE --tail=100
-              docker compose stop $NEW_SERVICE
-              docker compose rm -f $NEW_SERVICE
+
+            if [ "$HEALTH" = false ]; then
+              echo "Health Check Failed. Rollback."
+              sudo docker-compose logs $NEW_SERVICE --tail=100
+              sudo docker-compose stop $NEW_SERVICE
+              sudo docker-compose rm -f $NEW_SERVICE
               exit 1
             fi
-            
-            echo "Step 4: Switch Nginx to $NEW_SERVICE"
+
+            sudo docker-compose up -d nginx
+
             if [ "$NEW_COLOR" = "blue" ]; then
-              sed -i 's/server spring_green:8081/server spring_blue:8080/g' nginx/conf.d/offnal.conf
+              sed -i 's/server spring_green:8080/server spring_blue:8080/g' nginx/conf.d/default.conf
             else
-              sed -i 's/server spring_blue:8080/server spring_green:8081/g' nginx/conf.d/offnal.conf
+              sed -i 's/server spring_blue:8080/server spring_green:8080/g' nginx/conf.d/default.conf
             fi
-            
-            if docker compose exec nginx nginx -t; then
-              docker compose exec nginx nginx -s reload
-              echo "Nginx reloaded"
+
+            if sudo docker-compose exec nginx nginx -t; then
+              sudo docker-compose exec nginx nginx -s reload
+              echo "Nginx Reloaded"
             else
-              echo " Nginx config failed! Rolling back..."
-              if [ "$NEW_COLOR" = "blue" ]; then
-                sed -i 's/server spring_blue:8080/server spring_green:8081/g' nginx/conf.d/offnal.conf
-              else
-                sed -i 's/server spring_green:8081/server spring_blue:8080/g' nginx/conf.d/offnal.conf
-              fi
-              docker compose stop $NEW_SERVICE
+              echo "Nginx Failed. Rolling back..."
               exit 1
             fi
-            
-            echo "Step 5: Stop $CURRENT_SERVICE"
-            sleep 10
-            docker compose stop $CURRENT_SERVICE || true
-            docker compose rm -f $CURRENT_SERVICE || true
-            
-            echo "Step 6: Cleanup old images"
-            docker image prune -af --filter "until=48h"
-            
-            echo "===== Deployment Completed ====="
-            echo "Active: $NEW_SERVICE with image $NEW_IMAGE"
-            docker ps --filter "name=spring"
-            echo ""
-            echo "Nginx upstream:"
-            grep "server spring_" nginx/conf.d/offnal.conf | head -1
+
+            sleep 5
+            sudo docker-compose stop $CURRENT_SERVICE
+            sudo docker-compose rm -f $CURRENT_SERVICE
+
+            sleep 5
+            sudo docker-compose stop $CURRENT_SERVICE
+            sudo docker-compose rm -f $CURRENT_SERVICE
+

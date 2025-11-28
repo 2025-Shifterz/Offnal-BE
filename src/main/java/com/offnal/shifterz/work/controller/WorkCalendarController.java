@@ -311,12 +311,16 @@ public class WorkCalendarController {
     @Operation(summary = "단체 근무 일정 수정",
             description = """
                 같은 조직명(organizationName)을 가진 모든 팀(또는 특정 team)에 대해 날짜별 근무 타입을 수정합니다.
+                ### 📌 기능 설명
+                - 요청에 포함된 각 팀(team)에 대해 제출된 날짜별 근무 타입(shifts)을 기반으로 일정을 수정합니다.
+                - 해당 팀의 캘린더가 이미 존재하면 기존 일정이 **수정(upsert)** 됩니다.
+                - 해당 팀의 캘린더가 **존재하지 않는 경우**, 새로운 조직·캘린더가 생성된 뒤 근무 일정이 등록됩니다. \s
+                  (단, 같은 organizationName을 가진 캘린더가 없으면 생성이 불가능합니다.)
 
+                ### 📌 요청 필드
                 - organizationName: 필수
                 - team: 필수
                 - shifts: 날짜별 근무 타입(E/D/N/-)
-
-                기존 일정이 있으면 수정, 없으면 새로 생성(upsert)
                 """)
     @SuccessApiResponses.UpdateCalendar
     @ErrorApiResponses.Common
