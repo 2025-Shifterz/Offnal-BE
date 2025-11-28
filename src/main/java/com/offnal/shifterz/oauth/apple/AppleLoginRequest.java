@@ -13,6 +13,9 @@ public class AppleLoginRequest {
     @Schema(description = "iOS 네이티브 로그인에서 받은 identityToken(JWT)", required = true)
     private String identityToken;
 
+    @Schema(description = "Authorization Code", required = true)
+    private String authorizationCode;
+
     @Schema(description = "Apple 고유 사용자 ID (user identifier)")
     private String user;
 

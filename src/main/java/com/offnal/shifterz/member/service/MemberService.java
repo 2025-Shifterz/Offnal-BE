@@ -17,6 +17,7 @@ import com.offnal.shifterz.member.dto.MemberResponseDto;
 import com.offnal.shifterz.member.repository.MemberRepository;
 import com.offnal.shifterz.memberOrganizationTeam.repository.MemberOrganizationTeamRepository;
 import com.offnal.shifterz.memo.repository.MemoRepository;
+import com.offnal.shifterz.oauth.apple.AppleService;
 import com.offnal.shifterz.organization.repository.OrganizationRepository;
 import com.offnal.shifterz.todo.repository.TodoRepository;
 import com.offnal.shifterz.work.repository.WorkCalendarRepository;
@@ -41,6 +42,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final S3Service s3Service;
+    private final AppleService appleService;
     private final MemoRepository memoRepository;
     private final TodoRepository todoRepository;
     private final OrganizationRepository organizationRepository;
@@ -67,26 +69,38 @@ public class MemberService {
             String email,
             String memberName,
             String phoneNumber,
-            String socialProfileImageUrl
+            String socialProfileImageUrl,
+            String appleRefreshToken
     ) {
         Optional<Member> existingMember = memberRepository.findByProviderAndProviderId(provider, providerId);
 
         if (existingMember.isPresent()) {
-            // 기존 회원 정보 유지
-            return MemberConverter.toRegisterResponse(existingMember.get(), false);
+            Member member = existingMember.get();
+
+            // ★ 기존 회원이어도 refresh_token 새로 받으면 업데이트
+            if (provider == Provider.APPLE && appleRefreshToken != null) {
+                member.updateAppleRefreshToken(appleRefreshToken);
+            }
+
+            return MemberConverter.toRegisterResponse(member, false);
         } else {
-            // 신규 회원 등록
+
+            // 신규 회원 생성
             Member newMember = Member.builder()
                     .provider(provider)
                     .providerId(providerId)
                     .email(email)
                     .memberName(memberName)
                     .phoneNumber(phoneNumber)
+                    .appleRefreshToken(
+                            provider == Provider.APPLE ? appleRefreshToken : null
+                    ) // ★ 신규 회원도 refresh_token 저장
                     .profileImageKey(null)
                     .build();
 
             Member savedMember = memberRepository.save(newMember);
 
+            // 프로필 이미지 저장
             if (socialProfileImageUrl != null && !socialProfileImageUrl.isBlank()) {
                 uploadSocialProfileImage(savedMember, socialProfileImageUrl);
             }
@@ -94,6 +108,7 @@ public class MemberService {
             return MemberConverter.toRegisterResponse(savedMember, true);
         }
     }
+
 
     private void uploadSocialProfileImage(Member member, String socialProfileImageUrl) {
         try{
@@ -160,6 +175,7 @@ public class MemberService {
      */
     @Transactional
     public void withdrawCurrentMember(HttpServletRequest request) {
+
         Long memberId = AuthService.getCurrentUserId();
 
         String anonymized = "deleted_user_" + UUID.randomUUID();
@@ -168,6 +184,9 @@ public class MemberService {
                 .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         try {
+
+            revokeAppleAccountIfNecessary(member);
+
             String profileImageKey = member.getProfileImageKey();
             if (profileImageKey != null && !profileImageKey.isEmpty()) {
                 s3Service.deleteFile(profileImageKey);
@@ -262,6 +281,19 @@ public class MemberService {
                 null
         );
     }
+    private void revokeAppleAccountIfNecessary(Member member) {
+
+        if (member.getProvider() != Provider.APPLE) {
+            return;
+        }
+
+        try {
+            appleService.revoke(member);
+        } catch (Exception ex) {
+            throw new CustomException(MemberErrorCode.MEMBER_WITHDRAW_FAILED);
+        }
+    }
+
 
     @Transactional
     public PresignedUrlResponse generateProfileUploadUrl(String extension){
