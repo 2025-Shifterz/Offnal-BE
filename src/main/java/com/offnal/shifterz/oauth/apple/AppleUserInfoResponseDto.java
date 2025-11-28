@@ -20,7 +20,6 @@ public class AppleUserInfoResponseDto {
     @JsonProperty("is_private_email")
     private Boolean isPrivateEmail;
 
-    // 생성자 추가 (토큰 파싱 후 직접 생성용)
     public AppleUserInfoResponseDto(String sub, String email) {
         this.sub = sub;
         this.email = email;

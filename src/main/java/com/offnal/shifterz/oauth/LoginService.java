@@ -7,6 +7,7 @@ import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.dto.AuthResponseDto;
 import com.offnal.shifterz.member.dto.MemberResponseDto;
 import com.offnal.shifterz.member.service.MemberService;
+import com.offnal.shifterz.oauth.apple.AppleAuthTokenResponse;
 import com.offnal.shifterz.oauth.apple.AppleLoginRequest;
 import com.offnal.shifterz.oauth.apple.AppleService;
 import com.offnal.shifterz.oauth.apple.AppleUserInfoResponseDto;
@@ -15,9 +16,10 @@ import com.offnal.shifterz.oauth.kakao.KakaoUserInfoResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LoginService {
@@ -41,9 +43,18 @@ public class LoginService {
     }
 
     public AuthResponseDto loginWithAppleNative(AppleLoginRequest request) {
+
+        // 1) identityToken 검증 → Apple User Info 획득
         AppleUserInfoResponseDto userInfo = appleService.getUserInfoFromIdentityToken(request);
-        return handleAppleLogin(userInfo, request);
+
+        // 2) authorizationCode → Apple refresh_token 발급
+        AppleAuthTokenResponse appleToken =
+                appleService.exchangeAuthorizationCode(request.getAuthorizationCode());
+        log.info("🔍 [Login Stage] refresh_token = {}", appleToken.getRefreshToken());
+        // 3) handleAppleLogin 에 refresh_token 도 넘김
+        return handleAppleLogin(userInfo, request, appleToken);
     }
+
 
     private AuthResponseDto handleKakaoLogin(KakaoUserInfoResponseDto userInfo) {
         MemberResponseDto.MemberRegisterResponseDto result = memberService.registerMemberIfAbsent(
@@ -52,36 +63,42 @@ public class LoginService {
                 userInfo.getKakaoAccount().getEmail(),
                 userInfo.getKakaoAccount().getProfile().getNickName(),
                 null,
-                userInfo.getKakaoAccount().getProfile().getProfileImageUrl()
-        );
-
-        return issueTokens(result);
-    }
-    private AuthResponseDto handleAppleLogin(AppleUserInfoResponseDto userInfo, AppleLoginRequest request) {
-        // 닉네임은 클라이언트에서 전송한 fullName 사용 (최초 로그인 시에만 제공됨)
-        String nickname = null;
-        if (request.getFullName() != null) {
-            nickname = request.getFullName().getFullName();
-        }
-
-        if (nickname == null || nickname.isBlank()) {
-            nickname = "Apple User";
-        }
-
-        // 이메일도 클라이언트에서 전송한 값 우선 사용
-        String email = request.getEmail() != null ? request.getEmail() : userInfo.getEmail();
-
-        MemberResponseDto.MemberRegisterResponseDto result = memberService.registerMemberIfAbsent(
-                Provider.APPLE,
-                userInfo.getSub(),
-                email,
-                nickname,
-                null,
+                userInfo.getKakaoAccount().getProfile().getProfileImageUrl(),
                 null
         );
 
         return issueTokens(result);
     }
+    private AuthResponseDto handleAppleLogin(
+            AppleUserInfoResponseDto userInfo,
+            AppleLoginRequest request,
+            AppleAuthTokenResponse appleToken
+    ) {
+
+        String nickname = null;
+        if (request.getFullName() != null) {
+            nickname = request.getFullName().getFullName();
+        }
+        if (nickname == null || nickname.isBlank()) {
+            nickname = "Apple User";
+        }
+
+        String email = request.getEmail() != null ? request.getEmail() : userInfo.getEmail();
+
+        MemberResponseDto.MemberRegisterResponseDto result =
+                memberService.registerMemberIfAbsent(
+                        Provider.APPLE,
+                        userInfo.getSub(),
+                        email,
+                        nickname,
+                        null,
+                        null,
+                        appleToken.getRefreshToken()
+                );
+
+        return issueTokens(result);
+    }
+
 
     private AuthResponseDto issueTokens(MemberResponseDto.MemberRegisterResponseDto result) {
         if (result.getId() == null) {
