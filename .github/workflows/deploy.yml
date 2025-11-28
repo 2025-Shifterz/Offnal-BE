@@ -123,7 +123,7 @@ jobs:
 
             echo "Health Check..."
             HEALTH=false
-            for i in {1..20}; do
+            for i in {1..40}; do
               sleep 3
               if curl -f http://localhost:${NEW_PORT}/actuator/health > /dev/null 2>&1; then
                 echo "Health OK"
