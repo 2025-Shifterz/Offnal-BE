@@ -192,20 +192,10 @@ public class AppleService implements AppleSocialService {
     private String createClientSecret() {
 
         try {
+
             String keyPath = appleProperties.privateKeyPath();
 
-
-            String privateKeyPem;
-
-            if (keyPath.startsWith("classpath:")) {
-
-                Resource resource = resourceLoader.getResource(keyPath);
-                privateKeyPem = new String(resource.getInputStream().readAllBytes());
-            } else {
-
-                Path path = Paths.get(keyPath);
-                privateKeyPem = Files.readString(path);
-            }
+            String privateKeyPem = Files.readString(Path.of(keyPath));
 
             privateKeyPem = privateKeyPem
                     .replace("-----BEGIN PRIVATE KEY-----", "")

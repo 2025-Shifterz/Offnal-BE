@@ -15,6 +15,9 @@ services:
       DB_PASSWORD: "${DB_PASSWORD}"
       JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
       KAKAO_CLIENT_ID: "${KAKAO_CLIENT_ID}"
+      APPLE_PRIVATE_KEY_PATH: "/app/keys/apple.p8"
+    volumes:
+      - /home/ubuntu/.secure/apple/AuthKey.p8:/app/keys/apple.p8:ro
     networks:
       - offnal-be_default
       - offnal-network
@@ -33,6 +36,9 @@ services:
       DB_PASSWORD: "${DB_PASSWORD}"
       JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
       KAKAO_CLIENT_ID: "${KAKAO_CLIENT_ID}"
+      APPLE_PRIVATE_KEY_PATH: "/app/keys/apple.p8"
+    volumes:
+      - /home/ubuntu/.secure/apple/AuthKey.p8:/app/keys/apple.p8:ro
     networks:
       - offnal-be_default
       - offnal-network
