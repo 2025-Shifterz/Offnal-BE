@@ -6,6 +6,8 @@ server:
       force: true
 
 spring:
+  profiles:
+    default: local
   jackson:
     time-zone: Asia/Seoul
 
