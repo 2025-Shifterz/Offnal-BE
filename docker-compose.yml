@@ -38,6 +38,7 @@ services:
       JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
       KAKAO_CLIENT_ID: "${KAKAO_CLIENT_ID}"
       APPLE_PRIVATE_KEY_PATH: "/app/keys/apple.p8"
+      SPRING_PROFILES_ACTIVE: "${SPRING_PROFILES_ACTIVE}"
     volumes:
       - /home/ubuntu/.secure/apple/AuthKey.p8:/app/keys/apple.p8:ro
     networks:
