@@ -10,7 +10,9 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.context.annotation.Profile;
 
+@Profile("!prod")
 @Configuration
 public class SwaggerConfig {
 
