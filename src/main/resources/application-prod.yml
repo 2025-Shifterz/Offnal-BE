@@ -39,3 +39,8 @@ apple:
   key-id: ${APPLE_KEY_ID}
   private-key-path: ${APPLE_PRIVATE_KEY_PATH}
   redirect-uri: ${APPLE_REDIRECT_URI}
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
