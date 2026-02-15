@@ -39,3 +39,7 @@ apple:
   key-id: ${APPLE_KEY_ID}
   private-key-path: ${APPLE_PRIVATE_KEY_PATH}
   redirect-uri: ${APPLE_REDIRECT_URI}
+
+encrypt:
+  aes:
+    key: ${AES_ENCRYPTION_KEY}

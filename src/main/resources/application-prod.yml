@@ -44,3 +44,7 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+encrypt:
+  aes:
+    key: ${AES_ENCRYPTION_KEY}
