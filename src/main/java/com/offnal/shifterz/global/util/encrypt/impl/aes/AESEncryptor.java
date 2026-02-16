@@ -4,6 +4,7 @@ import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.global.util.encrypt.TwoWayEncryptor;
 import com.offnal.shifterz.global.util.encrypt.impl.sha.SHAEncryptor;
+import com.offnal.shifterz.global.util.encrypt.impl.sha.SHAType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -47,6 +48,24 @@ public class AESEncryptor implements TwoWayEncryptor {
     private static final SecureRandom secureRandom = new SecureRandom();
 
     /**
+     * AESEncryptor 생성자.
+     * <p>
+     * 입력받은 키를 SHA-256으로 해시하여 32바이트(256비트) 길이의 AES 키를 생성합니다.
+     * 이를 통해 입력 키의 길이와 상관없이 항상 256비트 키를 사용합니다.
+     * </p>
+     *
+     * @param key 암호화에 사용할 비밀 키 문자열
+     */
+    public AESEncryptor(@NonNull String key) {
+        try {
+            secretKey = generateSecretKeySpec(new SHAEncryptor(SHAType.SHA256, 0).encrypt(key));
+        } catch (Exception e) {
+            log.error("AESEncryptor 객체 생성에 실패했습니다.", e);
+            throw new CustomException(AESErrorCode.AES_ENCRYPTOR_CONSTRUCTION_FAILED);
+        }
+    }
+
+    /**
      * Cipher 인스턴스를 생성하여 반환합니다.
      *
      * @return AES/GCM/NoPadding 변환을 사용하는 Cipher 객체
@@ -67,30 +86,15 @@ public class AESEncryptor implements TwoWayEncryptor {
     }
 
     /**
-     * AESEncryptor 생성자.
-     * <p>
-     * 입력받은 키를 SHA-256으로 해시하여 32바이트(256비트) 길이의 AES 키를 생성합니다.
-     * 이를 통해 입력 키의 길이와 상관없이 항상 256비트 키를 사용합니다.
-     * </p>
-     *
-     * @param key 암호화에 사용할 비밀 키 문자열
-     */
-    public AESEncryptor(@NonNull String key) {
-        try {
-            secretKey = generateSecretKeySpec(new SHAEncryptor(0).encrypt(key));
-        } catch (Exception e) {
-            log.error("AESEncryptor 객체 생성에 실패했습니다.", e);
-            throw new CustomException(AESErrorCode.AES_ENCRYPTOR_CONSTRUCTION_FAILED);
-        }
-    }
-
-    /**
      * 바이트 배열 키로부터 SecretKeySpec 객체를 생성합니다.
      *
      * @param key 32바이트 길이의 키 데이터
      * @return 생성된 SecretKeySpec 객체
      */
     private SecretKeySpec generateSecretKeySpec(byte[] key) {
+        if (key == null || key.length != 32) {
+            throw new IllegalArgumentException("키는 32바이트 길이여야 합니다. 현재 길이: " + (key == null ? "null" : key.length));
+        }
         try {
             return new SecretKeySpec(key, "AES");
         } catch (Exception e) {
@@ -106,7 +110,10 @@ public class AESEncryptor implements TwoWayEncryptor {
      * @param nonce  초기화 벡터 (Nonce)
      * @param cipher 초기화할 Cipher 객체
      */
-    private void initCipher(int mode, byte[] nonce, Cipher cipher) {
+    private void initCipher(int mode, byte[] nonce, @NonNull Cipher cipher) {
+        if (nonce == null || nonce.length != NONCE_SIZE) {
+            throw new IllegalArgumentException("Nonce는 " + NONCE_SIZE + "바이트 길이여야 합니다. 현재 길이: " + (nonce == null ? "null" : nonce.length));
+        }
         try {
             cipher.init(mode, secretKey, new GCMParameterSpec(TAG_SIZE, nonce));
         } catch (Exception e) {
@@ -203,7 +210,6 @@ public class AESEncryptor implements TwoWayEncryptor {
             initCipher(Cipher.ENCRYPT_MODE, nonce, eCipher);
 
 
-
             try (FileInputStream fis = new FileInputStream(plainFile);
                  FileOutputStream fos = new FileOutputStream(encryptedFile);
                  CipherOutputStream cos = new CipherOutputStream(fos, eCipher)) {
@@ -256,7 +262,7 @@ public class AESEncryptor implements TwoWayEncryptor {
      */
     @Override
     public String decrypt(byte[] encryptedArray) {
-        if (encryptedArray.length < NONCE_SIZE + TAG_SIZE / 8) {
+        if (encryptedArray == null || encryptedArray.length < NONCE_SIZE + TAG_SIZE / 8) {
             throw new IllegalArgumentException("암호화된 데이터가 올바르지 않습니다.");
         }
 

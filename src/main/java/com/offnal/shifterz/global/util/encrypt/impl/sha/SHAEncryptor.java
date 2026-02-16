@@ -102,7 +102,10 @@ public class SHAEncryptor implements OneWayEncryptor {
      * @param salt      사용할 솔트
      * @return 솔트 + 해시된 바이트 배열
      */
-    private byte[] encrypt(String plainText, byte[] salt) {
+    private byte[] encrypt(@NonNull String plainText, byte[] salt) {
+        if (salt == null) {
+            salt = new byte[0];
+        }
         try {
             MessageDigest digest = shaType.getMessageDigest();
             digest.update(salt); // 솔트 추가
@@ -153,7 +156,7 @@ public class SHAEncryptor implements OneWayEncryptor {
      */
     @Override
     public boolean matches(@NonNull String plainText, byte[] hashedText) {
-        if (hashedText.length <= saltLength) {
+        if (hashedText == null || hashedText.length < saltLength) {
             return false;
         }
 
@@ -180,7 +183,11 @@ public class SHAEncryptor implements OneWayEncryptor {
      * @return 일치 여부
      */
     @Override
-    public boolean matches(@NonNull String plainText, @NonNull String hashedText) {
+    public boolean matches(@NonNull String plainText, String hashedText) {
+        if (hashedText == null) {
+            return false;
+        }
+
         try {
             byte[] hashedBytes = Hex.decodeHex(hashedText);
             return matches(plainText, hashedBytes);
