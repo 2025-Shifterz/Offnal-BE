@@ -1,45 +1,44 @@
 package com.offnal.shifterz.global.util.encrypt;
 
 /**
- * 단방향 암호화 인터페이스
+ * 단방향 암호화(해시) 기능을 정의하는 인터페이스입니다.
  * <p>
- * 복호화가 불가능한 해시 기반 암호화를 수행합니다.
- * 주요 용도: 비밀번호 저장, 데이터 무결성 검증
+ * 주로 데이터 무결성 검증 등 복호화가 필요 없는 데이터 보호에 사용됩니다.
  * </p>
  */
 public interface OneWayEncryptor {
 
     /**
-     * 평문을 암호화합니다.
+     * 평문을 암호화(해시)하여 바이트 배열로 반환합니다.
      *
      * @param plainText 암호화할 평문
-     * @return 암호화된 해시 문자열
+     * @return 암호화된 바이트 배열
      */
     byte[] encrypt(String plainText);
 
     /**
-     * 평문을 암호화하고 16진수 문자열로 반환합니다.
+     * 평문을 암호화(해시)하여 16진수 문자열로 반환합니다.
      *
      * @param plainText 암호화할 평문
-     * @return 16진수로 인코딩된 암호화 문자열
+     * @return 암호화된 해시값 (16진수 문자열)
      */
     String encryptToHex(String plainText);
 
     /**
-     * 평문과 암호화된 해시가 일치하는지 검증합니다.
+     * 평문이 주어진 암호화된 바이트 배열과 일치하는지 검증합니다.
      *
      * @param plainText  검증할 평문
-     * @param hashedText 비교할 해시 바이트 배열
-     * @return 일치 여부
+     * @param hashedText 비교할 암호화된 바이트 배열
+     * @return 일치 여부 (true/false)
      */
     boolean matches(String plainText, byte[] hashedText);
 
     /**
-     * 평문과 암호화된 해시가 일치하는지 검증합니다.
+     * 평문이 주어진 암호화된 해시 문자열과 일치하는지 검증합니다.
      *
      * @param plainText  검증할 평문
-     * @param hashedText 비교할 해시 문자열
-     * @return 일치 여부
+     * @param hashedText 비교할 암호화된 해시 문자열
+     * @return 일치 여부 (true/false)
      */
     boolean matches(String plainText, String hashedText);
 }

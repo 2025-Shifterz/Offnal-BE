@@ -1,186 +1,221 @@
 package com.offnal.shifterz.global.util.encrypt.impl.sha;
 
+import com.offnal.shifterz.global.exception.CustomException;
+import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.global.util.encrypt.OneWayEncryptor;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
+import org.springframework.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
- * SHA 해시 암호화 구현 클래스
+ * SHA 알고리즘을 사용한 단방향 해시 암호화 구현체입니다.
  * <p>
- * SHA-256, SHA-512, MD5 알고리즘을 사용한 단방향 해시 암호화를 제공합니다.
- * 모든 해시에 자동으로 Salt를 추가하여 동일한 평문도 다른 해시를 생성합니다.
+ * 솔트(Salt)를 사용하여 레인보우 테이블 공격에 대응하며,
+ * 생성된 해시 값 앞부분에 솔트가 포함됩니다.
  * </p>
  */
+@Slf4j
 public class SHAEncryptor implements OneWayEncryptor {
 
-    private static final int DEFAULT_SALT_LENGTH = 16;
+    private static final int DEFAULT_SALT_LENGTH = 16; // 기본 솔트 길이 (16바이트)
 
     @Getter
     private final SHAType shaType;
 
     private final int saltLength;
 
+    private static final SecureRandom secureRandom = new SecureRandom();
+
     /**
-     * SHA 암호화 객체를 생성합니다.
+     * 지정된 알고리즘과 솔트 길이를 사용하는 SHAEncryptor 생성자.
      *
-     * @param shaType    SHA 알고리즘 타입 (SHA256, SHA512, MD5)
-     * @param saltLength Salt의 길이 (바이트 단위)
+     * @param shaType    사용할 SHA 알고리즘 타입
+     * @param saltLength 생성할 솔트의 길이 (바이트)
+     * @throws IllegalArgumentException 솔트 길이가 음수일 경우
      */
-    public SHAEncryptor(SHAType shaType, int saltLength) {
+    public SHAEncryptor(@NonNull SHAType shaType, int saltLength) {
         this.shaType = shaType;
-        if(saltLength < 0) {
-            throw new IllegalArgumentException("Salt 길이는 0 이상이어야 합니다.");
+        if (saltLength < 0) {
+            throw new IllegalArgumentException("솔트 길이는 음수일 수 없습니다: " + saltLength);
         }
         this.saltLength = saltLength;
     }
 
     /**
-     * SHA 암호화 객체를 생성합니다.
+     * 지정된 알고리즘과 기본 솔트 길이를 사용하는 SHAEncryptor 생성자.
      *
-     * @param shaType SHA 알고리즘 타입 (SHA256, SHA512, MD5)
+     * @param shaType 사용할 SHA 알고리즘 타입
      */
-    public SHAEncryptor(SHAType shaType) {
+    public SHAEncryptor(@NonNull SHAType shaType) {
         this(shaType, DEFAULT_SALT_LENGTH);
     }
 
     /**
-     * SHA-256 알고리즘으로 암호화 객체를 생성합니다.
+     * SHA-256 알고리즘과 지정된 솔트 길이를 사용하는 SHAEncryptor 생성자.
      *
-     * @param saltLength Salt의 길이 (바이트 단위)
+     * @param saltLength 생성할 솔트의 길이 (바이트)
      */
     public SHAEncryptor(int saltLength) {
         this(SHAType.SHA256, saltLength);
     }
 
     /**
-     * 기본 SHA-256 알고리즘으로 암호화 객체를 생성합니다.
+     * SHA-256 알고리즘과 기본 솔트 길이를 사용하는 SHAEncryptor 생성자.
      */
     public SHAEncryptor() {
         this(SHAType.SHA256);
     }
 
     /**
-     * 평문을 SHA로 해시화합니다.
+     * 평문을 암호화(해시)하여 바이트 배열로 반환합니다.
      * <p>
-     * 자동으로 랜덤 Salt를 생성하여 해시에 포함시킵니다.
-     * 결과 형식: [Salt (16바이트)] + [Hash]
-     * 동일한 평문을 여러 번 해시화해도 매번 다른 결과가 생성됩니다.
+     * 랜덤한 솔트를 생성하여 해시를 수행하고, [솔트 + 해시] 형태의 배열을 반환합니다.
      * </p>
      *
-     * @param plainText 해시화할 평문
-     * @return Salt + 해시가 결합된 바이트 배열
-     * @throws RuntimeException 해시 생성 중 오류 발생 시
+     * @param plainText 암호화할 평문
+     * @return 솔트가 포함된 암호화된 바이트 배열
      */
     @Override
-    public byte[] encrypt(String plainText) {
-        byte[] salt = generateSalt();
-        return encrypt(plainText, salt);
+    public byte[] encrypt(@NonNull String plainText) {
+        try {
+            byte[] salt = generateSalt();
+            return encrypt(plainText, salt);
+        } catch (Exception e) {
+            log.error("SHA 암호화 중 오류 발생", e);
+            throw new CustomException(SHAErrorCode.ENCRYPT_FAILED);
+        }
     }
 
     /**
-     * 제공된 Salt를 사용하여 평문을 해시화합니다.
-     * <p>
-     * Salt는 해시 결과의 앞부분에 추가되어 반환됩니다.
-     * 결과 형식: [Salt] + [Hash]
-     * </p>
+     * 내부적인 암호화 로직을 수행합니다.
      *
-     * @param plainText 해시화할 평문
-     * @param salt      사용할 Salt
-     * @return Salt + 해시가 결합된 바이트 배열
-     * @throws RuntimeException 해시 생성 중 오류 발생 시
+     * @param plainText 암호화할 평문
+     * @param salt      사용할 솔트
+     * @return 솔트 + 해시된 바이트 배열
      */
     private byte[] encrypt(String plainText, byte[] salt) {
         try {
             MessageDigest digest = shaType.getMessageDigest();
-            digest.update(salt);
-            digest.update(plainText.getBytes(StandardCharsets.UTF_8));
-            byte[] hash = digest.digest();
+            digest.update(salt); // 솔트 추가
+            digest.update(plainText.getBytes(StandardCharsets.UTF_8)); // 평문 추가
+            byte[] hash = digest.digest(); // 해시 생성
 
-            // Salt + Hash 결합
+            // 결과 배열 생성 (솔트 길이 + 해시 길이)
             byte[] result = new byte[salt.length + hash.length];
             System.arraycopy(salt, 0, result, 0, salt.length);
             System.arraycopy(hash, 0, result, salt.length, hash.length);
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("SHA 해시 생성 중 오류 발생", e);
+            if (e instanceof NoSuchAlgorithmException) {
+                log.error("지원하지 않는 해시 알고리즘입니다: {}", shaType, e);
+            } else {
+                log.error("SHA 해시 생성 중 오류 발생", e);
+            }
+            throw new CustomException(SHAErrorCode.ENCRYPT_FAILED);
         }
     }
 
     /**
-     * 평문을 해시화하여 16진수 문자열로 반환합니다.
-     * <p>
-     * 자동으로 Salt가 포함된 해시를 생성합니다.
-     * </p>
+     * 평문을 암호화하여 16진수 문자열로 반환합니다.
      *
-     * @param plainText 해시화할 평문
-     * @return Salt + 해시가 결합된 16진수 문자열
-     * @throws RuntimeException 해시 생성 중 오류 발생 시
+     * @param plainText 암호화할 평문
+     * @return 솔트가 포함된 16진수 해시 문자열
      */
     @Override
-    public String encryptToHex(String plainText) {
-        byte[] saltedHash = encrypt(plainText);
-        return Hex.encodeHexString(saltedHash);
+    public String encryptToHex(@NonNull String plainText) {
+        try {
+            byte[] saltedHash = encrypt(plainText);
+            return Hex.encodeHexString(saltedHash);
+        } catch (Exception e) {
+            log.error("Hex 인코딩된 SHA 암호화에 실패했습니다.", e);
+            throw new CustomException(SHAErrorCode.ENCRYPT_FAILED);
+        }
     }
 
     /**
-     * 평문과 Salt가 포함된 해시가 일치하는지 검증합니다.
+     * 평문이 암호화된 바이트 배열과 일치하는지 검증합니다.
      * <p>
-     * 해시에서 Salt를 자동으로 추출하여 평문과 함께 해시화한 후 비교합니다.
+     * 암호화된 배열의 앞부분에서 솔트를 추출하여 평문을 다시 해시한 후 비교합니다.
      * </p>
      *
      * @param plainText  검증할 평문
-     * @param hashedText Salt + 해시가 결합된 바이트 배열
+     * @param hashedText 비교할 솔트가 포함된 암호화 데이터
      * @return 일치 여부
      */
     @Override
-    public boolean matches(String plainText, byte[] hashedText) {
+    public boolean matches(@NonNull String plainText, byte[] hashedText) {
         if (hashedText.length <= saltLength) {
             return false;
         }
 
-        // Salt 추출
-        byte[] salt = Arrays.copyOfRange(hashedText, 0, saltLength);
-
-        // 평문 + Salt로 해시 생성
-        byte[] newHash = encrypt(plainText, salt);
-
-        return MessageDigest.isEqual(newHash, hashedText);
-    }
-
-    /**
-     * 평문과 Salt가 포함된 16진수 해시 문자열이 일치하는지 검증합니다.
-     * <p>
-     * 해시에서 Salt를 자동으로 추출하여 검증합니다.
-     * </p>
-     *
-     * @param plainText  검증할 평문
-     * @param hashedText Salt + 해시가 결합된 16진수 문자열
-     * @return 일치 여부
-     */
-    @Override
-    public boolean matches(String plainText, String hashedText) {
         try {
-            byte[] hashedBytes = Hex.decodeHex(hashedText);
-            return matches(plainText, hashedBytes);
+            // 암호문에서 솔트 추출
+            byte[] salt = Arrays.copyOfRange(hashedText, 0, saltLength);
+
+            // 평문과 추출한 솔트로 새로운 해시 생성
+            byte[] newHash = encrypt(plainText, salt);
+
+            // 두 해시 비교
+            return MessageDigest.isEqual(newHash, hashedText);
         } catch (Exception e) {
-            throw new RuntimeException("16진수 해시 디코딩 중 오류 발생", e);
+            log.error("SHA 해시 검증 중 오류 발생", e);
+            throw new CustomException(SHAErrorCode.MATCHES_FAILED);
         }
     }
 
     /**
-     * 랜덤 Salt를 생성합니다.
+     * 평문이 암호화된 16진수 문자열과 일치하는지 검증합니다.
      *
-     * @return 생성된 Salt 바이트 배열 (16바이트)
+     * @param plainText  검증할 평문
+     * @param hashedText 비교할 솔트가 포함된 16진수 해시 문자열
+     * @return 일치 여부
+     */
+    @Override
+    public boolean matches(@NonNull String plainText, @NonNull String hashedText) {
+        try {
+            byte[] hashedBytes = Hex.decodeHex(hashedText);
+            return matches(plainText, hashedBytes);
+        } catch (Exception e) {
+            log.error("16진수 해시 디코딩 중 오류 발생", e);
+            throw new CustomException(SHAErrorCode.MATCHES_FAILED);
+        }
+    }
+
+    /**
+     * 랜덤한 솔트(Salt)를 생성합니다.
+     *
+     * @return 생성된 솔트 바이트 배열
      */
     private byte[] generateSalt() {
-        byte[] salt = new byte[saltLength];
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(salt);
-        return salt;
+        try {
+            byte[] salt = new byte[saltLength];
+            secureRandom.nextBytes(salt);
+            return salt;
+        } catch (Exception e) {
+            log.error("Salt 생성 중 오류 발생", e);
+            throw new CustomException(SHAErrorCode.GENERATE_SALT_FAILED);
+        }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum SHAErrorCode implements ErrorReason {
+        SHA_ENCRYPTOR_CONSTRUCTION_FAILED("SHA001", HttpStatus.INTERNAL_SERVER_ERROR, "SHAEncryptor 인스턴스 생성에 실패하였습니다."),
+        ENCRYPT_FAILED("SHA002", HttpStatus.INTERNAL_SERVER_ERROR, "SHA 암호화(해시 생성)에 실패하였습니다."),
+        MATCHES_FAILED("SHA003", HttpStatus.INTERNAL_SERVER_ERROR, "SHA 해시 검증에 실패하였습니다."),
+        GENERATE_SALT_FAILED("SHA004", HttpStatus.INTERNAL_SERVER_ERROR, "Salt 생성에 실패하였습니다.");
+
+        private final String code;
+        private final HttpStatus status;
+        private final String message;
     }
 }
