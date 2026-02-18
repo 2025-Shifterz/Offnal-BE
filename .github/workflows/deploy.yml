@@ -2,10 +2,10 @@ name: Blue-Green Deploy with Docker Hub
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ dev ]
     types: [ closed ]
   push:
-    branches: [ main ]
+    branches: [ dev ]
 
 env:
   IMAGE_TAG: ${{ github.sha }}
@@ -49,7 +49,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
+
       - name: Build & Push Docker Image
         uses: docker/build-push-action@v4
         with:
@@ -113,7 +113,7 @@ jobs:
               NEW_PORT=8080
               CURRENT_SERVICE="spring_green"
             fi
- 
+            
             echo "CURRENT=$CURRENT_COLOR, NEW=$NEW_COLOR"
 
             sudo docker-compose stop $NEW_SERVICE || true
@@ -164,4 +164,3 @@ jobs:
             sleep 5
             sudo docker-compose stop $CURRENT_SERVICE
             sudo docker-compose rm -f $CURRENT_SERVICE
-
