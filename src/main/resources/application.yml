@@ -45,3 +45,20 @@ apple:
     token: https://appleid.apple.com
     public-key: https://appleid.apple.com/auth/keys
     revoke: https://appleid.apple.com/auth/revoke
+
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: ping
+        readiness:
+          include: db, redis
+

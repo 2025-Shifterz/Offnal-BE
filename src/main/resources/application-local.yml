@@ -46,3 +46,9 @@ apple:
 encrypt:
   aes:
     key: ${AES_ENCRYPTION_KEY}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

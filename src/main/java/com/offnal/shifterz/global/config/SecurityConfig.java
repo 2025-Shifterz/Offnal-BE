@@ -38,6 +38,8 @@ public class SecurityConfig {
 		http.cors().and() //CORS 활성화 추가
 			.authorizeHttpRequests(authorizeRequests ->
 				authorizeRequests.requestMatchers(
+						"/health/**",
+						"/actuator/health/**",
 						"/login/**",
 						"/login/page/**",
 						"/tokens/reissue",
