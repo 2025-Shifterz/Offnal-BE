@@ -122,4 +122,16 @@ public class EncryptUtil {
     public boolean verifySHA512(@NonNull String plainText, @NonNull String hashedText) {
         return sha512Encryptor.matches(plainText, hashedText);
     }
+
+    public String encryptAESOrNull(String value) {
+        if (value == null) return null;
+        if (value.isBlank()) return null;
+        return encryptAES(value);
+    }
+
+    public String decryptAESOrNull(String value) {
+        if (value == null) return null;
+        if (value.isBlank()) return null;
+        return decryptAES(value);
+    }
 }
