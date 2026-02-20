@@ -158,10 +158,10 @@ jobs:
             fi
 
             sleep 5
-            sudo docker-compose stop $CURRENT_SERVICE
+            sudo docker-compose stop -t 30 $CURRENT_SERVICE
             sudo docker-compose rm -f $CURRENT_SERVICE
 
             sleep 5
-            sudo docker-compose stop $CURRENT_SERVICE
+            sudo docker-compose stop -t 30 $CURRENT_SERVICE
             sudo docker-compose rm -f $CURRENT_SERVICE
 
