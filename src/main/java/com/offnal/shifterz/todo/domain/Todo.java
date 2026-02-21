@@ -39,10 +39,15 @@ public class Todo extends BaseTimeEntity {
     @JoinColumn(name = "organization_id")
     private Organization organization; // nullable
 
-    public void update(TodoRequestDto.UpdateDto request) {
-        if (request.getContent() != null) this.content = request.getContent();
+    // public void update(TodoRequestDto.UpdateDto request) {
+    //     if (request.getContent() != null) this.content = request.getContent();
+    //     if (request.getCompleted() != null) this.completed = request.getCompleted();
+    //     if (request.getTargetDate() != null) this.targetDate = request.getTargetDate();
+    // }
+
+    public void update(TodoRequestDto.UpdateDto request, String encryptedContent) {
+        if (request.getContent() != null) this.content = encryptedContent; // ✅ 암호문 저장
         if (request.getCompleted() != null) this.completed = request.getCompleted();
         if (request.getTargetDate() != null) this.targetDate = request.getTargetDate();
     }
 }
-

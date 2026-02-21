@@ -39,12 +39,10 @@ public class Memo extends BaseTimeEntity {
     @JoinColumn(name = "organization_id")
     private Organization organization; // nullable
 
-    public void update(MemoRequestDto.UpdateMemoDto request) {
-
-        if (request.getTitle() != null) this.title = request.getTitle();
-        if (request.getContent() != null) this.content = request.getContent();
+    public void update(MemoRequestDto.UpdateMemoDto request, String encryptedTitle, String encryptedContent) {
+        if (request.getTitle() != null) this.title = encryptedTitle;
+        if (request.getContent() != null) this.content = encryptedContent;
         if (request.getTargetDate() != null) this.targetDate = request.getTargetDate();
     }
-
 }
 
