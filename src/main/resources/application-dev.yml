@@ -43,3 +43,5 @@ apple:
 encrypt:
   aes:
     key: ${AES_ENCRYPTION_KEY}
+  migration:
+    enabled: true
