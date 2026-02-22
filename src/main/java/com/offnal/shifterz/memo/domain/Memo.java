@@ -44,5 +44,11 @@ public class Memo extends BaseTimeEntity {
         if (request.getContent() != null) this.content = encryptedContent;
         if (request.getTargetDate() != null) this.targetDate = request.getTargetDate();
     }
+
+    //마이그레이션 후 삭제
+    public void migrateTitleContent(String encryptedTitle, String encryptedContent) {
+        this.title = encryptedTitle;
+        this.content = encryptedContent;
+    }
 }
 

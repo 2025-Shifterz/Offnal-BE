@@ -60,4 +60,11 @@ public class Member extends BaseTimeEntity {
 		this.appleRefreshToken = encryptedAppleRefreshToken;
 	}
 
+	//마이그레이션 후 삭제
+	public void migrateSensitiveFields(String emailEnc, String nameEnc, String phoneEnc, String appleRefreshTokenEnc) {
+		this.email = emailEnc;
+		this.memberName = nameEnc;
+		this.phoneNumber = phoneEnc;
+		this.appleRefreshToken = appleRefreshTokenEnc;
+	}
 }
