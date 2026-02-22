@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.Base64;
 
 /**
  * 암호화 및 해시 유틸리티 클래스입니다.
@@ -21,6 +22,8 @@ public class EncryptUtil {
     private final AESEncryptor aesEncryptor;
     private final SHAEncryptor sha256Encryptor;
     private final SHAEncryptor sha512Encryptor;
+    private static final int AES_GCM_NONCE_SIZE = 12;
+    private static final int AES_GCM_TAG_SIZE_BYTES = 16;
 
     /**
      * EncryptUtil 생성자.
@@ -121,5 +124,33 @@ public class EncryptUtil {
      */
     public boolean verifySHA512(@NonNull String plainText, @NonNull String hashedText) {
         return sha512Encryptor.matches(plainText, hashedText);
+    }
+
+    public String encryptAESOrNull(String value) {
+        if (value == null) return null;
+        if (value.isBlank()) return null;
+
+
+        // 이미 암호문이면 그대로 반환 (중복 암호화 방지)
+        if (isProbablyAesGcmBase64(value)) return value;
+
+        return encryptAES(value);
+    }
+
+    public String decryptAESOrNull(String value) {
+        if (value == null) return null;
+        if (value.isBlank()) return null;
+
+
+        return decryptAES(value);
+    }
+
+    private boolean isProbablyAesGcmBase64(String value) {
+        try {
+            byte[] decoded = Base64.getDecoder().decode(value);
+            return decoded.length >= (AES_GCM_NONCE_SIZE + AES_GCM_TAG_SIZE_BYTES);
+        } catch (IllegalArgumentException e) {
+            return false; // Base64 자체가 아니면 평문
+        }
     }
 }

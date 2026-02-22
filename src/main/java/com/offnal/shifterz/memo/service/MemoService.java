@@ -3,6 +3,7 @@ package com.offnal.shifterz.memo.service;
 import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
+import com.offnal.shifterz.global.util.encrypt.EncryptUtil;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.memo.converter.MemoConverter;
 import com.offnal.shifterz.memo.domain.Memo;
@@ -29,6 +30,7 @@ public class MemoService {
 
     private final MemoRepository memoRepository;
     private final OrganizationRepository organizationRepository;
+    private final EncryptUtil encryptUtil;
 
     @Transactional
     public MemoResponseDto.MemoDto createMemo(MemoRequestDto.CreateDto request) {
@@ -40,8 +42,12 @@ public class MemoService {
                     .orElseThrow(() -> new CustomException(MemoErrorCode.ORGANIZATION_NOT_FOUND));
         }
 
-        Memo memo = MemoConverter.toEntity(request, member, organization);
-        return MemoConverter.toDto(memoRepository.save(memo));
+        String titleEnc = encryptUtil.encryptAESOrNull(request.getTitle());
+        String contentEnc = encryptUtil.encryptAESOrNull(request.getContent());
+
+        Memo memo = MemoConverter.toEntity(request, titleEnc, contentEnc, member, organization);
+
+        return MemoConverter.toDto(memoRepository.save(memo), encryptUtil);
     }
 
     @Transactional
@@ -55,8 +61,19 @@ public class MemoService {
             throw new CustomException(MemoErrorCode.MEMO_ACCESS_DENIED);
         }
 
-        memo.update(request);
-        return MemoConverter.toDto(memo);
+        String titleEnc = null;
+        if (request.getTitle() != null) {
+            titleEnc = encryptUtil.encryptAESOrNull(request.getTitle()); // blank면 null 저장(삭제 정책)
+        }
+
+        String contentEnc = null;
+        if (request.getContent() != null) {
+            contentEnc = encryptUtil.encryptAESOrNull(request.getContent());
+        }
+
+        memo.update(request, titleEnc, contentEnc);
+
+        return MemoConverter.toDto(memo, encryptUtil);
     }
 
     @Transactional(readOnly = true)
@@ -70,7 +87,7 @@ public class MemoService {
             throw new CustomException(MemoErrorCode.MEMO_ACCESS_DENIED);
         }
 
-        return MemoConverter.toDto(memo);
+        return MemoConverter.toDto(memo, encryptUtil);
     }
 
     @Transactional
@@ -96,8 +113,8 @@ public class MemoService {
         List<Memo> memos = memoRepository.findMemosWithFilters(member, organizationId, unassigned, targetDate);
 
         return memos.stream()
-                .map(MemoConverter::toDto)
-                .toList();
+            .map(m -> MemoConverter.toDto(m, encryptUtil))
+            .toList();
     }
 
     @Getter
