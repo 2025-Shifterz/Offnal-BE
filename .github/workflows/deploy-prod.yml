@@ -2,10 +2,10 @@ name: Blue-Green Canary Deploy (2-Phase)
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ dev ]
     types: [ closed ]
   push:
-    branches: [ main ]
+    branches: [ dev ]
 
 env:
   IMAGE_TAG: ${{ github.sha }}
