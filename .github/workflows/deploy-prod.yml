@@ -228,12 +228,30 @@ jobs:
             set_weight() {
               local blue_weight=$1
               local green_weight=$2
-            
+
               cp "$UPSTREAM_FILE" "$UPSTREAM_FILE.bak"
-            
-              sed -i -E "s/(server spring_blue:8080[[:space:]]+weight=)[0-9]+/\1${blue_weight}/" "$UPSTREAM_FILE"
-              sed -i -E "s/(server spring_green:8080[[:space:]]+weight=)[0-9]+/\1${green_weight}/" "$UPSTREAM_FILE"
-            
+
+              # weight=0 방지
+              local bw="$blue_weight"
+              local gw="$green_weight"
+              if [ "$bw" -eq 0 ]; then bw=1; fi
+              if [ "$gw" -eq 0 ]; then gw=1; fi
+
+              # weight 숫자 갱신
+              sed -i -E "s/(server spring_blue:8080[[:space:]]+weight=)[0-9]+/\1${bw}/" "$UPSTREAM_FILE"
+              sed -i -E "s/(server spring_green:8080[[:space:]]+weight=)[0-9]+/\1${gw}/" "$UPSTREAM_FILE"
+
+              if [ "$blue_weight" -eq 100 ] && [ "$green_weight" -eq 0 ]; then
+                sed -i -E "s/(server spring_green:8080[^;]*);/\1 down;/" "$UPSTREAM_FILE"
+                sed -i -E "s/(server spring_blue:8080[^;]*) down;/\1;/" "$UPSTREAM_FILE"
+              elif [ "$blue_weight" -eq 0 ] && [ "$green_weight" -eq 100 ]; then
+                sed -i -E "s/(server spring_blue:8080[^;]*);/\1 down;/" "$UPSTREAM_FILE"
+                sed -i -E "s/(server spring_green:8080[^;]*) down;/\1;/" "$UPSTREAM_FILE"
+              else
+                sed -i -E "s/(server spring_blue:8080[^;]*) down;/\1;/" "$UPSTREAM_FILE"
+                sed -i -E "s/(server spring_green:8080[^;]*) down;/\1;/" "$UPSTREAM_FILE"
+              fi
+
               if sudo docker-compose exec nginx nginx -t; then
                 sudo docker-compose exec nginx nginx -s reload
                 return 0
@@ -248,140 +266,140 @@ jobs:
             # ----------------------------
             # Canary 모니터링 함수 ( /login/page 기준, 추후 기준 api 변경)
             # ----------------------------
-              monitor_canary() {
-              local duration=$1
-              local endpoint="/login/page"
+            monitor_canary() {
+            local duration=$1
+            local endpoint="/login/page"
             
+            
+            local host_header
+            host_header=$(grep -m1 -E "^[[:space:]]*server_name[[:space:]]+" "$UPSTREAM_FILE" \
+            | awk '{print $2}' | tr -d ';')
 
-              local host_header
-              host_header=$(grep -m1 -E "^[[:space:]]*server_name[[:space:]]+" "$UPSTREAM_FILE" \
-              | awk '{print $2}' | tr -d ';')
-            
-            # 혹시 못 찾으면 fallback (그래도 dev/prod 둘 다 이걸로는 보통 안전)
+              # 혹시 못 찾으면 fallback
               if [ -z "$host_header" ]; then
               host_header="localhost"
               fi
-            
+              
               echo "모니터링 중 (${duration}초)... endpoint=${endpoint}, host=${host_header}"
-            
+              
               local fail_count=0
               local total_checks=$((duration / 3))
-            
+              
               for i in $(seq 1 $total_checks); do
               sleep 3
               
               # 80은 301로 https로 보내므로 200~399면 OK로 처리
               local code
-            code=$(curl -sS -o /dev/null -w "%{http_code}" -H "Host: ${host_header}" "http://localhost${endpoint}" || echo "000")
-              
-              if [ "$code" -ge 200 ] && [ "$code" -lt 400 ]; then
-              echo "✓ /login/page OK (code=$code) [$i/$total_checks]"
-              else
-              fail_count=$((fail_count + 1))
-              echo "❌ /login/page FAIL (code=$code) (fail=$fail_count) [$i/$total_checks]"
-              fi
-              
-              if [ "$fail_count" -gt 3 ]; then
-              echo "에러 과다 발생 (/login/page 기준)"
-              return 1
-              fi
-              done
-            
-              echo "모니터링 완료 (/login/page 기준)"
-              return 0
+              code=$(curl -sS -o /dev/null -w "%{http_code}" -H "Host: ${host_header}" "http://localhost${endpoint}" || echo "000")
+                
+                if [ "$code" -ge 200 ] && [ "$code" -lt 400 ]; then
+                echo "✓ /login/page OK (code=$code) [$i/$total_checks]"
+                else
+                fail_count=$((fail_count + 1))
+                echo "❌ /login/page FAIL (code=$code) (fail=$fail_count) [$i/$total_checks]"
+                fi
+                
+                if [ "$fail_count" -gt 3 ]; then
+                echo "에러 과다 발생 (/login/page 기준)"
+                return 1
+                fi
+                done
+                
+                echo "모니터링 완료 (/login/page 기준)"
+                return 0
             }
-
-            # ----------------------------
-            # 9) Canary Phase 1: 10% 트래픽
-            # ----------------------------
-            echo "🐤 1단계: 10% 트래픽 전환"
-
-            if [ "$NEW_COLOR" = "blue" ]; then
+    
+              # ----------------------------
+              # 9) Canary Phase 1: 10% 트래픽
+              # ----------------------------
+              echo "1단계: 10% 트래픽 전환"
+    
+              if [ "$NEW_COLOR" = "blue" ]; then
               if ! set_weight 10 90; then
-                echo "1단계 weight 설정 실패"
-                sudo docker-compose stop "$NEW_SERVICE" || true
-                sudo docker-compose rm -f "$NEW_SERVICE" || true
-                exit 1
-              fi
-            else
-              if ! set_weight 90 10; then
-                echo "1단계 weight 설정 실패"
-                sudo docker-compose stop "$NEW_SERVICE" || true
-                sudo docker-compose rm -f "$NEW_SERVICE" || true
-                exit 1
-              fi
-            fi
-
-            if ! monitor_canary 30; then
-              echo "❌ 1단계 모니터링 실패, 롤백"
-            
-              # 트래픽 복구
-              if [ "$CURRENT_COLOR" = "blue" ]; then
-                set_weight 100 0 || true
-              else
-                set_weight 0 100 || true
-              fi
-            
+              echo "1단계 weight 설정 실패"
               sudo docker-compose stop "$NEW_SERVICE" || true
               sudo docker-compose rm -f "$NEW_SERVICE" || true
               exit 1
-            fi
-
-            # ----------------------------
-            # 10) Full Switch: 100% 트래픽
-            # ----------------------------
-            echo "🚀 2단계: 100% 트래픽 전환"
-
-            if [ "$NEW_COLOR" = "blue" ]; then
+              fi
+              else
+              if ! set_weight 90 10; then
+              echo "1단계 weight 설정 실패"
+              sudo docker-compose stop "$NEW_SERVICE" || true
+              sudo docker-compose rm -f "$NEW_SERVICE" || true
+              exit 1
+              fi
+              fi
+              
+              if ! monitor_canary 30; then
+              echo "❌ 1단계 모니터링 실패, 롤백"
+              
+              # 트래픽 복구
+              if [ "$CURRENT_COLOR" = "blue" ]; then
+              set_weight 100 0 || true
+              else
+              set_weight 0 100 || true
+              fi
+              
+              sudo docker-compose stop "$NEW_SERVICE" || true
+              sudo docker-compose rm -f "$NEW_SERVICE" || true
+              exit 1
+              fi
+    
+              # ----------------------------
+              # 10) Full Switch: 100% 트래픽
+              # ----------------------------
+              echo "2단계: 100% 트래픽 전환"
+    
+              if [ "$NEW_COLOR" = "blue" ]; then
               if ! set_weight 100 0; then
-                echo "❌ 전체 전환 실패"
-                # 10%로 되돌림
-                set_weight 10 90 || true
-                exit 1
+              echo "전체 전환 실패"
+              # 10%로 되돌림
+              set_weight 10 90 || true
+              exit 1
               fi
-            else
+              else
               if ! set_weight 0 100; then
-                echo "❌ 전체 전환 실패"
-                # 10%로 되돌림
-                set_weight 90 10 || true
-                exit 1
+              echo "전체 전환 실패"
+              # 10%로 되돌림
+              set_weight 90 10 || true
+              exit 1
               fi
-            fi
-
-            rm -f "$UPSTREAM_FILE.bak"
-
-            # ----------------------------
-            # 11) 최종 검증
-            # ----------------------------
-            echo "최종 검증 중..."
-            sleep 10
-
-            if ! curl -fsS "http://localhost:${NEW_PORT}/actuator/health" > /dev/null 2>&1; then
-              echo "⚠️ 최종 Health check 실패"
-            fi
-
-            # ----------------------------
-            # 12) 기존 서비스 종료 (60초 유예)
-            # ----------------------------
-            echo "$CURRENT_COLOR 종료 대기 중 (60초 유예)..."
-            for i in {1..12}; do
+              fi
+              
+              rm -f "$UPSTREAM_FILE.bak"
+              
+              # ----------------------------
+              # 11) 최종 검증
+              # ----------------------------
+              echo "최종 검증 중..."
+              sleep 10
+              
+              if ! curl -fsS "http://localhost:${NEW_PORT}/actuator/health" > /dev/null 2>&1; then
+              echo "최종 Health check 실패"
+              fi
+              
+              # ----------------------------
+              # 12) 기존 서비스 종료 (60초 유예)
+              # ----------------------------
+              echo "$CURRENT_COLOR 종료 대기 중 (60초 유예)..."
+              for i in {1..12}; do
               echo -n "."
               sleep 5
-            done
-            echo ""
-
-            sudo docker-compose stop -t 30 "$CURRENT_SERVICE" || true
-            sudo docker-compose rm -f "$CURRENT_SERVICE" || true
-
-            # ----------------------------
-            # 13) 배포 완료
-            # ----------------------------
-            echo ""
-            echo "=========================================="
-            echo "✅ 배포 완료"
-            echo "=========================================="
-            echo "시간:       $(date '+%Y-%m-%d %H:%M:%S')"
-            echo "활성:       $NEW_COLOR ($NEW_SERVICE:$NEW_PORT)"
-            echo "종료:       $CURRENT_COLOR ($CURRENT_SERVICE)"
-            echo "단계:       10% → 100%"
-            echo "=========================================="
+              done
+              echo ""
+              
+              sudo docker-compose stop -t 30 "$CURRENT_SERVICE" || true
+              sudo docker-compose rm -f "$CURRENT_SERVICE" || true
+              
+              # ----------------------------
+              # 13) 배포 완료
+              # ----------------------------
+              echo ""
+              echo "=========================================="
+              echo "✅ 배포 완료"
+              echo "=========================================="
+              echo "시간: $(date '+%Y-%m-%d %H:%M:%S')"
+              echo "활성: $NEW_COLOR ($NEW_SERVICE:$NEW_PORT)"
+              echo "종료: $CURRENT_COLOR ($CURRENT_SERVICE)"
+              echo "단계: 10% → 100%"
+              echo "=========================================="
