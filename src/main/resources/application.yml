@@ -4,62 +4,43 @@ server:
       charset: UTF-8
       enabled: true
       force: true
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8081}
+
+swagger:
+  server-url: ${SWAGGER_SERVER_URL:http://localhost:8080}
+
 spring:
+  profiles:
+    default: local
   jackson:
     time-zone: Asia/Seoul
+
   application:
     name: shifterz
-  config:
-    import: optional:file:.env[.properties]
-  # SQL
-  jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+
   data:
     redis:
-      host: ${REDIS_HOST}
       port: 6379
       repositories:
         enabled: false
+
   cloud:
     aws:
-      credentials:
-        access-key: ${AWS_ACCESS_KEY}
-        secret-key: ${AWS_SECRET_KEY}
-      s3:
-        bucket: ${AWS_S3_BUCKET}
       region:
         static: ap-northeast-2
 
-# JWT
 jwt:
-  secret: ${JWT_SECRET_KEY}
-  access-token-validity-second: 1800 # 30분
-  refresh-token-validity-second: 604800  # 7일
+  access-token-validity-second: 1800
+  refresh-token-validity-second: 604800
 
-# Kakao
 kakao:
-  client_id: ${KAKAO_CLIENT_ID}
-  redirect_uri: ${KAKAO_REDIRECT_URI}
   url:
     token: https://kauth.kakao.com
     user: https://kapi.kakao.com
+
 apple:
-  team-id: ${APPLE_TEAM_ID}
-  client-id: ${APPLE_CLIENT_ID}
-  key-id: ${APPLE_KEY_ID}
-  private-key-path: ${APPLE_PRIVATE_KEY_PATH}
-  redirect-uri: ${APPLE_REDIRECT_URI}
   url:
     token: https://appleid.apple.com
     public-key: https://appleid.apple.com/auth/keys

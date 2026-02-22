@@ -3,6 +3,7 @@ package com.offnal.shifterz.todo.service;
 import com.offnal.shifterz.global.common.AuthService;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
+import com.offnal.shifterz.global.util.encrypt.EncryptUtil;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.organization.domain.Organization;
 import com.offnal.shifterz.organization.repository.OrganizationRepository;
@@ -28,6 +29,7 @@ public class TodoService {
 
     private final TodoRepository todoRepository;
     private final OrganizationRepository organizationRepository;
+    private final EncryptUtil encryptUtil;
 
     @Transactional
     public TodoResponseDto.TodoDto createTodo(TodoRequestDto.CreateDto request) {
@@ -39,8 +41,10 @@ public class TodoService {
                     .orElseThrow(() -> new CustomException(TodoErrorCode.ORGANIZATION_NOT_FOUND));
         }
 
-        Todo todo = TodoConverter.toEntity(request, member, organization);
-        return TodoConverter.toDto(todoRepository.save(todo));
+        String contentEnc = encryptUtil.encryptAESOrNull(request.getContent());
+
+        Todo todo = TodoConverter.toEntity(request, contentEnc, member, organization);
+        return TodoConverter.toDto(todoRepository.save(todo), encryptUtil);
     }
 
     @Transactional
@@ -54,8 +58,14 @@ public class TodoService {
             throw new CustomException(TodoErrorCode.TODO_ACCESS_DENIED);
         }
 
-        todo.update(request);
-        return TodoConverter.toDto(todo);
+        String contentEnc = null;
+        if (request.getContent() != null) {
+            contentEnc = encryptUtil.encryptAESOrNull(request.getContent());
+        }
+
+        todo.update(request, contentEnc);
+
+        return TodoConverter.toDto(todo, encryptUtil);
     }
 
 
@@ -70,8 +80,9 @@ public class TodoService {
             throw new CustomException(TodoErrorCode.TODO_ACCESS_DENIED);
         }
 
-        return TodoConverter.toDto(todo);
+        return TodoConverter.toDto(todo, encryptUtil);
     }
+
     @Transactional(readOnly = true)
     public List<TodoResponseDto.TodoDto> getTodos(String filter, Long organizationId,  LocalDate targetDate) {
         Member member = AuthService.getCurrentMember();
@@ -81,7 +92,7 @@ public class TodoService {
         List<Todo> todos = todoRepository.findTodosWithFilters(member, organizationId, unassigned, targetDate);
 
         return todos.stream()
-                .map(TodoConverter::toDto)
+            .map(t -> TodoConverter.toDto(t, encryptUtil))
                 .toList();
     }
 
@@ -98,7 +109,6 @@ public class TodoService {
 
         todoRepository.delete(todo);
     }
-
 
     @Getter
     @AllArgsConstructor
