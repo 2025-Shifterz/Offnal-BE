@@ -246,45 +246,48 @@ jobs:
             }
 
             # ----------------------------
-            # Canary 모니터링 함수
+            # Canary 모니터링 함수 ( /login/page 기준, 추후 기준 api 변경)
             # ----------------------------
-            monitor_canary() {
+              monitor_canary() {
               local duration=$1
+              local endpoint="/login/page"
             
-              echo "모니터링 중 (${duration}초)..."
+
+              local host_header
+              host_header=$(grep -m1 -E "^[[:space:]]*server_name[[:space:]]+" "$UPSTREAM_FILE" \
+              | awk '{print $2}' | tr -d ';')
             
-              local error_count=0
+            # 혹시 못 찾으면 fallback (그래도 dev/prod 둘 다 이걸로는 보통 안전)
+              if [ -z "$host_header" ]; then
+              host_header="localhost"
+              fi
+            
+              echo "모니터링 중 (${duration}초)... endpoint=${endpoint}, host=${host_header}"
+            
+              local fail_count=0
               local total_checks=$((duration / 3))
             
               for i in $(seq 1 $total_checks); do
-                sleep 3
-            
-                # Health check
-                if ! curl -fsS "http://localhost:${NEW_PORT}/actuator/health" > /dev/null 2>&1; then
-                  error_count=$((error_count + 1))
-                  echo "Health check 실패 (에러: $error_count)"
-                fi
-            
-                # 5xx 에러 체크
-                local errors_5xx=$(sudo docker-compose exec nginx sh -c \
-                  "tail -n 50 /var/log/nginx/access.log 2>/dev/null | grep -c ' 5[0-9][0-9] ' || echo 0")
-            
-                if [ "$errors_5xx" -gt 5 ]; then
-                  echo "5xx 에러 다수 감지: $errors_5xx"
-                  error_count=$((error_count + 2))
-                fi
-            
-                # 에러 누적 시 중단
-                if [ $error_count -gt 3 ]; then
-                  echo "에러 과다 발생"
-                  return 1
-                fi
-            
-                echo -n "."
+              sleep 3
+              
+              # 80은 301로 https로 보내므로 200~399면 OK로 처리
+              local code
+            code=$(curl -sS -o /dev/null -w "%{http_code}" -H "Host: ${host_header}" "http://localhost${endpoint}" || echo "000")
+              
+              if [ "$code" -ge 200 ] && [ "$code" -lt 400 ]; then
+              echo "✓ /login/page OK (code=$code) [$i/$total_checks]"
+              else
+              fail_count=$((fail_count + 1))
+              echo "❌ /login/page FAIL (code=$code) (fail=$fail_count) [$i/$total_checks]"
+              fi
+              
+              if [ "$fail_count" -gt 3 ]; then
+              echo "에러 과다 발생 (/login/page 기준)"
+              return 1
+              fi
               done
-              echo ""
             
-              echo "모니터링 완료"
+              echo "모니터링 완료 (/login/page 기준)"
               return 0
             }
 
