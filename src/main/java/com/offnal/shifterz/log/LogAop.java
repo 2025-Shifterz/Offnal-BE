@@ -89,17 +89,33 @@ public class LogAop {
         StringBuilder sb = new StringBuilder();
         for (Object arg : args) {
             if (arg == null) continue;
+
+            // ✅ multipart 요약 처리
+            if (arg instanceof org.springframework.web.multipart.MultipartFile file) {
+                sb.append("MultipartFile")
+                    .append("{name=").append(file.getName())
+                    .append(", originalFilename=").append(file.getOriginalFilename())
+                    .append(", size=").append(file.getSize())
+                    .append(", contentType=").append(file.getContentType())
+                    .append("}; ");
+                continue;
+            }
+
             sb.append(arg.getClass().getSimpleName())
-                    .append(":")
-                    .append(stringify(arg))
-                    .append("; ");
+                .append(":")
+                .append(stringify(arg))
+                .append("; ");
         }
         return sb.toString();
     }
 
     private String stringify(Object obj) {
         try {
-            return (obj != null) ? obj.toString() : "null";
+            String s = (obj != null) ? obj.toString() : "null";
+            // ✅ 너무 긴 값은 자르기 (Bedrock 응답 같은 거)
+            int MAX = 500; // 취향대로 (200~2000 추천)
+            if (s.length() > MAX) return s.substring(0, MAX) + "...(truncated:" + s.length() + ")";
+            return s;
         } catch (Exception e) {
             return "unprintable";
         }

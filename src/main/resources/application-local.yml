@@ -1,7 +1,11 @@
 spring:
   config:
     import: optional:file:.env[.properties]
-
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB      # 파일 1개 최대 크기
+      max-request-size: 10MB   # 요청 전체 최대 크기
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
@@ -48,3 +52,14 @@ encrypt:
     key: ${AES_ENCRYPTION_KEY}
   migration:
     enabled: true
+
+bedrock:
+  region: ${BEDROCK_REGION}
+  modelId: ${BEDROCK_MODEL_ID}
+  timeout:
+    connectMs: ${BEDROCK_CONNECT_MS}
+    responseMs: ${BEDROCK_RESPONSE_MS}
+    apiCallMs: ${BEDROCK_APICALL_MS}
+aws:
+  bedrock:
+    api-key: ${AWS_BEARER_TOKEN_BEDROCK:}

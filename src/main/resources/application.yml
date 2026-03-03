@@ -45,3 +45,8 @@ apple:
     token: https://appleid.apple.com
     public-key: https://appleid.apple.com/auth/keys
     revoke: https://appleid.apple.com/auth/revoke
+logging:
+  level:
+    org.springframework.web.filter: OFF
+    org.apache.catalina.filters: OFF
+    org.springframework.web.servlet.DispatcherServlet: WARN
