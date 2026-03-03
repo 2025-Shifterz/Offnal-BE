@@ -50,8 +50,12 @@ apple:
 encrypt:
   aes:
     key: ${AES_ENCRYPTION_KEY}
-  migration:
-    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
 
 bedrock:
   region: ${BEDROCK_REGION}
