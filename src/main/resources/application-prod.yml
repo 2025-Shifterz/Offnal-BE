@@ -54,3 +54,14 @@ management:
     web:
       exposure:
         include: health
+
+bedrock:
+  region: ${BEDROCK_REGION}
+  modelId: ${BEDROCK_MODEL_ID}
+  timeout:
+    connectMs: ${BEDROCK_CONNECT_MS}
+    responseMs: ${BEDROCK_RESPONSE_MS}
+    apiCallMs: ${BEDROCK_APICALL_MS}
+aws:
+  bedrock:
+    api-key: ${AWS_BEARER_TOKEN_BEDROCK:}
