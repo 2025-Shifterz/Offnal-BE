@@ -1,4 +1,5 @@
 server:
+  shutdown: graceful
   servlet:
     encoding:
       charset: UTF-8
@@ -12,6 +13,8 @@ swagger:
   server-url: ${SWAGGER_SERVER_URL:http://localhost:8080}
 
 spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
   profiles:
     default: local
   jackson:
