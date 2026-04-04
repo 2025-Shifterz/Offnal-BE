@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -171,7 +172,7 @@ public class OauthLoginController {
     )
     @PostMapping("/login/kakao")
     public SuccessResponse<AuthResponseDto> kakaoNativeLogin(
-            @RequestBody KakaoLoginRequest request
+            @RequestBody @Valid KakaoLoginRequest request
     ){
         AuthResponseDto response = loginService.loginWithKakaoNative(request);
         return SuccessResponse.success(SuccessCode.LOGIN_SUCCESS, response);

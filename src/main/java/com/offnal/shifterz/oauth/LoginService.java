@@ -110,7 +110,12 @@ public class LoginService {
     }
 
     public AuthResponseDto loginWithKakaoNative(KakaoLoginRequest request) {
-        KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(request.getAccessToken());
+        KakaoUserInfoResponseDto userInfo;
+        try {
+            userInfo = kakaoService.getUserInfo(request.getAccessToken());
+        } catch (Exception e) {
+            throw new CustomException(LoginErrorCode.INVALID_SOCIAL_TOKEN);
+        }
         return handleKakaoLogin(userInfo);
     }
 
