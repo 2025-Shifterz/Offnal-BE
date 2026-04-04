@@ -11,6 +11,7 @@ import com.offnal.shifterz.oauth.apple.AppleAuthTokenResponse;
 import com.offnal.shifterz.oauth.apple.AppleLoginRequest;
 import com.offnal.shifterz.oauth.apple.AppleService;
 import com.offnal.shifterz.oauth.apple.AppleUserInfoResponseDto;
+import com.offnal.shifterz.oauth.kakao.KakaoLoginRequest;
 import com.offnal.shifterz.oauth.kakao.KakaoService;
 import com.offnal.shifterz.oauth.kakao.KakaoUserInfoResponseDto;
 import lombok.AllArgsConstructor;
@@ -106,6 +107,11 @@ public class LoginService {
         String jwtRefreshToken = jwtTokenProvider.createRefreshToken(result.getId());
 
         return AuthResponseDto.from(result, jwtAccessToken, jwtRefreshToken);
+    }
+
+    public AuthResponseDto loginWithKakaoNative(KakaoLoginRequest request) {
+        KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(request.getAccessToken());
+        return handleKakaoLogin(userInfo);
     }
 
     @Getter
