@@ -74,7 +74,10 @@ public class LogAop {
     @AfterThrowing(value = "controllerPointcut() || servicePointcut()", throwing = "ex")
     public void logException(JoinPoint joinPoint, Exception ex) {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-        Member member = AuthService.getCurrentMember();
+        Member member = null;
+        try {
+            member = AuthService.getCurrentMember();
+        } catch (Exception ignored) {}
 
         String msg = "[Error] in " + method.getName() + " - " + ex.getMessage();
 

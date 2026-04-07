@@ -10,11 +10,13 @@ import com.offnal.shifterz.global.util.AuthResponseUtil;
 import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.dto.AuthResponseDto;
 import com.offnal.shifterz.oauth.apple.AppleLoginRequest;
+import com.offnal.shifterz.oauth.kakao.KakaoLoginRequest;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -162,5 +164,17 @@ public class OauthLoginController {
         return SuccessResponse.success(SuccessCode.LOGIN_SUCCESS, response);
     }
 
-
+    @Operation(
+            summary = "카카오 로그인 (네이티브)",
+            description = """
+                     Kakao Native SDK를 통해 획득한 accessToken을 이용하여 카카오 로그인 또는 신규 회원가입을 처리하는 API입니다.
+                    """
+    )
+    @PostMapping("/login/kakao")
+    public SuccessResponse<AuthResponseDto> kakaoNativeLogin(
+            @RequestBody @Valid KakaoLoginRequest request
+    ){
+        AuthResponseDto response = loginService.loginWithKakaoNative(request);
+        return SuccessResponse.success(SuccessCode.LOGIN_SUCCESS, response);
+    }
 }
