@@ -1,7 +1,10 @@
 package com.offnal.shifterz.oauth.kakao;
 
 import com.offnal.shifterz.global.config.KakaoProperties;
+import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.service.SocialService;
+import com.offnal.shifterz.oauth.OAuthProvider;
+import com.offnal.shifterz.oauth.OAuthUserInfoDto;
 import com.offnal.shifterz.oauth.TokenResponseDto;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +19,26 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class KakaoService implements SocialService<KakaoUserInfoResponseDto>  {
+public class KakaoService implements SocialService<KakaoUserInfoResponseDto>, OAuthProvider {
 
     private final KakaoProperties kakaoProperties;
+
+    @Override
+    public Provider getProviderType(){
+        return Provider.KAKAO;
+    }
+
+    @Override
+    public OAuthUserInfoDto toOAuthUserInfoDto(Object rawUserInfoDto) {
+        KakaoUserInfoResponseDto dto = (KakaoUserInfoResponseDto) rawUserInfoDto;
+
+        return OAuthUserInfoDto.builder()
+                .providerId(String.valueOf(dto.getId()))
+                .email(dto.getKakaoAccount().getEmail())
+                .nickname(dto.getKakaoAccount().getProfile().getNickName())
+                .profileImageUrl(dto.getKakaoAccount().getProfile().getProfileImageUrl())
+                .build();
+    }
 
     @Override
     public String getAccessToken(String code) {

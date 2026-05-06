@@ -9,8 +9,12 @@ import com.offnal.shifterz.global.config.AppleProperties;
 import com.offnal.shifterz.global.exception.CustomException;
 import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.member.domain.Member;
+import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.service.AppleSocialService;
 import java.util.Objects;
+
+import com.offnal.shifterz.oauth.OAuthProvider;
+import com.offnal.shifterz.oauth.OAuthUserInfoDto;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -51,7 +55,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AppleService implements AppleSocialService {
+public class AppleService implements AppleSocialService, OAuthProvider {
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -64,6 +68,8 @@ public class AppleService implements AppleSocialService {
 
     private Map<String, PublicKey> cachedKeys = new ConcurrentHashMap<>();
     private long lastFetchTime = 0L;
+
+
 
 
     @Override
@@ -252,6 +258,28 @@ public class AppleService implements AppleSocialService {
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new CustomException(AppleErrorCode.APPLE_REVOKE_FAIL);
         }
+    }
+
+    @Override
+    public Provider getProviderType() {
+        return Provider.APPLE;
+    }
+
+    @Override
+    public OAuthUserInfoDto toOAuthUserInfoDto(Object rawUserInfoDto) {
+        AppleUserInfoResponseDto dto = (AppleUserInfoResponseDto) rawUserInfoDto;
+        return OAuthUserInfoDto.builder()
+                .providerId(dto.getSub())
+                .email(dto.getEmail())
+                .build();
+    }
+
+    public OAuthUserInfoDto toOAuthUserInfo(AppleUserInfoResponseDto dto, String appleRefreshToken) {
+        return OAuthUserInfoDto.builder()
+                .providerId(dto.getSub())
+                .email(dto.getEmail())
+                .appleRefreshToken(appleRefreshToken)
+                .build();
     }
 
     @Getter
