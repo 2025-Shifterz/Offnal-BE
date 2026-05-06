@@ -11,17 +11,14 @@ import com.offnal.shifterz.global.exception.ErrorReason;
 import com.offnal.shifterz.member.domain.Member;
 import com.offnal.shifterz.member.domain.Provider;
 import com.offnal.shifterz.member.service.AppleSocialService;
-import java.util.Objects;
 
 import com.offnal.shifterz.oauth.OAuthProvider;
 import com.offnal.shifterz.oauth.OAuthUserInfoDto;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -31,7 +28,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.time.Instant;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -40,8 +36,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -274,12 +268,26 @@ public class AppleService implements AppleSocialService, OAuthProvider {
                 .build();
     }
 
-    public OAuthUserInfoDto toOAuthUserInfo(AppleUserInfoResponseDto dto, String appleRefreshToken) {
+    public OAuthUserInfoDto toOAuthUserInfoDto(AppleLoginRequest request,
+                                         AppleUserInfoResponseDto dto,
+                                         String appleRefreshToken) {
+        String nickname = resolveNickname(request);
+        String email = request.getEmail() != null ? request.getEmail() : dto.getEmail();
+
         return OAuthUserInfoDto.builder()
                 .providerId(dto.getSub())
-                .email(dto.getEmail())
+                .email(email)
+                .nickname(nickname)
                 .appleRefreshToken(appleRefreshToken)
                 .build();
+    }
+
+    private String resolveNickname(AppleLoginRequest request) {
+        if (request.getFullName() != null) {
+            String name = request.getFullName().getFullName();
+            if (name != null && !name.isBlank()) return name;
+        }
+        return "Apple User";
     }
 
     @Getter
